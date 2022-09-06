@@ -1,9 +1,9 @@
-import React from 'react';
-import { Button as NativeBaseButton, IButtonProps, Heading } from 'native-base';
+import React from "react";
+import { Button as NativeBaseButton, IButtonProps, Heading } from "native-base";
 
 type Props = IButtonProps & {
   title: string;
-}
+};
 
 export function ButtonFull({ title, ...rest }: Props) {
   return (
@@ -15,11 +15,7 @@ export function ButtonFull({ title, ...rest }: Props) {
       borderRadius={6}
       {...rest}
     >
-      <Heading
-        color="white"
-        fontSize={16}
-        fontFamily="Montserrat_300Light"
-      >
+      <Heading color="white" fontSize={16} fontFamily="Montserrat_300Light">
         {title}
       </Heading>
     </NativeBaseButton>

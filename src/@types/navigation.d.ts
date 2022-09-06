@@ -5,7 +5,7 @@ export declare global {
       stepName: undefined;
       stepEmail: undefined;
       stepPassword: undefined;
-      stepConfirmPassword: undefined
+      stepConfirmPassword: undefined;
     }
   }
 }

@@ -1,19 +1,17 @@
-import React from 'react';
+import React from "react";
 import { Box, VStack } from "native-base";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
-import LogoPrimary from '../../assets/logo_primary.svg'
+import B2K from "../../assets/logo.svg";
 
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
-import { ButtonFull } from '../../components/ButtonFull';
+import { Input } from "../../components/Input";
+import { Button } from "../../components/Button";
+import { ButtonFull } from "../../components/ButtonFull";
 
 export default function SignIn() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => {
-    navigation.navigate("stepName");
-  }
+  const handleNextPage = () => navigation.navigate("stepName");
 
   return (
     <VStack
@@ -24,18 +22,18 @@ export default function SignIn() {
       bg="blue.700"
     >
       <Box width="full" px={8} alignItems="center" mt={122}>
-        <LogoPrimary />
+        <B2K />
 
         <Input placeholder="E-mail" mb={8} mt={90} />
 
         <Input placeholder="Senha" secureTextEntry />
 
-        <Button title='Entrar' mt={16} w={188} h={52} />
+        <Button title="Entrar" mt={16} w={188} h={52} />
       </Box>
 
-      <Box w="full"  >
-        <ButtonFull title='CRIAR CONTA' onPress={handleNextPage} />
+      <Box w="full">
+        <ButtonFull title="CRIAR CONTA" onPress={handleNextPage} />
       </Box>
     </VStack>
-  )
+  );
 }

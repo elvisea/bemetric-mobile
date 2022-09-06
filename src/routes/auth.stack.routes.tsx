@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import SignIn from '../screens/AuthScreens/SignIn';
-import StepName from '../screens/AuthScreens/CreateAnAccount/StepName';
-import StepEmail from '../screens/AuthScreens/CreateAnAccount/StepEmail';
-import StepPassword from '../screens/AuthScreens/CreateAnAccount/StepPassword';
-import StepConfirmPassword from '../screens/AuthScreens/CreateAnAccount/StepConfirmPassword';
+import SignIn from "../screens/AuthScreens/SignIn";
+import StepName from "../screens/AuthScreens/CreateAnAccount/StepName";
+import StepEmail from "../screens/AuthScreens/CreateAnAccount/StepEmail";
+import StepPassword from "../screens/AuthScreens/CreateAnAccount/StepPassword";
+import StepConfirmPassword from "../screens/AuthScreens/CreateAnAccount/StepConfirmPassword";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -13,7 +13,7 @@ export default function AuthStackRoutes() {
   return (
     <>
       <Navigator
-        initialRouteName='signIn'
+        initialRouteName="signIn"
         screenOptions={{ headerShown: false, animation: "none" }}
       >
         <Screen name="signIn" component={SignIn} />
