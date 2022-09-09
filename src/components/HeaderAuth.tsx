@@ -1,22 +1,26 @@
 import React from "react";
 import { CaretLeft } from "phosphor-react-native";
-import { Box, Heading, HStack, IconButton } from "native-base";
+import { Box, Heading, IconButton } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
 export function HeaderAuth() {
   const navigation = useNavigation();
 
-  function handleGoBack() {
-    navigation.goBack();
-  }
+  const handleGoBack = () => navigation.goBack();
 
   return (
-    <HStack w="full" px={8} marginTop={8}>
+    <Box
+      w="full"
+      h={76}
+      px={8}
+      bg="blue.700"
+      marginTop={8}
+      alignItems="center"
+      justifyContent="center"
+    >
       <IconButton icon={<CaretLeft color="white" />} onPress={handleGoBack} />
 
-      <Box flex={1} alignItems="center">
-        <Heading color="white">Bemetric</Heading>
-      </Box>
-    </HStack>
+
+    </Box>
   );
 }

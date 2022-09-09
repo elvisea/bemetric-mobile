@@ -2,9 +2,9 @@ import React from "react";
 import { Box, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
+import { Header } from "../../../components/Header";
 import { Input } from "../../../components/Input";
 import { ButtonFull } from "../../../components/ButtonFull";
-// import { HeaderAuth } from '../../../components/HeaderAuth';
 
 export default function StepConfirmPassword() {
   const navigation = useNavigation();
@@ -19,8 +19,8 @@ export default function StepConfirmPassword() {
       alignItems="center"
       justifyContent="space-between"
     >
-      {/* <HeaderAuth /> */}
 
+      <Header />
       <Box width="full" px={8} alignItems="center">
         <Input placeholder="Confirme sua senha" secureTextEntry />
       </Box>

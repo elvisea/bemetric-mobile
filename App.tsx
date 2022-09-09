@@ -16,6 +16,7 @@ import {
 import { Routes } from "./src/routes";
 import { THEME } from "./src/theme/theme";
 import { Loading } from "./src/components/Loading";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function App() {
 
@@ -29,7 +30,9 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={THEME}>
-      {fontsLoaded ? <Routes /> : <Loading />}
+      <SafeAreaView style={{ flex: 1 }}>
+        {fontsLoaded ? <Routes /> : <Loading />}
+      </SafeAreaView>
     </NativeBaseProvider>
   );
 }
