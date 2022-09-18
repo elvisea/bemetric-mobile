@@ -1,6 +1,6 @@
 import React from "react";
 import { CaretLeft } from "phosphor-react-native";
-import { Box, Heading, IconButton } from "native-base";
+import { Box, IconButton } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
 export function HeaderAuth() {
@@ -19,8 +19,6 @@ export function HeaderAuth() {
       justifyContent="center"
     >
       <IconButton icon={<CaretLeft color="white" />} onPress={handleGoBack} />
-
-
     </Box>
   );
 }
