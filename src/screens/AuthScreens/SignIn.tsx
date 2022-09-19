@@ -2,11 +2,11 @@ import React from "react";
 import { Box, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import B2K from "../../assets/logo.svg";
+import B2K from "@assets/logo.svg";
 
-import { Input } from "../../components/Input";
-import { Button } from "../../components/Button";
-import { ButtonFull } from "../../components/ButtonFull";
+import { Input } from "@components/Input";
+import { Button } from "@components/Button";
+import { ButtonFull } from "@components/ButtonFull";
 
 export default function SignIn() {
   const navigation = useNavigation();

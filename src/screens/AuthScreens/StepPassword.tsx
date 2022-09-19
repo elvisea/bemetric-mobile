@@ -2,14 +2,14 @@ import React from "react";
 import { Box, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import { Header } from "../../../components/Header";
-import { Input } from "../../../components/Input";
-import { ButtonFull } from "../../../components/ButtonFull";
+import { Input } from "@components/Input";
+import { Header } from "@components/Header";
+import { ButtonFull } from "@components/ButtonFull";
 
-export default function StepEmail() {
+export default function StepPassword() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("stepPassword");
+  const handleNextPage = () => navigation.navigate("stepConfirmPassword");
 
   return (
     <VStack
@@ -19,10 +19,9 @@ export default function StepEmail() {
       alignItems="center"
       justifyContent="space-between"
     >
-
       <Header />
       <Box width="full" px={8} alignItems="center">
-        <Input placeholder="E-mail" />
+        <Input placeholder="Crie uma senha" secureTextEntry />
       </Box>
 
       <ButtonFull title="Avançar" onPress={handleNextPage} />

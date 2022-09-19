@@ -1,9 +1,9 @@
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
-import { Container } from './styles';
-import { IconButton } from 'native-base';
+import { Container } from "./styles";
+import { IconButton } from "native-base";
 
 export function Header() {
   const navigation = useNavigation();
@@ -13,7 +13,7 @@ export function Header() {
   return (
     <Container>
       <IconButton
-        icon={<Feather name='chevron-left' size={24} color="#FFF" />}
+        icon={<Feather name="chevron-left" size={24} color="#FFF" />}
         onPress={handleGoBack}
       />
     </Container>

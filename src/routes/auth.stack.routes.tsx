@@ -2,18 +2,17 @@ import * as React from "react";
 import { StatusBar } from "expo-status-bar";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import SignIn from "../screens/AuthScreens/SignIn";
-import StepName from "../screens/AuthScreens/CreateAnAccount/StepName";
-import StepEmail from "../screens/AuthScreens/CreateAnAccount/StepEmail";
-import StepPassword from "../screens/AuthScreens/CreateAnAccount/StepPassword";
-import StepConfirmPassword from "../screens/AuthScreens/CreateAnAccount/StepConfirmPassword";
+import SignIn from "@screens/AuthScreens/SignIn";
+import StepName from "@screens/AuthScreens/StepName";
+import StepEmail from "@screens/AuthScreens/StepEmail";
+import StepPassword from "@screens/AuthScreens/StepPassword";
+import StepConfirmPassword from "@screens/AuthScreens/StepConfirmPassword";
 
-import { THEME } from "../theme/theme";
+import { THEME } from "@theme/theme";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
 export default function AuthStackRoutes() {
-
   return (
     <>
       <StatusBar backgroundColor={THEME.colors.blue[700]} />
