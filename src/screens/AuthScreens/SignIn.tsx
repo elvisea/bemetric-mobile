@@ -2,7 +2,7 @@ import React from "react";
 import { Box, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import B2K from "@assets/logo.svg";
+import Logo from "@assets/logo.svg";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
@@ -22,7 +22,7 @@ export default function SignIn() {
       bg="blue.700"
     >
       <Box width="full" px={8} alignItems="center" mt={122}>
-        <B2K />
+        <Logo />
 
         <Input placeholder="E-mail" mb={8} mt={90} />
 
