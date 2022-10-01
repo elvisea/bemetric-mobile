@@ -1,17 +1,18 @@
-import React from "react";
-import { Box, VStack } from "native-base";
-import { useNavigation } from "@react-navigation/native";
+import React from 'react';
+import { Box, VStack } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
 
-import Logo from "@assets/logo.svg";
+import Logo from '@assets/logo.svg';
 
-import { Input } from "@components/Input";
-import { Button } from "@components/Button";
-import { ButtonFull } from "@components/ButtonFull";
+import { Input } from '@components/Input';
+import { Button } from '@components/Button';
+import { ButtonFull } from '@components/ButtonFull';
 
 export default function SignIn() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("stepName");
+  const handleLogin = () => navigation.navigate('welcome');
+  const handleNextPage = () => navigation.navigate('stepName');
 
   return (
     <VStack
@@ -28,7 +29,7 @@ export default function SignIn() {
 
         <Input placeholder="Senha" secureTextEntry />
 
-        <Button title="Entrar" mt={16} w={188} h={52} />
+        <Button title="Entrar" mt={16} w={188} h={52} onPress={handleLogin} />
       </Box>
 
       <Box w="full">

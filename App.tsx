@@ -1,5 +1,9 @@
+import 'react-native-gesture-handler';
+
 import React from "react";
+
 import { NativeBaseProvider } from "native-base";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   useFonts,
@@ -13,10 +17,12 @@ import {
   Montserrat_300Light
 } from '@expo-google-fonts/montserrat';
 
+import { CustomerProvider } from "./src/hooks/customer"
+
 import { Routes } from "./src/routes";
 import { THEME } from "./src/theme/theme";
+
 import { Loading } from "./src/components/Loading";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function App() {
 
@@ -31,7 +37,9 @@ export default function App() {
   return (
     <NativeBaseProvider theme={THEME}>
       <SafeAreaView style={{ flex: 1 }}>
-        {fontsLoaded ? <Routes /> : <Loading />}
+        <CustomerProvider>
+          {fontsLoaded ? <Routes /> : <Loading />}
+        </CustomerProvider>
       </SafeAreaView>
     </NativeBaseProvider>
   );

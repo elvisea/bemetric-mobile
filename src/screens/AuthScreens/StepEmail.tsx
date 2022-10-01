@@ -1,15 +1,15 @@
-import React from "react";
-import { Box, VStack } from "native-base";
-import { useNavigation } from "@react-navigation/native";
+import React from 'react';
+import { Box, VStack } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
 
-import { Input } from "@components/Input";
-import { Header } from "@components/Header";
-import { ButtonFull } from "@components/ButtonFull";
+import { Input } from '@components/Input';
+import { Header } from '@components/Header';
+import { ButtonFull } from '@components/ButtonFull';
 
 export default function StepEmail() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("stepPassword");
+  const handleNextPage = () => navigation.navigate('stepPassword');
 
   return (
     <VStack

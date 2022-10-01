@@ -1,9 +1,9 @@
-import React from "react";
-import { useNavigation } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
+import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { Feather } from '@expo/vector-icons';
 
-import { Container } from "./styles";
-import { IconButton } from "native-base";
+import { Container } from './styles';
+import { IconButton } from 'native-base';
 
 export function Header() {
   const navigation = useNavigation();
