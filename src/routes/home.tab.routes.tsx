@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { StatusBar } from 'expo-status-bar';
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from '@expo/vector-icons';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -71,13 +71,12 @@ export default function HomeTabRoutes() {
 
 const styles = StyleSheet.create({
   tabBarLabelStyle: {
-    marginBottom: 10
+    marginBottom: 10,
   },
   tabBarIconStyle: {
-    marginBottom: 4
+    marginBottom: 4,
   },
   tabBarStyle: {
     height: 80,
-  }
-})
-
+  },
+});

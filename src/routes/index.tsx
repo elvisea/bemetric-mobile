@@ -8,7 +8,7 @@ import { useCustomer } from '@hooks/customer';
 
 const Routes = () => {
   const { customer } = useCustomer();
-  console.log("CUSTOMER: ", customer);
+  console.log('CUSTOMER: ', customer);
   return (
     <NavigationContainer>
       {!customer ? <AppDrawerRoutes /> : <AuthStackRoutes />}

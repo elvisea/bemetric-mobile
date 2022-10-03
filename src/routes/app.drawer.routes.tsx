@@ -14,31 +14,29 @@ export default function AppDrawerRoutes() {
   return (
     <>
       <StatusBar />
-      <Navigator>
-        {/* <Navigator screenOptions={{ headerShown: false }}> */}
+      <Navigator screenOptions={{ headerShown: false }}>
         <Screen
           name="HomeTabRoutes"
-          options={{ drawerLabel: "Home" }}
+          options={{ drawerLabel: 'Home' }}
           component={HomeTabRoutes}
         />
 
         <Screen
           name="ProfileScreen"
-          options={{ drawerLabel: "Detalhes da Conta" }}
+          options={{ drawerLabel: 'Detalhes da Conta' }}
           component={ProfileScreen}
         />
         <Screen
           name="ChangeCustomerScreen"
-          options={{ drawerLabel: "Alterar Cliente" }}
+          options={{ drawerLabel: 'Alterar Cliente' }}
           component={ChangeCustomerScreen}
         />
         <Screen
           name="SupportServiceScreen"
-          options={{ drawerLabel: "Atendimento de Suporte" }}
+          options={{ drawerLabel: 'Atendimento de Suporte' }}
           component={SupportServiceScreen}
         />
       </Navigator>
     </>
   );
 }
-

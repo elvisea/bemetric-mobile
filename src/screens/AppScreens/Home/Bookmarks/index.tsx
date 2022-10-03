@@ -1,9 +1,18 @@
-import { Text, View } from "react-native";
+import { LayoutDefault } from '@components/LayoutDefault';
+
+import { useNavigation, DrawerActions } from '@react-navigation/native';
+
+import { THEME } from '@theme/theme';
 
 export default function BookmarksScreen() {
+  const navigation = useNavigation();
+  const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Bookmarks!</Text>
-    </View>
+    <LayoutDefault
+      bg={THEME.colors.shape}
+      icon="menu"
+      functionIcon={handleMenu}
+    />
   );
 }

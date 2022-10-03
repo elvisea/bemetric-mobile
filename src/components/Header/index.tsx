@@ -1,21 +1,18 @@
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 
-import { Container } from './styles';
+import { Container, Icon } from './styles';
 import { IconButton } from 'native-base';
 
-export function Header() {
-  const navigation = useNavigation();
+type Props = {
+  icon: keyof typeof Feather.glyphMap;
+  functionIcon: () => void;
+};
 
-  const handleGoBack = () => navigation.goBack();
-
+export function Header({ icon, functionIcon }: Props) {
   return (
     <Container>
-      <IconButton
-        icon={<Feather name="chevron-left" size={24} color="#FFF" />}
-        onPress={handleGoBack}
-      />
+      <IconButton icon={<Icon name={icon} />} onPress={functionIcon} />
     </Container>
   );
 }

@@ -24,7 +24,8 @@ export default function Welcome() {
       alignItems="center"
       justifyContent="flex-start"
     >
-      <Header />
+      <Header icon="chevron-left" functionIcon={() => navigation.goBack()} />
+
       <HeaderWelcome name="Paulo Castro" />
       <Box
         px={8}
