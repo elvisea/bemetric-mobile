@@ -8,10 +8,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { THEME } from '@theme/theme';
 
-import BookmarksScreen from '@screens/AppScreens/Home/Bookmarks';
 import EquipamentScreen from '@screens/AppScreens/Home/Equipament';
-import ExchangeScreen from '@screens/AppScreens/Home/Exchange';
 import IncludeScreen from '@screens/AppScreens/Home/Include';
+import ExchangeScreen from '@screens/AppScreens/Home/Exchange';
+import BookmarksScreen from '@screens/AppScreens/Home/Bookmarks';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 

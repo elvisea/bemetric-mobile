@@ -30,6 +30,9 @@
       "@interfaces/*": [
         "./src/interfaces/*"
       ],
+      "@fakes/*": [
+        "./src/fakes/*"
+      ],
     }
   },
   "extends": "expo/tsconfig.base"

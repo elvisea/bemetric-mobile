@@ -9,6 +9,7 @@ import {
   useFonts,
   Roboto_500Medium,
   Roboto_700Bold,
+  Roboto_400Regular
 } from '@expo-google-fonts/roboto';
 
 import {
@@ -32,6 +33,7 @@ export default function App() {
     Montserrat_300Light,
     Roboto_500Medium,
     Roboto_700Bold,
+    Roboto_400Regular
   });
 
   return (

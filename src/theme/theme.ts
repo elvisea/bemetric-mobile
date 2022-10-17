@@ -35,6 +35,7 @@ export const THEME = extendTheme({
   },
   fonts: {
     Roboto_700Bold: 'Roboto_700Bold',
+    Roboto_400Regular: 'Roboto_400Regular',
     Roboto_500Medium: 'Roboto_500Medium',
     Montserrat_300Light: 'Montserrat_300Light',
     Montserrat_400Regular: 'Montserrat_400Regular',

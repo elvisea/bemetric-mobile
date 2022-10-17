@@ -20,7 +20,6 @@ export default function AppDrawerRoutes() {
           options={{ drawerLabel: 'Home' }}
           component={HomeTabRoutes}
         />
-
         <Screen
           name="ProfileScreen"
           options={{ drawerLabel: 'Detalhes da Conta' }}
