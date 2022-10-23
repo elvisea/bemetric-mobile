@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
-import { Box, VStack, Select, FormControl, Heading } from 'native-base';
+import React from 'react';
 import { useNavigation } from '@react-navigation/native';
+
 import { Feather } from '@expo/vector-icons';
+import { Box, VStack, Select, FormControl, Heading } from 'native-base';
 
 import { THEME } from '@theme/theme';
+import { useCustomer } from '@hooks/customer';
 
 import { Header } from '@components/Header';
 import { ButtonFull } from '@components/ButtonFull';
 import { HeaderWelcome } from '@components/HeaderWelcome';
 
-export default function Welcome() {
+export function Clients() {
+  const { addCustomer } = useCustomer();
   const navigation = useNavigation();
 
-  const [service, setService] = useState('');
+  const handleNextPage = () => navigation.navigate('Email');
 
-  const handleNextPage = () => navigation.navigate('stepEmail');
+  const handleAddCustomer = (client: string) => {
+    addCustomer(client);
+  }
 
   return (
     <VStack
@@ -62,6 +67,7 @@ export default function Welcome() {
             borderRightWidth={0}
             borderRadius={0}
             borderBottomColor="blue.700"
+            onValueChange={(client) => handleAddCustomer(client)}
           >
             <Select.Item label="UX Research" value="ux" />
             <Select.Item label="Web Development" value="web" />

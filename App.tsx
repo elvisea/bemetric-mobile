@@ -18,12 +18,13 @@ import {
   Montserrat_300Light
 } from '@expo-google-fonts/montserrat';
 
-import { CustomerProvider } from "./src/hooks/customer"
+import { AuthProvider } from '@hooks/auth';
+import { CustomerProvider } from "@hooks/customer"
 
 import { Routes } from "./src/routes";
 import { THEME } from "./src/theme/theme";
 
-import { Loading } from "./src/components/Loading";
+import { Loading } from "@components/Loading";
 
 export default function App() {
 
@@ -39,9 +40,11 @@ export default function App() {
   return (
     <NativeBaseProvider theme={THEME}>
       <SafeAreaView style={{ flex: 1 }}>
-        <CustomerProvider>
-          {fontsLoaded ? <Routes /> : <Loading />}
-        </CustomerProvider>
+        <AuthProvider>
+          <CustomerProvider>
+            {fontsLoaded ? <Routes /> : <Loading />}
+          </CustomerProvider>
+        </AuthProvider>
       </SafeAreaView>
     </NativeBaseProvider>
   );

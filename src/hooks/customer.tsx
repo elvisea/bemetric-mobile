@@ -1,7 +1,19 @@
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect
+} from 'react';
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { CUSTOMER } from '@constants/storage';
 
 type CustomerContextData = {
-  customer: boolean;
+  customer: string | null;
+  addCustomer: (customer: string) => Promise<void>;
+  resetCustomerState: () => void;
 };
 
 type CustomerProviderProps = {
@@ -11,12 +23,30 @@ type CustomerProviderProps = {
 export const CustomerContext = createContext({} as CustomerContextData);
 
 const CustomerProvider = ({ children }: CustomerProviderProps) => {
-  const [customer, setCustomer] = useState(false);
+  const [customer, setCustomer] = useState<string | null>(null);
+
+  const addCustomer = async (customer: string) => {
+    setCustomer(customer);
+    await AsyncStorage.setItem(CUSTOMER, customer);
+  };
+
+  const resetCustomerState = () => setCustomer(null);
+
+  const loadCustomerStorage = async () => {
+    const storage = await AsyncStorage.getItem(CUSTOMER);
+    if (storage) setCustomer(storage);
+  };
+
+  useEffect(() => {
+    loadCustomerStorage();
+  }, [])
 
   return (
     <CustomerContext.Provider
       value={{
         customer,
+        addCustomer,
+        resetCustomerState
       }}
     >
       {children}

@@ -8,10 +8,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { THEME } from '@theme/theme';
 
-import EquipamentScreen from '@screens/AppScreens/Home/Equipament';
-import IncludeScreen from '@screens/AppScreens/Home/Include';
-import ExchangeScreen from '@screens/AppScreens/Home/Exchange';
-import BookmarksScreen from '@screens/AppScreens/Home/Bookmarks';
+import HomeStackRoutes from './home.stack.routes';
+
+import { IncludeScreen } from '@screens/AppScreens/Home/Include';
+import { ExchangeScreen } from '@screens/AppScreens/Home/Exchange';
+import { BookmarksScreen } from '@screens/AppScreens/Home/Bookmarks';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -30,7 +31,7 @@ export default function HomeTabRoutes() {
       >
         <Screen
           name="Equipament"
-          component={EquipamentScreen}
+          component={HomeStackRoutes}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="settings" color={color} size={size} />

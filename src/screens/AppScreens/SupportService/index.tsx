@@ -4,7 +4,7 @@ import { useNavigation, DrawerActions } from '@react-navigation/native';
 
 import { THEME } from '@theme/theme';
 
-export default function SupportServiceScreen() {
+export function SupportServiceScreen() {
   const navigation = useNavigation();
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 

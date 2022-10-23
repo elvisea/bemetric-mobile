@@ -6,10 +6,10 @@ import { Input } from '@components/Input';
 import { ButtonFull } from '@components/ButtonFull';
 import { LayoutDefault } from '@components/LayoutDefault';
 
-export default function StepPassword() {
+export function Password() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate('stepConfirmPassword');
+  const handleNextPage = () => navigation.navigate('ConfirmPassword');
 
   return (
     <LayoutDefault

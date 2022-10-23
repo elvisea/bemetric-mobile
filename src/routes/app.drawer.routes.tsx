@@ -4,9 +4,9 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import HomeTabRoutes from './home.tab.routes';
 
-import ProfileScreen from '@screens/AppScreens/Profile';
-import ChangeCustomerScreen from '@screens/AppScreens/ChangeCustomer';
-import SupportServiceScreen from '@screens/AppScreens/SupportService';
+import { ProfileScreen } from '@screens/AppScreens/Profile';
+import { ChangeCustomerScreen } from '@screens/AppScreens/ChangeCustomer';
+import { SupportServiceScreen } from '@screens/AppScreens/SupportService';
 
 const { Navigator, Screen } = createDrawerNavigator();
 

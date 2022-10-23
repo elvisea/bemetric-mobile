@@ -33,6 +33,12 @@
       "@fakes/*": [
         "./src/fakes/*"
       ],
+      "@services/*": [
+        "./src/services/*"
+      ],
+      "@constants/*": [
+        "./src/constants/*"
+      ],
     }
   },
   "extends": "expo/tsconfig.base"

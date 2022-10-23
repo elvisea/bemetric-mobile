@@ -19,6 +19,8 @@ module.exports = function (api) {
             '@hooks': './src/hooks',
             '@interfaces': './src/interfaces',
             '@fakes': './src/fakes',
+            '@services': './src/services',
+            '@constants': './src/constants',
           }
         }
       ]

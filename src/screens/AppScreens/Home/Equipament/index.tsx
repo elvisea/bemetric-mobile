@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { FlatList } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Heading, VStack } from 'native-base';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -13,12 +16,29 @@ import { AccordionSession } from '@components/AccordionSession';
 import { THEME } from '@theme/theme';
 import { clients } from '@fakes/clients';
 
-export default function EquipamentScreen() {
+import { useAuth } from '@hooks/auth';
+import { useCustomer } from '@hooks/customer';
+
+import { CUSTOMER, TOKEN, USER } from '@constants/storage';
+
+export function EquipamentScreen() {
   const navigation = useNavigation();
+
+  const { resetUserState } = useAuth();
+  const { resetCustomerState } = useCustomer();
 
   const [expanded, setExpanded] = useState("");
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+
+  const clearStorage = async () => {
+    await AsyncStorage.removeItem(USER);
+    await AsyncStorage.removeItem(CUSTOMER);
+    await AsyncStorage.removeItem(TOKEN);
+
+    resetUserState();
+    resetCustomerState();
+  };
 
   const handleExpanded = (item: string) => {
     if (item === expanded) {
@@ -44,11 +64,13 @@ export default function EquipamentScreen() {
         pt={`${RFValue(16)}px`}
       >
 
-        <Heading
-          style={{ fontSize: 20, marginLeft: 8, marginBottom: 12 }}
-        >
-          Clientes
-        </Heading>
+        <TouchableOpacity onPress={clearStorage}>
+          <Heading
+            style={{ fontSize: 20, marginLeft: 8, marginBottom: 12 }}
+          >
+            Grupos
+          </Heading>
+        </TouchableOpacity>
 
         <FlatList
           data={clients}
@@ -71,7 +93,11 @@ export default function EquipamentScreen() {
                   expanded={false}
                   title={equipament.title}
                   description={equipament.description}
-                  onPress={() => console.log("equipament =>", equipament)}
+                  onPress={() => console.log("Próxima Pagina =>")}
+                // onPress={() => navigation.navigate("Equipament")}
+                // onPress={() => navigation.re("EquipamentsTopTabRoutes", {
+                //   screen: "Equipament"
+                // })}
                 />
               ))}
 

@@ -6,10 +6,10 @@ import { Input } from '@components/Input';
 import { ButtonFull } from '@components/ButtonFull';
 import { LayoutDefault } from '@components/LayoutDefault';
 
-export default function StepName() {
+export function Email() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate('stepEmail');
+  const handleNextPage = () => navigation.navigate('Password');
 
   return (
     <LayoutDefault
@@ -25,7 +25,7 @@ export default function StepName() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="Nome" />
+        <Input placeholder="E-mail" />
       </Box>
       <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>
