@@ -1,12 +1,12 @@
-import React from 'react';
-import { Box } from 'native-base';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { RectButtonProps } from 'react-native-gesture-handler';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import { Box } from "native-base";
+import { RFValue } from "react-native-responsive-fontsize";
+import { RectButtonProps } from "react-native-gesture-handler";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
-import { THEME } from '@theme/theme';
+import { THEME } from "@theme/theme";
 
-import { Button, Content, Description, Title } from './styles';
+import { Button, Content, Description, Title } from "./styles";
 
 interface Props extends RectButtonProps {
   title: string;
@@ -23,11 +23,7 @@ export function AccordionItem({
   return (
     <Content>
       <Button {...rest}>
-        <Box
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="center"
-        >
+        <Box flexDirection="row" alignItems="center" justifyContent="center">
           <MaterialIcons
             size={30}
             color={THEME.colors.blue[700]}
@@ -42,17 +38,15 @@ export function AccordionItem({
             <Title>{title}</Title>
 
             <Description>{description}</Description>
-
           </Box>
         </Box>
 
         <MaterialCommunityIcons
           size={30}
           color={THEME.colors.blue[700]}
-          name='arrow-right'
+          name="arrow-right"
         />
       </Button>
-
     </Content>
   );
 }

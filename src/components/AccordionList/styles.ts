@@ -1,8 +1,8 @@
-import styled from 'styled-components/native';
+import styled from "styled-components/native";
 
-import { THEME } from '@theme/theme';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { RectButton } from 'react-native-gesture-handler';
+import { THEME } from "@theme/theme";
+import { RFValue } from "react-native-responsive-fontsize";
+import { RectButton } from "react-native-gesture-handler";
 
 export const Container = styled.View`
   width: 100%;
@@ -29,5 +29,5 @@ export const Title = styled.Text`
 export const Description = styled.Text`
   font-size: ${RFValue(12)}px;
   font-family: ${THEME.fonts.Roboto_400Regular};
-  color: #A4A4A4;
+  color: #a4a4a4;
 `;

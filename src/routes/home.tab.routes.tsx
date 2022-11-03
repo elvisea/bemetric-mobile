@@ -1,83 +1,91 @@
-import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import * as React from "react";
+import { StyleSheet } from "react-native";
 
-import { StatusBar } from 'expo-status-bar';
-import { MaterialIcons } from '@expo/vector-icons';
+import { StatusBar } from "expo-status-bar";
+import { MaterialIcons } from "@expo/vector-icons";
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import { THEME } from '@theme/theme';
+import { THEME } from "@theme/theme";
 
-import HomeStackRoutes from './home.stack.routes';
+import { Equipamentos } from "@screens/AppScreens/Equipamentos";
+import { Incluir } from "@screens/AppScreens/Incluir";
+import { Trocar } from "@screens/AppScreens/Trocar";
+import { Marcadores } from "@screens/AppScreens/Marcadores";
 
-import { IncludeScreen } from '@screens/AppScreens/Home/Include';
-import { ExchangeScreen } from '@screens/AppScreens/Home/Exchange';
-import { BookmarksScreen } from '@screens/AppScreens/Home/Bookmarks';
-
-const { Navigator, Screen } = createBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function HomeTabRoutes() {
   return (
     <>
       <StatusBar backgroundColor={THEME.colors.blue[700]} />
-      <Navigator
-        initialRouteName="Equipament"
+      <Tab.Navigator
+        initialRouteName="Equipamentos"
         screenOptions={{
           headerShown: false,
           tabBarStyle: styles.tabBarStyle,
-          tabBarIconStyle: styles.tabBarIconStyle,
           tabBarLabelStyle: styles.tabBarLabelStyle,
+          tabBarItemStyle: styles.tabBarItemStyle,
         }}
       >
-        <Screen
-          name="Equipament"
-          component={HomeStackRoutes}
+        <Tab.Screen
+          name="Equipamentos"
+          component={Equipamentos}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="settings" color={color} size={size} />
             ),
           }}
         />
-        <Screen
-          name="Include"
-          component={IncludeScreen}
+        <Tab.Screen
+          name="Incluir"
+          component={Incluir}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="add" color={color} size={size} />
             ),
           }}
         />
-        <Screen
-          name="Exchange"
-          component={ExchangeScreen}
+        <Tab.Screen
+          name="Trocar"
+          component={Trocar}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="home" color={color} size={size} />
+              <MaterialIcons name="sync" color={color} size={size} />
             ),
           }}
         />
-        <Screen
-          name="Bookmarks"
-          component={BookmarksScreen}
+        <Tab.Screen
+          name="Marcadores"
+          component={Marcadores}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="location-pin" color={color} size={size} />
             ),
           }}
         />
-      </Navigator>
+      </Tab.Navigator>
     </>
   );
 }
 
 const styles = StyleSheet.create({
   tabBarLabelStyle: {
-    marginBottom: 10,
+    fontSize: 12,
+    fontFamily: THEME.fonts.Roboto_400Regular,
   },
-  tabBarIconStyle: {
-    marginBottom: 4,
-  },
+
   tabBarStyle: {
-    height: 80,
+    paddingBottom: 8,
+    height: 60,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "white",
+  },
+  tabBarItemStyle: {
+    height: 60,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

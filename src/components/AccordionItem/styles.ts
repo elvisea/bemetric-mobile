@@ -1,8 +1,8 @@
-import styled from 'styled-components/native';
+import styled from "styled-components/native";
 
-import { THEME } from '@theme/theme';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { RectButton } from 'react-native-gesture-handler';
+import { THEME } from "@theme/theme";
+import { RFValue } from "react-native-responsive-fontsize";
+import { RectButton } from "react-native-gesture-handler";
 
 export const Container = styled.View`
   width: 100%;
@@ -23,13 +23,12 @@ export const Line = styled.View`
 `;
 
 export const Content = styled.View`
-  /* flex: 1; */
   width: 100%;
   height: ${RFValue(65)}px;
   margin-top: ${RFValue(8)}px;
-  border-top-color: #E6E6E6;
-  border-right-color: #E6E6E6;
-  border-bottom-color: #E6E6E6;
+  border-top-color: #e6e6e6;
+  border-right-color: #e6e6e6;
+  border-bottom-color: #e6e6e6;
   border-left-color: ${THEME.colors.blue[700]};
   border-top-width: ${RFValue(1)}px;
   border-right-width: ${RFValue(1)}px;
@@ -56,5 +55,5 @@ export const Title = styled.Text`
 export const Description = styled.Text`
   font-size: ${RFValue(12)}px;
   font-family: ${THEME.fonts.Roboto_400Regular};
-  color: #A4A4A4;
+  color: #a4a4a4;
 `;

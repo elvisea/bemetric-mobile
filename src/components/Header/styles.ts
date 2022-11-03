@@ -1,8 +1,8 @@
-import styled from 'styled-components/native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { RFValue } from 'react-native-responsive-fontsize';
+import styled from "styled-components/native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { RFValue } from "react-native-responsive-fontsize";
 
-import { THEME } from '@theme/theme';
+import { THEME } from "@theme/theme";
 
 export const Container = styled.View`
   width: 100%;

@@ -1,25 +1,25 @@
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
 
-import { Feather } from '@expo/vector-icons';
-import { Box, VStack, Select, FormControl, Heading } from 'native-base';
+import { Feather } from "@expo/vector-icons";
+import { Box, VStack, Select, FormControl, Heading } from "native-base";
 
-import { THEME } from '@theme/theme';
-import { useCustomer } from '@hooks/customer';
+import { THEME } from "@theme/theme";
+import { useCustomer } from "@hooks/customer";
 
-import { Header } from '@components/Header';
-import { ButtonFull } from '@components/ButtonFull';
-import { HeaderWelcome } from '@components/HeaderWelcome';
+import { Header } from "@components/Header";
+import { ButtonFull } from "@components/ButtonFull";
+import { HeaderWelcome } from "@components/HeaderWelcome";
 
 export function Clients() {
   const { addCustomer } = useCustomer();
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate('Email');
+  const handleNextPage = () => navigation.navigate("Email");
 
   const handleAddCustomer = (client: string) => {
     addCustomer(client);
-  }
+  };
 
   return (
     <VStack

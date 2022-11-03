@@ -1,7 +1,7 @@
-import React from 'react';
-import { CaretLeft } from 'phosphor-react-native';
-import { Box, IconButton } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { CaretLeft } from "phosphor-react-native";
+import { Box, IconButton } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
 export function HeaderAuth() {
   const navigation = useNavigation();

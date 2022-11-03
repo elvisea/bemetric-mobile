@@ -1,18 +1,18 @@
-import React, { ReactNode } from 'react';
-import { Feather } from '@expo/vector-icons';
-import { Box, VStack, IconButton } from 'native-base';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { ColorSchemeType } from 'native-base/lib/typescript/components/types';
+import React, { ReactNode } from "react";
+import { Feather } from "@expo/vector-icons";
+import { Box, VStack, IconButton } from "native-base";
+import { RFValue } from "react-native-responsive-fontsize";
+import { ColorSchemeType } from "native-base/lib/typescript/components/types";
 
-import { Icon } from './styles';
-import { THEME } from '@theme/theme';
+import { Icon } from "./styles";
+import { THEME } from "@theme/theme";
 
 type Props = {
   bg: ColorSchemeType;
   icon: keyof typeof Feather.glyphMap;
   children?: ReactNode;
   functionIcon: () => void;
-  justifyContent?: 'space-between' | 'center' | 'flex-start' | 'flex-end';
+  justifyContent?: "space-between" | "center" | "flex-start" | "flex-end";
 };
 
 export function LayoutDefault({

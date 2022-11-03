@@ -1,15 +1,15 @@
-import React from 'react';
-import { Box } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { Box } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
-import { Input } from '@components/Input';
-import { ButtonFull } from '@components/ButtonFull';
-import { LayoutDefault } from '@components/LayoutDefault';
+import { Input } from "@components/Input";
+import { ButtonFull } from "@components/ButtonFull";
+import { LayoutDefault } from "@components/LayoutDefault";
 
 export function ConfirmPassword() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate('SignIn');
+  const handleNextPage = () => navigation.navigate("VerificarToken");
 
   return (
     <LayoutDefault
@@ -25,7 +25,8 @@ export function ConfirmPassword() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="Confirme sua senha" secureTextEntry />
+        <Input placeholder="senha sua senha" secureTextEntry />
+        <Input placeholder="e Confirme sua senha" secureTextEntry />
       </Box>
       <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>

@@ -8,21 +8,21 @@ export const clients = [
         id: 1,
         title: "Grupo 1: Equipamento 1",
         description: "Ligado",
-        value: "30"
+        value: "30",
       },
       {
         id: 2,
         title: "Grupo 1: Equipamento 2",
         description: "Desligado",
-        value: "40"
+        value: "40",
       },
       {
         id: 3,
         title: "Grupo 1: Equipamento 3",
         description: "Desligado",
-        value: "40"
-      }
-    ]
+        value: "40",
+      },
+    ],
   },
   {
     id: 2,
@@ -33,15 +33,15 @@ export const clients = [
         id: 1,
         title: "Grupo 2: Equipamento 1",
         description: "Ligado",
-        value: "10"
+        value: "10",
       },
       {
         id: 2,
         title: "Grupo 2: Equipamento 2",
         description: "Ligado",
-        value: "20"
-      }
-    ]
+        value: "20",
+      },
+    ],
   },
   {
     id: 3,
@@ -52,9 +52,9 @@ export const clients = [
         id: 1,
         title: "Grupo 3: Equipamento 1",
         description: "Ligado",
-        value: "10"
-      }
-    ]
+        value: "10",
+      },
+    ],
   },
   {
     id: 4,
@@ -65,15 +65,15 @@ export const clients = [
         id: 1,
         title: "Grupo 4: Equipamento 1",
         description: "Ligado",
-        value: "10"
+        value: "10",
       },
       {
         id: 2,
         title: "Grupo 4: Equipamento 2",
         description: "Ligado",
-        value: "10"
-      }
-    ]
+        value: "10",
+      },
+    ],
   },
   {
     id: 5,
@@ -84,15 +84,15 @@ export const clients = [
         id: 1,
         title: "Grupo 5: Equipamento 1",
         description: "Ligado",
-        value: "10"
+        value: "10",
       },
       {
         id: 2,
         title: "Grupo 5: Equipamento 2",
         description: "Ligado",
-        value: "10"
-      }
-    ]
+        value: "10",
+      },
+    ],
   },
   {
     id: 6,
@@ -103,21 +103,21 @@ export const clients = [
         id: 1,
         title: "Grupo 6: Equipamento 1",
         description: "Ligado",
-        value: "30"
+        value: "30",
       },
       {
         id: 2,
         title: "Grupo 6: Equipamento 2",
         description: "Desligado",
-        value: "40"
+        value: "40",
       },
       {
         id: 3,
         title: "Grupo 6: Equipamento 3",
         description: "Desligado",
-        value: "40"
-      }
-    ]
+        value: "40",
+      },
+    ],
   },
   {
     id: 7,
@@ -128,20 +128,20 @@ export const clients = [
         id: 1,
         title: "Grupo 7: Equipamento 1",
         description: "Ligado",
-        value: "30"
+        value: "30",
       },
       {
         id: 2,
         title: "Grupo 7: Equipamento 2",
         description: "Desligado",
-        value: "40"
+        value: "40",
       },
       {
         id: 3,
         title: "Grupo 7: Equipamento 3",
         description: "Desligado",
-        value: "40"
-      }
-    ]
+        value: "40",
+      },
+    ],
   },
-]
+];

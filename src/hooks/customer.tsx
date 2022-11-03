@@ -3,12 +3,12 @@ import React, {
   useContext,
   ReactNode,
   useState,
-  useEffect
-} from 'react';
+  useEffect,
+} from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { CUSTOMER } from '@constants/storage';
+import { CUSTOMER } from "@constants/storage";
 
 type CustomerContextData = {
   customer: string | null;
@@ -39,14 +39,14 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
 
   useEffect(() => {
     loadCustomerStorage();
-  }, [])
+  }, []);
 
   return (
     <CustomerContext.Provider
       value={{
         customer,
         addCustomer,
-        resetCustomerState
+        resetCustomerState,
       }}
     >
       {children}

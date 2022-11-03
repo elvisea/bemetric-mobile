@@ -1,5 +1,5 @@
-import React from 'react';
-import { Input as NativeBaseInput, IInputProps } from 'native-base';
+import React from "react";
+import { Input as NativeBaseInput, IInputProps } from "native-base";
 
 export function Input({ ...rest }: IInputProps) {
   return (
@@ -13,8 +13,8 @@ export function Input({ ...rest }: IInputProps) {
       borderLeftWidth={0}
       borderRightWidth={0}
       _focus={{
-        bg: 'transparent',
-        borderColor: 'white',
+        bg: "transparent",
+        borderColor: "white",
         borderTopWidth: 0,
         borderLeftWidth: 0,
         borderRightWidth: 0,

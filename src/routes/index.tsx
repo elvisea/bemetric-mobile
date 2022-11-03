@@ -1,12 +1,12 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
 
-import AuthStackRoutes from './auth.stack.routes';
-import AppDrawerRoutes from './app.drawer.routes';
-import ClientsStackRoutes from './clients.stack.routes';
+import AuthStackRoutes from "./auth.stack.routes";
+import AppDrawerRoutes from "./app.drawer.routes";
+import ClientsStackRoutes from "./clients.stack.routes";
 
-import { useAuth } from '@hooks/auth';
-import { useCustomer } from '@hooks/customer';
+import { useAuth } from "@hooks/auth";
+import { useCustomer } from "@hooks/customer";
 
 const Routes = () => {
   const { user } = useAuth();
@@ -24,11 +24,12 @@ const Routes = () => {
     if (user && customer) {
       return <AppDrawerRoutes />;
     }
-  }
+  };
 
   return (
     <NavigationContainer>
       {switchNavigation()}
+      {/* <AppDrawerRoutes /> */}
     </NavigationContainer>
   );
 };

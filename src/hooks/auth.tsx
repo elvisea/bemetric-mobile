@@ -1,14 +1,20 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 
-import { Alert } from 'react-native';
+import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import api from '@services/api';
+import api from "@services/api";
 
-import { TOKEN, USER } from '@constants/storage';
+import { TOKEN, USER } from "@constants/storage";
 
-import { User } from '@interfaces/User';
-import { Credentials } from '@interfaces/Credentials';
+import { User } from "@interfaces/User";
+import { Credentials } from "@interfaces/Credentials";
 
 type AuthContextData = {
   user: User | null;
@@ -34,7 +40,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await api.post("/Usuario/ValidarLogin", {
         email,
         password,
-        tipoaplicacao: 0
+        tipoaplicacao: 0,
       });
 
       const { data } = response;
@@ -45,7 +51,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       api.defaults.headers.common.Authorization = `Bearer ${data.jwtToken}`;
 
       setUser(data);
-
     } catch (error) {
       console.log(error);
     }
@@ -73,14 +78,14 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     loadUserStorage();
     loadTokenStorage();
-  }, [])
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         signIn,
-        resetUserState
+        resetUserState,
       }}
     >
       {children}

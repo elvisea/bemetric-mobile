@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Box, VStack } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import { Box, VStack } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
-import Logo from '@assets/logo.svg';
+import Logo from "@assets/logo.svg";
 
-import { useAuth } from '@hooks/auth';
+import { useAuth } from "@hooks/auth";
 
-import { Input } from '@components/Input';
-import { Button } from '@components/Button';
-import { ButtonFull } from '@components/ButtonFull';
+import { Input } from "@components/Input";
+import { Button } from "@components/Button";
+import { ButtonFull } from "@components/ButtonFull";
 
 export function SignIn() {
   const navigation = useNavigation();
 
   const { signIn } = useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = () => {
     try {
@@ -24,13 +24,12 @@ export function SignIn() {
         email,
         password,
       });
-
     } catch (error) {
       console.log("ERROR =>", error);
     }
   };
 
-  const handleNextPage = () => navigation.navigate('Name');
+  const handleNextPage = () => navigation.navigate("AceitarTermos");
 
   return (
     <VStack

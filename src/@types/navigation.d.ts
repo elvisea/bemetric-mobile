@@ -4,9 +4,21 @@ export declare global {
       Clients: undefined;
       ConfirmPassword: undefined;
       Email: undefined;
-      Name: undefined;
+      InserirDados: undefined;
       Password: undefined;
       SignIn: undefined;
+      VerificarToken: undefined;
+      VincularCliente: undefined;
+      AceitarTermos: undefined;
+      AtivarCodigo: undefined;
+      InserirDadosUsuario: undefined;
+      InserirDadosCliente: undefined;
+      InserirTokenCliente: undefined;
+      InserirDadosUsuario: undefined;
+      // Equipamentos: undefined;
+      EquipamentoTabRoutes: {
+        screen: string;
+      };
     }
   }
 }

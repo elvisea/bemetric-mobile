@@ -1,15 +1,15 @@
-import React from 'react';
-import { Box } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { Box } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
-import { Input } from '@components/Input';
-import { ButtonFull } from '@components/ButtonFull';
-import { LayoutDefault } from '@components/LayoutDefault';
+import { Input } from "@components/Input";
+import { ButtonFull } from "@components/ButtonFull";
+import { LayoutDefault } from "@components/LayoutDefault";
 
 export function Email() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate('Password');
+  const handleNextPage = () => navigation.navigate("Password");
 
   return (
     <LayoutDefault
