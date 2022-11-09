@@ -6,10 +6,10 @@ import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-export function InserirDadosClientes() {
+export function NameAndEmail() {
   const navigation = useNavigation();
 
-  const ConfirmPassword = () => navigation.navigate("ConfirmPassword");
+  const handleNextPage = () => navigation.navigate("AcceptTerms");
 
   return (
     <LayoutDefault
@@ -25,11 +25,10 @@ export function InserirDadosClientes() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="Nome do Cliente" />
-        <Input placeholder="CNPJ" />
+        <Input placeholder="Nome" mb={8} />
+        <Input placeholder="E-mail" keyboardType="email-address" />
       </Box>
-      {/* <ButtonFull title="Avançar" onPress={() => handleNextPage} /> */}
-      <ButtonFull title="Avançar" onPress={() => ConfirmPassword} />
+      <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>
   );
 }

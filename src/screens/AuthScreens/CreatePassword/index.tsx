@@ -6,10 +6,10 @@ import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-export function ConfirmPassword() {
+export function CreatePassword() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("VerificarToken");
+  const handleNextPage = () => navigation.navigate("VerifyToken");
 
   return (
     <LayoutDefault
@@ -25,8 +25,8 @@ export function ConfirmPassword() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="senha sua senha" secureTextEntry />
-        <Input placeholder="e Confirme sua senha" secureTextEntry />
+        <Input placeholder="Crie uma senha" secureTextEntry mb={8} />
+        <Input placeholder="Confirme sua senha" secureTextEntry />
       </Box>
       <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>

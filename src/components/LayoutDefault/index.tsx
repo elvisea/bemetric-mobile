@@ -12,6 +12,7 @@ type Props = {
   icon: keyof typeof Feather.glyphMap;
   children?: ReactNode;
   functionIcon: () => void;
+  alignItems?: "center" | "flex-start" | "flex-end";
   justifyContent?: "space-between" | "center" | "flex-start" | "flex-end";
 };
 
@@ -19,6 +20,7 @@ export function LayoutDefault({
   bg,
   icon,
   children,
+  alignItems = "center",
   justifyContent,
   functionIcon,
 }: Props) {
@@ -44,7 +46,7 @@ export function LayoutDefault({
       <Box
         w="full"
         flex={1}
-        alignItems="flex-start"
+        alignItems={alignItems}
         justifyContent={justifyContent}
       >
         {children}

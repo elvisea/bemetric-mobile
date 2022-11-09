@@ -6,10 +6,10 @@ import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-export function AceitarTermos() {
+export function CreateAccount() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("InserirDadosUsuario");
+  const handleNextPage = () => navigation.navigate("CreatePassword");
 
   return (
     <LayoutDefault
@@ -25,22 +25,10 @@ export function AceitarTermos() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="AceitarTermos" />
+        <Input placeholder="Nome do Cliente" mb={8} />
+        <Input placeholder="CPF ou CNPJ" keyboardType="email-address" />
       </Box>
       <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>
   );
 }
-
-// Irá ser selecionado se vai criar
-// conta nova ou vincular a uma conta ja existente
-
-//########################################################################
-
-// se conta nova
-// informar CNPJ ou CPF e nome do cliente
-
-//########################################################################
-
-// se conta já existente
-// vai informar o token do cliente

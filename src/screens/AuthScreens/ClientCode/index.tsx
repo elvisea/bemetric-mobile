@@ -1,15 +1,15 @@
 import React from "react";
-import { Box } from "native-base";
+import { Box, Heading } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import { Input } from "@components/Input";
+import { THEME } from "@theme/theme";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-export function Password() {
+export function ClientCode() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("ConfirmPassword");
+  const handleNextPage = () => navigation.navigate("CreatePassword");
 
   return (
     <LayoutDefault
@@ -25,7 +25,9 @@ export function Password() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="Crie uma senha" secureTextEntry />
+        <Heading size={"sm"} textAlign="center" color={THEME.colors.white}>
+          Insira o token fornecido pelo{"\n"}administrador do cliente.
+        </Heading>
       </Box>
       <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>

@@ -1,15 +1,14 @@
 import React from "react";
-import { Box } from "native-base";
+import { Box, Heading } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-export function InserirTokenCliente() {
+export function AcceptTerms() {
   const navigation = useNavigation();
 
-  const criarContaCliente = () => navigation.navigate("ConfirmPassword");
+  const handleNextPage = () => navigation.navigate("Choose");
 
   return (
     <LayoutDefault
@@ -25,11 +24,9 @@ export function InserirTokenCliente() {
         alignItems="center"
         justifyContent="center"
       >
-        <Input placeholder="Inserir Token" />
-        {/* <Input placeholder="Email do usuario" /> */}
+        <Heading color="white">Accept Terms</Heading>
       </Box>
-      {/* <ButtonFull title="Avançar" onPress={() => handleNextPage} /> */}
-      <ButtonFull title="Avançar" onPress={() => criarContaCliente} />
+      <ButtonFull title="Avançar" onPress={handleNextPage} />
     </LayoutDefault>
   );
 }

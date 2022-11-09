@@ -29,7 +29,7 @@ export function SignIn() {
     }
   };
 
-  const handleNextPage = () => navigation.navigate("AceitarTermos");
+  const handleNextPage = () => navigation.navigate("NameAndEmail");
 
   return (
     <VStack
