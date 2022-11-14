@@ -3,12 +3,41 @@ export declare global {
     interface RootParamList {
       SignIn: undefined;
       NameAndEmail: undefined;
-      AcceptTerms: undefined;
-      Choose: undefined;
-      CreateAccount: undefined;
-      CreatePassword: undefined;
-      VerifyToken: undefined;
-      ClientCode: undefined;
+
+      AcceptTerms: {
+        name: string;
+        email: string;
+      };
+
+      Choose: {
+        name: string;
+        email: string;
+      };
+
+      CreateAccount: {
+        name: string;
+        email: string;
+      };
+
+      ClientCode: {
+        name: string;
+        email: string;
+      };
+
+      CreatePassword: {
+        name: string;
+        email: string;
+        client: string;
+        identification: string;
+      };
+
+      VerifyToken: {
+        name: string;
+        email: string;
+        password: string;
+        client: string;
+        identification: string;
+      };
 
       // Pra Cima OK
 

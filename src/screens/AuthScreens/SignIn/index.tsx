@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import Logo from "@assets/logo.svg";
 
@@ -10,26 +14,41 @@ import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
 
+interface FormDataProps {
+  email: string;
+  password: string;
+}
+
+const schema = yup.object({
+  email: yup.string().required("Informe seu e-mail.").email("E-mail inválido"),
+  password: yup
+    .string()
+    .required("Informe sua senha")
+    .min(4, "A senha deve ter pelo menos 4 dígitos."),
+});
+
 export function SignIn() {
   const navigation = useNavigation();
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(schema),
+  });
+
   const { signIn } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = () => {
+  const handleLogin = async ({ email, password }: FormDataProps) => {
     try {
-      signIn({
-        email,
-        password,
-      });
+      signIn({ email, password });
     } catch (error) {
       console.log("ERROR =>", error);
     }
   };
 
-  const handleNextPage = () => navigation.navigate("NameAndEmail");
+  const handleCreateAccount = () => navigation.navigate("NameAndEmail");
 
   return (
     <VStack
@@ -42,15 +61,46 @@ export function SignIn() {
       <Box width="full" px={8} alignItems="center" mt={122}>
         <Logo />
 
-        <Input placeholder="E-mail" mb={8} mt={90} onChangeText={setEmail} />
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="E-mail"
+              mb={4}
+              mt={90}
+              onChangeText={onChange}
+              value={value}
+              errorMessage={errors.email?.message}
+            />
+          )}
+        />
 
-        <Input placeholder="Senha" secureTextEntry onChangeText={setPassword} />
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              placeholder="Senha"
+              secureTextEntry
+              onChangeText={onChange}
+              value={value}
+              errorMessage={errors.password?.message}
+            />
+          )}
+        />
 
-        <Button title="Entrar" mt={16} w={188} h={52} onPress={handleLogin} />
+        <Button
+          title="Entrar"
+          mt={8}
+          w={188}
+          h={52}
+          onPress={handleSubmit(handleLogin)}
+        />
       </Box>
 
       <Box w="full">
-        <ButtonFull title="CRIAR CONTA" onPress={handleNextPage} />
+        <ButtonFull title="CRIAR CONTA" onPress={handleCreateAccount} />
       </Box>
     </VStack>
   );

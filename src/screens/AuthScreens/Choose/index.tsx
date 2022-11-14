@@ -1,17 +1,25 @@
 import React from "react";
 import { Center, Heading } from "native-base";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
 import { LayoutDefault } from "@components/LayoutDefault";
 
+interface Params {
+  name: string;
+  email: string;
+}
+
 export function Choose() {
   const navigation = useNavigation();
 
+  const route = useRoute();
+  const { name, email } = route.params as Params;
+
   const handleNextPage = (screen: "ClientCode" | "CreateAccount") => {
-    navigation.navigate(screen);
+    navigation.navigate(screen, { name, email });
   };
 
   return (

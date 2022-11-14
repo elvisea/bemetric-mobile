@@ -1,14 +1,22 @@
 import React from "react";
 import { Box, Heading } from "native-base";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
+interface Params {
+  name: string;
+  email: string;
+}
+
 export function AcceptTerms() {
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("Choose");
+  const route = useRoute();
+  const { name, email } = route.params as Params;
+
+  const handleNextPage = () => navigation.navigate("Choose", { name, email });
 
   return (
     <LayoutDefault
