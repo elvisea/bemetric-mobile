@@ -14,7 +14,7 @@ import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
 
-interface FormDataProps {
+interface FormProps {
   email: string;
   password: string;
 }
@@ -34,13 +34,13 @@ export function SignIn() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>({
+  } = useForm<FormProps>({
     resolver: yupResolver(schema),
   });
 
   const { signIn } = useAuth();
 
-  const handleLogin = async ({ email, password }: FormDataProps) => {
+  const handleLogin = async ({ email, password }: FormProps) => {
     try {
       signIn({ email, password });
     } catch (error) {

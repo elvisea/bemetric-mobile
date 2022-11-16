@@ -17,18 +17,21 @@ export declare global {
       CreateAccount: {
         name: string;
         email: string;
+        type: number;
       };
 
       ClientCode: {
         name: string;
         email: string;
+        type: number;
       };
 
       CreatePassword: {
         name: string;
         email: string;
-        client: string;
-        identification: string;
+        client?: string;
+        identification?: string;
+        type: number;
       };
 
       VerifyToken: {
@@ -37,6 +40,7 @@ export declare global {
         password: string;
         client: string;
         identification: string;
+        type: number;
       };
 
       // Pra Cima OK

@@ -18,8 +18,11 @@ export function Choose() {
   const route = useRoute();
   const { name, email } = route.params as Params;
 
-  const handleNextPage = (screen: "ClientCode" | "CreateAccount") => {
-    navigation.navigate(screen, { name, email });
+  const handleNextPage = (
+    screen: "ClientCode" | "CreateAccount",
+    type: number
+  ) => {
+    navigation.navigate(screen, { name, email, type });
   };
 
   return (
@@ -45,7 +48,7 @@ export function Choose() {
           h={52}
           w={188}
           mb={16}
-          onPress={() => handleNextPage("CreateAccount")}
+          onPress={() => handleNextPage("CreateAccount", 0)}
         />
 
         <Button
@@ -53,7 +56,7 @@ export function Choose() {
           h={52}
           w={188}
           mb={8}
-          onPress={() => handleNextPage("ClientCode")}
+          onPress={() => handleNextPage("ClientCode", 1)}
         />
 
         <Heading size={"sm"} textAlign="center" color={THEME.colors.white}>

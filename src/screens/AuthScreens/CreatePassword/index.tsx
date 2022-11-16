@@ -12,7 +12,7 @@ import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-interface FormDataProps {
+interface FormProps {
   password: string;
   password_confirm: string;
 }
@@ -22,6 +22,7 @@ interface Params {
   email: string;
   client: string;
   identification: string;
+  type: number;
 }
 
 const schema = yup.object({
@@ -39,20 +40,17 @@ export function CreatePassword() {
   const navigation = useNavigation();
 
   const route = useRoute();
-  const { name, email, client, identification } = route.params as Params;
+  const { name, email, client, identification, type } = route.params as Params;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>({
+  } = useForm<FormProps>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({
-    password,
-    password_confirm,
-  }: FormDataProps) => {
+  const handleNextPage = async ({ password }: FormProps) => {
     try {
       const response = await api.post(
         `/Usuario/GerarCodigoAtivacao?email=${email}`
@@ -65,6 +63,7 @@ export function CreatePassword() {
           password,
           client,
           identification,
+          type,
         });
       }
     } catch (error) {

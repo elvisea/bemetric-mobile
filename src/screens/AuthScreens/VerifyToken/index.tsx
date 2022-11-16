@@ -1,6 +1,6 @@
 import React from "react";
 import { Alert } from "react-native";
-import { Box, Heading } from "native-base";
+import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
@@ -10,12 +10,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { LayoutDefault } from "@components/LayoutDefault";
+import { InputToken } from "@components/InputToken";
 
-interface FormDataProps {
-  token: string;
+interface FormProps {
+  firstDigit: string;
+  secondDigit: string;
+  thirdDigit: string;
+  fourthDigit: string;
+  fifthDigit: string;
+  sixthDigit: string;
 }
 
 interface Params {
@@ -24,67 +29,111 @@ interface Params {
   password: string;
   client: string;
   identification: string;
+  type: number;
 }
 
 const schema = yup.object({
-  token: yup
-    .string()
-    .required("Informe seu token.")
-    .min(6, "O Token deve ter pelo menos 6 dígitos."),
+  firstDigit: yup.string().required("Inválido"),
+  secondDigit: yup.string().required("Inválido"),
+  thirdDigit: yup.string().required("Inválido"),
+  fourthDigit: yup.string().required("Inválido"),
+  fifthDigit: yup.string().required("Inválido"),
+  sixthDigit: yup.string().required("Inválido"),
 });
 
 export function VerifyToken() {
   const navigation = useNavigation();
 
   const route = useRoute();
-  const { name, email, password, client, identification } =
-    route.params as Params;
-
-  console.log("PARAMS =>", route.params);
+  const params = route.params as Params;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>({
+  } = useForm<FormProps>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({ token }: FormDataProps) => {
+  const handleNextPage = async ({
+    firstDigit,
+    secondDigit,
+    thirdDigit,
+    fourthDigit,
+    fifthDigit,
+    sixthDigit,
+  }: FormProps) => {
+    const token = `${firstDigit}${secondDigit}${thirdDigit}${fourthDigit}${fifthDigit}${sixthDigit}`;
+
     const data = {
-      // codigoUsuario: 0,
-      nomeUsuario: name,
-      emailUsuario: email,
-      senhaUsuario: password,
-      codigoCliente: 0,
-      tipoContaCliente: 0,
-      cpfCnpjCliente: Number(identification),
-      nomeCliente: client,
+      nomeUsuario: params.name,
+      emailUsuario: params.email,
+      senhaUsuario: params.password,
+      tipoContaCliente: params.type,
+      cpfCnpjCliente: Number(params.identification),
+      nomeCliente: params.client,
+      // codigoCliente: 0,
       // tokenCliente: 0,
-      codigoAtivacao: token,
+      codigoAtivacao: Number(token),
     };
 
-    console.log("DATA =>", data);
     try {
       const response = await api.post("/Usuario/CriarContaApp", data);
 
       console.log("Response =>", response.data);
 
-      if (response.data === 0) navigation.navigate("SignIn");
+      if (response.data === 0) {
+        Alert.alert("Conta criada com sucesso!", "Conta criada com sucesso!", [
+          {
+            text: "",
+            onPress: () => navigation.navigate("SignIn"),
+          },
+        ]);
+      }
 
-      if (response.data !== 0) {
-        Alert.alert(response.data);
+      if (response.data === 1) {
+        Alert.alert(
+          "Erro ao tentar criar conta",
+          "Erro no código de ativação. Tente novamente."
+        );
+      }
+
+      if (response.data === 2) {
+        Alert.alert(
+          "Erro ao tentar criar conta",
+          "Erro código de ativação expirado. Tente novamente."
+        );
+      }
+
+      if (response.data === 3) {
+        Alert.alert(
+          "Erro ao tentar criar conta",
+          "Email já cadastrado. Tente novamente."
+        );
+      }
+
+      if (response.data === 4) {
+        Alert.alert(
+          "Erro ao tentar criar conta",
+          "CNPJ ou CPF já existente. Tente novamente."
+        );
+      }
+
+      if (response.data === 5) {
+        Alert.alert(
+          "Erro ao tentar criar conta",
+          "Token do cliente não existe. Tente novamente."
+        );
       }
     } catch (error) {
-      console.log("=> =>", error)
-      Alert.alert(`${error}`);
+      Alert.alert("Erro ao tentar criar conta", `${error}`);
     }
   };
 
   const handleResendToken = async () => {
     try {
       const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${email}`
+        `/Usuario/GerarCodigoAtivacao?email=${params.email}`
       );
 
       if (response.data === 1) {
@@ -130,22 +179,102 @@ export function VerifyToken() {
           and publishing industries for previewing layouts and visual mockups.
         </Heading>
 
-        <Controller
-          control={control}
-          name="token"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              placeholder="Insira seu Token."
-              keyboardType="numeric"
-              returnKeyType="send"
-              onChangeText={onChange}
-              mt={16}
-              value={value}
-              errorMessage={errors.token?.message}
+        <HStack mt={8} justifyContent="space-between" w="100%">
+          <Box width="14%">
+            <Controller
+              control={control}
+              name="firstDigit"
+              render={({ field: { onChange, value } }) => (
+                <InputToken
+                  placeholder="0"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.firstDigit?.message}
+                />
+              )}
             />
-          )}
-        />
+          </Box>
 
+          <Box width="14%">
+            <Controller
+              control={control}
+              name="secondDigit"
+              render={({ field: { onChange, value } }) => (
+                <InputToken
+                  placeholder="0"
+                  keyboardType="numeric"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.secondDigit?.message}
+                />
+              )}
+            />
+          </Box>
+
+          <Box width="14%">
+            <Controller
+              control={control}
+              name="thirdDigit"
+              render={({ field: { onChange, value } }) => (
+                <InputToken
+                  placeholder="0"
+                  keyboardType="numeric"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.thirdDigit?.message}
+                />
+              )}
+            />
+          </Box>
+
+          <Box width="14%">
+            <Controller
+              control={control}
+              name="fourthDigit"
+              render={({ field: { onChange, value } }) => (
+                <InputToken
+                  placeholder="0"
+                  keyboardType="numeric"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.fourthDigit?.message}
+                />
+              )}
+            />
+          </Box>
+
+          <Box width="14%">
+            <Controller
+              control={control}
+              name="fifthDigit"
+              render={({ field: { onChange, value } }) => (
+                <InputToken
+                  placeholder="0"
+                  keyboardType="numeric"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.fifthDigit?.message}
+                />
+              )}
+            />
+          </Box>
+
+          <Box width="14%">
+            <Controller
+              control={control}
+              name="sixthDigit"
+              render={({ field: { onChange, value } }) => (
+                <InputToken
+                  placeholder="0"
+                  keyboardType="numeric"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.sixthDigit?.message}
+                />
+              )}
+            />
+          </Box>
+        </HStack>
       </Box>
 
       <Box w="full" px={4} mb={8}>

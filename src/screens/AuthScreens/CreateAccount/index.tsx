@@ -13,7 +13,7 @@ import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-interface FormDataProps {
+interface FormProps {
   client: string;
   identification: string;
 }
@@ -21,6 +21,7 @@ interface FormDataProps {
 interface Params {
   name: string;
   email: string;
+  type: number;
 }
 
 const schema = yup.object({
@@ -32,17 +33,17 @@ export function CreateAccount() {
   const navigation = useNavigation();
 
   const route = useRoute();
-  const { name, email } = route.params as Params;
+  const { name, email, type } = route.params as Params;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>({
+  } = useForm<FormProps>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({ client, identification }: FormDataProps) => {
+  const handleNextPage = async ({ client, identification }: FormProps) => {
     try {
       const response = await api.get(
         `/Cliente/ValidarCpfCnpj?CpfCnpj=${Number(identification)}`
@@ -54,6 +55,7 @@ export function CreateAccount() {
           email,
           client,
           identification,
+          type,
         });
       }
 

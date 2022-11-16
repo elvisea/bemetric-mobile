@@ -12,7 +12,7 @@ type Props = IInputProps & {
   errorMessage?: string | null;
 };
 
-export function Input({
+export function InputToken({
   mt = 0,
   mb = 0,
   isInvalid,
@@ -24,21 +24,16 @@ export function Input({
   return (
     <FormControl isInvalid={invalid} mt={mt} mb={mb}>
       <NativeBaseInput
-        px={0}
         color="white"
         fontSize="sm"
+        textAlign="center"
         fontFamily="Montserrat_400Regular"
         placeholderTextColor="white"
-        borderTopWidth={0}
-        borderLeftWidth={0}
-        borderRightWidth={0}
-        borderBottomWidth={1}
+        maxLength={1}
+        keyboardType="numeric"
         _focus={{
           bg: "transparent",
           borderColor: "white",
-          borderTopWidth: 0,
-          borderLeftWidth: 0,
-          borderRightWidth: 0,
         }}
         _invalid={{
           borderWidth: 1,

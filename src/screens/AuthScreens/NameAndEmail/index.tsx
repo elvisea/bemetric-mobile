@@ -14,7 +14,7 @@ import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-interface FormDataProps {
+interface FormProps {
   name: string;
   email: string;
 }
@@ -31,11 +31,11 @@ export function NameAndEmail() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>({
+  } = useForm<FormProps>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({ name, email }: FormDataProps) => {
+  const handleNextPage = async ({ name, email }: FormProps) => {
     try {
       const response = await api.get(`/Usuario/ValidarEmail?email=${email}`);
 
