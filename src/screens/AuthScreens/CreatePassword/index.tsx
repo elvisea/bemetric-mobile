@@ -23,6 +23,7 @@ interface Params {
   client: string;
   identification: string;
   type: number;
+  tokenCliente: string;
 }
 
 const schema = yup.object({
@@ -37,10 +38,17 @@ const schema = yup.object({
 });
 
 export function CreatePassword() {
+  const route = useRoute();
   const navigation = useNavigation();
 
-  const route = useRoute();
-  const { name, email, client, identification, type } = route.params as Params;
+  const {
+    name,
+    email,
+    client,
+    identification,
+    type,
+    tokenCliente
+  } = route.params as Params;
 
   const {
     control,
@@ -64,6 +72,7 @@ export function CreatePassword() {
           client,
           identification,
           type,
+          tokenCliente,
         });
       }
     } catch (error) {

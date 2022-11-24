@@ -29,7 +29,6 @@ const Routes = () => {
   return (
     <NavigationContainer>
       {switchNavigation()}
-      {/* <AppDrawerRoutes /> */}
     </NavigationContainer>
   );
 };

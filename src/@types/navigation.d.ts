@@ -32,6 +32,7 @@ export declare global {
         client?: string;
         identification?: string;
         type: number;
+        tokenCliente?: string;
       };
 
       VerifyToken: {
@@ -41,6 +42,7 @@ export declare global {
         client: string;
         identification: string;
         type: number;
+        tokenCliente?: string;
       };
 
       // Pra Cima OK

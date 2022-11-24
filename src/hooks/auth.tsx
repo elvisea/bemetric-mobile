@@ -39,20 +39,68 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const response = await api.post("/Usuario/ValidarLogin", {
         email,
-        password,
+        senha: password,
         tipoaplicacao: 0,
       });
 
-      const { data } = response;
+      console.log("RES", response.data);
 
-      await AsyncStorage.setItem(TOKEN, data.jwtToken);
-      await AsyncStorage.setItem(USER, JSON.stringify(data));
+      if (response.status === 200) {
+        const { data } = response;
 
-      api.defaults.headers.common.Authorization = `Bearer ${data.jwtToken}`;
+        await AsyncStorage.setItem(TOKEN, data.jwtToken);
+        await AsyncStorage.setItem(USER, JSON.stringify(data));
 
-      setUser(data);
+        api.defaults.headers.common.Authorization = `Bearer ${data.jwtToken}`;
+
+        setUser(data);
+      }
+
+      if (response.data === 1) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email do login não cadastrado. Tente novamente."
+        );
+      }
+
+      if (response.data === 2) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email do login não habilitado. Tente novamente."
+        );
+      }
+
+      if (response.data === 3) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email do login não é do cliente. Tente novamente."
+        );
+      }
+
+      if (response.data === 4) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email ou Senha inválida. Tente novamente."
+        );
+      }
+
+      if (response.data === 5) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email com senha temporária."
+        );
+      }
     } catch (error) {
+      Alert.alert("Erro ao tentar fazer login!", `${error}`);
       console.log(error);
+    }
+  };
+
+  const loadTokenStorage = async () => {
+    const storage = await AsyncStorage.getItem(TOKEN);
+
+    if (storage) {
+      api.defaults.headers.common.Authorization = `Bearer ${storage}`;
     }
   };
 
@@ -65,19 +113,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const loadTokenStorage = async () => {
-    const storage = await AsyncStorage.getItem(TOKEN);
-
-    if (storage) {
-      api.defaults.headers.common.Authorization = `Bearer ${storage}`;
-    }
-  };
-
   const resetUserState = () => setUser(null);
 
   useEffect(() => {
-    loadUserStorage();
     loadTokenStorage();
+    loadUserStorage();
   }, []);
 
   return (

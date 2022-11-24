@@ -30,7 +30,6 @@ export function InputToken({
         fontFamily="Montserrat_400Regular"
         placeholderTextColor="white"
         maxLength={1}
-        keyboardType="numeric"
         _focus={{
           bg: "transparent",
           borderColor: "white",

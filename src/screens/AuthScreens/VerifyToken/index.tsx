@@ -30,6 +30,7 @@ interface Params {
   client: string;
   identification: string;
   type: number;
+  tokenCliente: string;
 }
 
 const schema = yup.object({
@@ -72,8 +73,7 @@ export function VerifyToken() {
       tipoContaCliente: params.type,
       cpfCnpjCliente: Number(params.identification),
       nomeCliente: params.client,
-      // codigoCliente: 0,
-      // tokenCliente: 0,
+      tokenCliente: params.tokenCliente,
       codigoAtivacao: Number(token),
     };
 
@@ -202,7 +202,6 @@ export function VerifyToken() {
               render={({ field: { onChange, value } }) => (
                 <InputToken
                   placeholder="0"
-                  keyboardType="numeric"
                   onChangeText={onChange}
                   value={value}
                   errorMessage={errors.secondDigit?.message}
@@ -218,7 +217,6 @@ export function VerifyToken() {
               render={({ field: { onChange, value } }) => (
                 <InputToken
                   placeholder="0"
-                  keyboardType="numeric"
                   onChangeText={onChange}
                   value={value}
                   errorMessage={errors.thirdDigit?.message}
@@ -234,7 +232,6 @@ export function VerifyToken() {
               render={({ field: { onChange, value } }) => (
                 <InputToken
                   placeholder="0"
-                  keyboardType="numeric"
                   onChangeText={onChange}
                   value={value}
                   errorMessage={errors.fourthDigit?.message}
@@ -250,7 +247,6 @@ export function VerifyToken() {
               render={({ field: { onChange, value } }) => (
                 <InputToken
                   placeholder="0"
-                  keyboardType="numeric"
                   onChangeText={onChange}
                   value={value}
                   errorMessage={errors.fifthDigit?.message}
@@ -266,7 +262,6 @@ export function VerifyToken() {
               render={({ field: { onChange, value } }) => (
                 <InputToken
                   placeholder="0"
-                  keyboardType="numeric"
                   onChangeText={onChange}
                   value={value}
                   errorMessage={errors.sixthDigit?.message}

@@ -74,6 +74,7 @@ export function ClientCode() {
           name,
           email,
           type,
+          tokenCliente: token,
         });
       }
     } catch (error) {

@@ -1,25 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { Feather } from "@expo/vector-icons";
 import { Box, VStack, Select, FormControl, Heading } from "native-base";
 
+import api from "@services/api";
 import { THEME } from "@theme/theme";
+
+import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
+
+import { Customer } from "@interfaces/Customer";
 
 import { Header } from "@components/Header";
 import { ButtonFull } from "@components/ButtonFull";
 import { HeaderWelcome } from "@components/HeaderWelcome";
 
 export function Clients() {
+  const { user } = useAuth();
   const { addCustomer } = useCustomer();
+
   const navigation = useNavigation();
 
-  const handleNextPage = () => navigation.navigate("Email");
+  const [customer, setCustomer] = useState<Customer>({} as Customer);
+  const [customers, setCustomers] = useState<Customer[]>([] as Customer[]);
 
-  const handleAddCustomer = (client: string) => {
-    addCustomer(client);
+  const handleNextPage = () => addCustomer(customer);
+
+  const handleAddCustomer = (selected: string) => {
+    const selectedCustomer = customers.find(
+      (customer) => customer.token === selected
+    );
+
+    if (selectedCustomer) {
+      setCustomer(selectedCustomer);
+    }
   };
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const response = await api.post("/Cliente/ObterLista", {
+          codigoParceiro: user?.codigoParceiro,
+        });
+
+        setCustomers(response.data);
+      } catch (error) {}
+    };
+
+    if (user) fetch();
+  }, []);
 
   return (
     <VStack
@@ -67,13 +97,16 @@ export function Clients() {
             borderRightWidth={0}
             borderRadius={0}
             borderBottomColor="blue.700"
-            onValueChange={(client) => handleAddCustomer(client)}
+            onValueChange={(selected) => handleAddCustomer(selected)}
           >
-            <Select.Item label="UX Research" value="ux" />
-            <Select.Item label="Web Development" value="web" />
-            <Select.Item label="Cross Platform Development" value="cross" />
-            <Select.Item label="UI Designing" value="ui" />
-            <Select.Item label="Backend Development" value="backend" />
+            {customers.map((customer, index) => (
+              <Select.Item
+                key={index}
+                alignItems="center"
+                value={customer.token}
+                label={customer.nomeCliente}
+              />
+            ))}
           </Select>
         </FormControl>
       </Box>
