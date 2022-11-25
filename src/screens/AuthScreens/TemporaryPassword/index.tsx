@@ -1,5 +1,6 @@
 import React from "react";
 import { Box } from "native-base";
+import { Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
@@ -13,36 +14,31 @@ import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 interface FormProps {
-  password: string;
-  password_confirm: string;
+  novaSenha: string;
+  novaSenhaConfirmada: string;
 }
 
 interface Params {
-  name: string;
   email: string;
-  client: string;
-  identification: string;
-  type: number;
-  tokenCliente: string;
+  password: string;
 }
 
 const schema = yup.object({
-  password: yup
+  novaSenha: yup
     .string()
     .required("Informe uma senha.")
     .min(6, "A senha deve ter pelo menos 6 dígitos."),
-  password_confirm: yup
+  novaSenhaConfirmada: yup
     .string()
     .required("Confirme sua senha.")
-    .oneOf([yup.ref("password"), null], "A confirmação da senha não confere"),
+    .oneOf([yup.ref("novaSenha"), null], "A confirmação da senha não confere"),
 });
 
-export function CreatePassword() {
+export function TemporaryPassword() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const { name, email, client, identification, type, tokenCliente } =
-    route.params as Params;
+  const { email, password } = route.params as Params;
 
   const {
     control,
@@ -52,25 +48,45 @@ export function CreatePassword() {
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({ password }: FormProps) => {
+  const handleNextPage = async ({ novaSenha }: FormProps) => {
     try {
-      const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${email}`
-      );
+      const response = await api.put("Usuario/TrocarSenhaTemporaria", {
+        email,
+        senha: password,
+        novaSenha,
+      });
+
+      if (response.data === 0) {
+        Alert.alert(
+          "Senha Alterada Com Sucesso!",
+          "Senha Alterada Com Sucesso!",
+          [
+            {
+              text: "Efetuar Login!",
+              onPress: () => navigation.navigate("SignIn"),
+            },
+          ]
+        );
+      }
 
       if (response.data === 1) {
-        navigation.navigate("VerifyToken", {
-          name,
-          email,
-          password,
-          client,
-          identification,
-          type,
-          tokenCliente,
-        });
+        Alert.alert(
+          "Falha ao tentar alterar senha!",
+          "Falha ao tentar alterar senha!"
+        );
+      }
+
+      if (response.data === 2) {
+        Alert.alert(
+          "Falha ao tentar alterar senha!",
+          "Falha ao tentar alterar senha!"
+        );
       }
     } catch (error) {
-      console.log("ERROR =>", error);
+      Alert.alert(
+        "Erro ao tentar alterar senha!",
+        "Erro ao tentar alterar senha!"
+      );
     }
   };
 
@@ -90,7 +106,7 @@ export function CreatePassword() {
       >
         <Controller
           control={control}
-          name="password"
+          name="novaSenha"
           render={({ field: { onChange, value } }) => (
             <Input
               placeholder="Crie uma senha"
@@ -98,14 +114,14 @@ export function CreatePassword() {
               mb={8}
               onChangeText={onChange}
               value={value}
-              errorMessage={errors.password?.message}
+              errorMessage={errors.novaSenha?.message}
             />
           )}
         />
 
         <Controller
           control={control}
-          name="password_confirm"
+          name="novaSenhaConfirmada"
           render={({ field: { onChange, value } }) => (
             <Input
               placeholder="Confirme sua senha"
@@ -113,7 +129,7 @@ export function CreatePassword() {
               onChangeText={onChange}
               returnKeyType="send"
               value={value}
-              errorMessage={errors.password_confirm?.message}
+              errorMessage={errors.novaSenhaConfirmada?.message}
             />
           )}
         />

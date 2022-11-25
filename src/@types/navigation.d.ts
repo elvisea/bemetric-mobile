@@ -45,6 +45,11 @@ export declare global {
         tokenCliente?: string;
       };
 
+      TemporaryPassword: {
+        email: string;
+        password: string;
+      };
+
       // Pra Cima OK
 
       Clients: undefined;

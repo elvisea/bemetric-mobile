@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "react-native";
 import { Box, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
@@ -8,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import Logo from "@assets/logo.svg";
 
+import api from "@services/api";
 import { useAuth } from "@hooks/auth";
 
 import { Input } from "@components/Input";
@@ -42,9 +44,49 @@ export function SignIn() {
 
   const handleLogin = async ({ email, password }: FormProps) => {
     try {
-      signIn({ email, password });
+      const response = await api.post("/Usuario/ValidarLogin", {
+        email,
+        senha: password,
+        tipoaplicacao: 1,
+      });
+
+      if (response.data.erro === 0) {
+        await signIn(response.data);
+      }
+
+      if (response.data.erro === 1) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email do login não cadastrado. Tente novamente."
+        );
+      }
+
+      if (response.data.erro === 2) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email do login não habilitado. Tente novamente."
+        );
+      }
+
+      if (response.data.erro === 3) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email do login não é do cliente. Tente novamente."
+        );
+      }
+
+      if (response.data.erro === 4) {
+        Alert.alert(
+          "Erro ao tentar fazer login!",
+          "Email ou Senha inválida. Tente novamente."
+        );
+      }
+
+      if (response.data.erro === 5) {
+        navigation.navigate("TemporaryPassword", { email, password });
+      }
     } catch (error) {
-      console.log("ERROR =>", error);
+      Alert.alert("Erro ao tentar fazer login!", "Erro ao tentar fazer login!");
     }
   };
 

@@ -12,6 +12,7 @@ import { CreateAccount } from "@screens/AuthScreens/CreateAccount";
 import { CreatePassword } from "@screens/AuthScreens/CreatePassword";
 import { VerifyToken } from "@screens/AuthScreens/VerifyToken";
 import { ClientCode } from "@screens/AuthScreens/ClientCode";
+import { TemporaryPassword } from "@screens/AuthScreens/TemporaryPassword";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function AuthStackRoutes() {
         <Screen name="CreatePassword" component={CreatePassword} />
         <Screen name="VerifyToken" component={VerifyToken} />
         <Screen name="ClientCode" component={ClientCode} />
+        <Screen name="TemporaryPassword" component={TemporaryPassword} />
       </Navigator>
     </>
   );

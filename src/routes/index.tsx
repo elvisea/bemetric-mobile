@@ -26,11 +26,7 @@ const Routes = () => {
     }
   };
 
-  return (
-    <NavigationContainer>
-      {switchNavigation()}
-    </NavigationContainer>
-  );
+  return <NavigationContainer>{switchNavigation()}</NavigationContainer>;
 };
 
 export { Routes };

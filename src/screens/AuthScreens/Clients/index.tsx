@@ -1,5 +1,6 @@
+import { Alert } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Feather } from "@expo/vector-icons";
 import { Box, VStack, Select, FormControl, Heading } from "native-base";
@@ -11,6 +12,7 @@ import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
 import { Customer } from "@interfaces/Customer";
+import { CUSTOMER, TOKEN, USER } from "@constants/storage";
 
 import { Header } from "@components/Header";
 import { ButtonFull } from "@components/ButtonFull";
@@ -18,14 +20,22 @@ import { HeaderWelcome } from "@components/HeaderWelcome";
 
 export function Clients() {
   const { user } = useAuth();
-  const { addCustomer } = useCustomer();
+  const { resetUserState } = useAuth();
+  const { addCustomer, resetCustomerState } = useCustomer();
 
-  const navigation = useNavigation();
-
-  const [customer, setCustomer] = useState<Customer>({} as Customer);
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([] as Customer[]);
 
-  const handleNextPage = () => addCustomer(customer);
+  const handleNextPage = () => {
+    if (customer) addCustomer(customer);
+
+    if (!customer) {
+      Alert.alert(
+        "Usuário não possui Clientes!",
+        "Usuário não possui Clientes cadastrados."
+      );
+    }
+  };
 
   const handleAddCustomer = (selected: string) => {
     const selectedCustomer = customers.find(
@@ -37,15 +47,33 @@ export function Clients() {
     }
   };
 
+  const clearStorage = async () => {
+    await AsyncStorage.removeItem(USER);
+    await AsyncStorage.removeItem(CUSTOMER);
+    await AsyncStorage.removeItem(TOKEN);
+
+    resetUserState();
+    resetCustomerState();
+  };
+
   useEffect(() => {
     const fetch = async () => {
       try {
-        const response = await api.post("/Cliente/ObterLista", {
-          codigoParceiro: user?.codigoParceiro,
+        const response = await api.post("/Usuario/ListaClientesUsuario", {
+          codigoUsuario: user?.codigoUsuario,
         });
 
-        setCustomers(response.data);
-      } catch (error) {}
+        if (response.status === 204) {
+          Alert.alert(
+            "Usuário não possui Clientes!",
+            "Usuário não possui Clientes cadastrados."
+          );
+        }
+
+        if (response.status === 200) {
+          setCustomers(response.data);
+        }
+      } catch (error) { }
     };
 
     if (user) fetch();
@@ -59,7 +87,7 @@ export function Clients() {
       alignItems="center"
       justifyContent="flex-start"
     >
-      <Header icon="chevron-left" functionIcon={() => navigation.goBack()} />
+      <Header icon="chevron-left" functionIcon={clearStorage} />
 
       <HeaderWelcome name="Paulo Castro" />
       <Box
@@ -99,14 +127,15 @@ export function Clients() {
             borderBottomColor="blue.700"
             onValueChange={(selected) => handleAddCustomer(selected)}
           >
-            {customers.map((customer, index) => (
-              <Select.Item
-                key={index}
-                alignItems="center"
-                value={customer.token}
-                label={customer.nomeCliente}
-              />
-            ))}
+            {customers.length > 0 &&
+              customers.map((customer, index) => (
+                <Select.Item
+                  key={index}
+                  alignItems="center"
+                  value={customer.token}
+                  label={customer.nomeCliente}
+                />
+              ))}
           </Select>
         </FormControl>
       </Box>

@@ -1,5 +1,5 @@
-export const USER = "@eaware:user";
+export const USER = "@b2k:user";
 
-export const CUSTOMER = "@eaware:customer";
+export const CUSTOMER = "@b2k:customer";
 
-export const TOKEN = "@eaware:token";
+export const TOKEN = "@b2k:token";
