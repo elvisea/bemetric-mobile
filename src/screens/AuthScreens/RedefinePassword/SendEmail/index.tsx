@@ -1,7 +1,8 @@
 import React from "react";
 import { Alert } from "react-native";
+
 import { Box } from "native-base";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -14,26 +15,15 @@ import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 interface FormProps {
-  client: string;
-  identification: string;
-}
-
-interface Params {
-  name: string;
   email: string;
-  type: number;
 }
 
 const schema = yup.object({
-  client: yup.string().required("Informe o cliente"),
-  identification: yup.string().required("Informe a identificação"),
+  email: yup.string().required("Informe seu e-mail").email("E-mail inválido"),
 });
 
-export function CreateAccount() {
+export function SendEmail() {
   const navigation = useNavigation();
-
-  const route = useRoute();
-  const { name, email, type } = route.params as Params;
 
   const {
     control,
@@ -43,27 +33,39 @@ export function CreateAccount() {
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({ client, identification }: FormProps) => {
+  const handleNextPage = async ({ email }: FormProps) => {
     try {
-      const response = await api.get(
-        `/Cliente/ValidarCpfCnpj?CpfCnpj=${Number(identification)}`
-      );
+      const response = await api.post("/Usuario/EsqueciSenha", {
+        email,
+        tipoAplicacao: 1,
+      });
 
       if (response.data === 0) {
-        navigation.navigate("CreatePassword", {
-          name,
-          email,
-          client,
-          identification,
-          type,
-        });
+        navigation.navigate("ValidateCode", { email });
       }
 
       if (response.data === 1) {
-        Alert.alert("CPF/CNPJ já cadastrado!", "CPF/CNPJ já cadastrado!");
+        Alert.alert(
+          "Erro ao tentar redefinir senha!",
+          "Email não foi encontrado. Tente novamente."
+        );
+      }
+
+      if (response.data === 2) {
+        Alert.alert(
+          "Erro ao tentar redefinir senha!",
+          "Email não está habilitado."
+        );
+      }
+
+      if (response.data === 3) {
+        Alert.alert(
+          "Erro ao tentar redefinir senha!",
+          "Email inválido. Tente novamente."
+        );
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar validar dados!", `${error}`);
+      Alert.alert("Erro ao tentar redefinir senha!", `${error}`);
     }
   };
 
@@ -83,29 +85,16 @@ export function CreateAccount() {
       >
         <Controller
           control={control}
-          name="client"
+          name="email"
           render={({ field: { onChange, value } }) => (
             <Input
-              placeholder="Nome do Cliente"
-              mb={4}
+              placeholder="E-mail"
               onChangeText={onChange}
               value={value}
-              errorMessage={errors.client?.message}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="identification"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              placeholder="CPF ou CNPJ"
-              onChangeText={onChange}
-              keyboardType="numeric"
+              errorMessage={errors.email?.message}
+              keyboardType="email-address"
               returnKeyType="send"
-              value={value}
-              errorMessage={errors.identification?.message}
+              onSubmitEditing={handleSubmit(handleNextPage)}
             />
           )}
         />

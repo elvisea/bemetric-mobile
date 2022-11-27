@@ -50,6 +50,17 @@ export declare global {
         password: string;
       };
 
+      SendEmail: undefined;
+
+      ValidateCode: {
+        email: string;
+      };
+
+      EnterNewPassword: {
+        email: string;
+        codigoAtivacao: string;
+      };
+
       // Pra Cima OK
 
       Clients: undefined;

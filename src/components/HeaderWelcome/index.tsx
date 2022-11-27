@@ -1,7 +1,8 @@
 import React from "react";
-import { Container } from "./styles";
 import { Heading } from "native-base";
+
 import { THEME } from "@theme/theme";
+import { Container } from "./styles";
 
 type Props = {
   name: string;

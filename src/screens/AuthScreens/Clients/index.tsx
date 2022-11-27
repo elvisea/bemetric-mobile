@@ -73,7 +73,9 @@ export function Clients() {
         if (response.status === 200) {
           setCustomers(response.data);
         }
-      } catch (error) { }
+      } catch (error) {
+        Alert.alert("Erro ao tentar listar Clientes!", `${error}`);
+      }
     };
 
     if (user) fetch();

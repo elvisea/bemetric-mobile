@@ -21,8 +21,8 @@ import {
 import { AuthProvider } from '@hooks/auth';
 import { CustomerProvider } from "@hooks/customer"
 
-import { Routes } from "./src/routes";
-import { THEME } from "./src/theme/theme";
+import { THEME } from '@theme/theme';
+import { Routes } from '@routes/index';
 
 import { Loading } from "@components/Loading";
 

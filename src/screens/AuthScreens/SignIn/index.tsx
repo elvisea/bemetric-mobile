@@ -1,6 +1,6 @@
 import React from "react";
-import { Alert } from "react-native";
-import { Box, VStack } from "native-base";
+import { Alert, TouchableOpacity } from "react-native";
+import { Box, Heading, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
@@ -47,7 +47,7 @@ export function SignIn() {
       const response = await api.post("/Usuario/ValidarLogin", {
         email,
         senha: password,
-        tipoaplicacao: 1,
+        tipoAplicacao: 1,
       });
 
       if (response.data.erro === 0) {
@@ -86,7 +86,7 @@ export function SignIn() {
         navigation.navigate("TemporaryPassword", { email, password });
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar fazer login!", "Erro ao tentar fazer login!");
+      Alert.alert("Erro ao tentar fazer login!", `${error}`);
     }
   };
 
@@ -139,6 +139,12 @@ export function SignIn() {
           h={52}
           onPress={handleSubmit(handleLogin)}
         />
+
+        <TouchableOpacity onPress={() => navigation.navigate("SendEmail")}>
+          <Heading mt={8} color="white" fontSize={14}>
+            Esqueci minha senha!
+          </Heading>
+        </TouchableOpacity>
       </Box>
 
       <Box w="full">
