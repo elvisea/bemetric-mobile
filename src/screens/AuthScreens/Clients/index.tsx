@@ -91,7 +91,7 @@ export function Clients() {
     >
       <Header icon="chevron-left" functionIcon={clearStorage} />
 
-      <HeaderWelcome name="Paulo Castro" />
+      {user && <HeaderWelcome name={user.nomeUsuario} />}
       <Box
         px={8}
         flex={1}

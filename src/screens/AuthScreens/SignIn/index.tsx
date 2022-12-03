@@ -71,7 +71,7 @@ export function SignIn() {
       if (response.data.erro === 3) {
         Alert.alert(
           "Erro ao tentar fazer login!",
-          "Email do login não é do cliente. Tente novamente."
+          "Email do login não é de cliente."
         );
       }
 
