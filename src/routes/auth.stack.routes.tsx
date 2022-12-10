@@ -38,7 +38,7 @@ export default function AuthStackRoutes() {
         <Screen name="TemporaryPassword" component={TemporaryPassword} />
         <Screen name="SendEmail" component={SendEmail} />
         <Screen name="ValidateCode" component={ValidateCode} />
-        <Screen name="EnterNewPasword" component={EnterNewPassword} />
+        <Screen name="EnterNewPassword" component={EnterNewPassword} />
       </Navigator>
     </>
   );

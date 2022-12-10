@@ -69,12 +69,11 @@ export function ValidateCode() {
       console.log("Response =>", response.data);
 
       if (response.data === 0) {
-        Alert.alert("Conta criada com sucesso!", "Conta criada com sucesso!", [
-          {
-            text: "Efetuar Login!",
-            onPress: () => navigation.navigate("SignIn"),
-          },
-        ]);
+        navigation.navigate("EnterNewPassword", {
+          codigoAtivacao: token,
+          email
+        })
+
       }
 
       if (response.data === 1) {
@@ -103,10 +102,16 @@ export function ValidateCode() {
       );
 
       if (response.data === 1) {
-        Alert.alert("OK");
+        Alert.alert(
+          "Código reenviado com sucesso!",
+          "Código reenviado com sucesso. Verifique seu e-mail."
+        );
       }
     } catch (error) {
-      console.log("ERROR =>", error);
+      Alert.alert(
+        "Não foi possível reenviar o código!",
+        "Não foi possível reenviar o código. Tente novamente mais tarde."
+      );
     }
   };
 
@@ -155,6 +160,7 @@ export function ValidateCode() {
                   placeholder="0"
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="numeric"
                   errorMessage={errors.firstDigit?.message}
                 />
               )}
@@ -170,6 +176,7 @@ export function ValidateCode() {
                   placeholder="0"
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="numeric"
                   errorMessage={errors.secondDigit?.message}
                 />
               )}
@@ -185,6 +192,7 @@ export function ValidateCode() {
                   placeholder="0"
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="numeric"
                   errorMessage={errors.thirdDigit?.message}
                 />
               )}
@@ -200,6 +208,7 @@ export function ValidateCode() {
                   placeholder="0"
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="numeric"
                   errorMessage={errors.fourthDigit?.message}
                 />
               )}
@@ -215,6 +224,7 @@ export function ValidateCode() {
                   placeholder="0"
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="numeric"
                   errorMessage={errors.fifthDigit?.message}
                 />
               )}
@@ -230,6 +240,7 @@ export function ValidateCode() {
                   placeholder="0"
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="numeric"
                   errorMessage={errors.sixthDigit?.message}
                 />
               )}

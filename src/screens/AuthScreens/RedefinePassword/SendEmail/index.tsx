@@ -37,7 +37,7 @@ export function SendEmail() {
     try {
       const response = await api.post("/Usuario/EsqueciSenha", {
         email,
-        tipoAplicacao: 1,
+        tipoAplicacao: 0,
       });
 
       if (response.data === 0) {

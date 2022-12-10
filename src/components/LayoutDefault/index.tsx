@@ -4,8 +4,10 @@ import { Box, VStack, IconButton } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ColorSchemeType } from "native-base/lib/typescript/components/types";
 
-import { Icon } from "./styles";
+import Logo from "@assets/b2k.svg"
 import { THEME } from "@theme/theme";
+
+import { Icon } from "./styles";
 
 type Props = {
   bg: ColorSchemeType;
@@ -41,6 +43,9 @@ export function LayoutDefault({
         justifyContent="flex-start"
       >
         <IconButton icon={<Icon name={icon} />} onPress={functionIcon} />
+        <Box flex={1} alignItems="center" justifyContent="center">
+          <Logo />
+        </Box>
       </Box>
 
       <Box
