@@ -86,9 +86,7 @@ export function Equipamentos() {
                     description={equipament.description}
                     // onPress={() => console.log("Próxima Pagina =>")}
                     onPress={() =>
-                      navigation.navigate("EquipamentoTabRoutes", {
-                        screen: "Equipamento",
-                      })
+                      navigation.navigate("EquipamentoTabRoutes")
                     }
                   />
                 ))}

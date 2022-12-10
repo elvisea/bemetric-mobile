@@ -61,6 +61,12 @@ export declare global {
         codigoAtivacao: string;
       };
 
+      DetalhesEquipamento: undefined;
+
+      Equipamentos: undefined;
+
+      EquipamentoTabRoutes: undefined;
+
       // Pra Cima OK
 
       Clients: undefined;
@@ -68,9 +74,7 @@ export declare global {
       VincularCliente: undefined;
       AtivarCodigo: undefined;
       // Equipamentos: undefined;
-      EquipamentoTabRoutes: {
-        screen: string;
-      };
+      EquipamentosScreen: undefined;
     }
   }
 }
