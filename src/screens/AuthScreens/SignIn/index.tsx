@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, TouchableOpacity } from "react-native";
 import { Box, Heading, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -91,6 +92,22 @@ export function SignIn() {
   };
 
   const handleCreateAccount = () => navigation.navigate("NameAndEmail");
+
+  async function getSetupDateTime() {
+    try {
+      const response = await api.get("setup/DateTime")
+      console.log(response.data);
+
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error);
+      }
+    }
+  }
+
+  useEffect(() => {
+    getSetupDateTime();
+  }, [])
 
   return (
     <VStack
