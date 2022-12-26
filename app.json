@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "b2kbemetrics",
-    "slug": "b2kbemetrics",
+    "name": "bemetrics",
+    "slug": "bemetrics",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,7 @@
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/bd653e93-78cc-422c-8bed-904d0d79efef"
+      "url": "https://u.expo.dev/f52fcfed-7c2d-4265-9cf7-5ae87f222951"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -32,7 +32,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "bd653e93-78cc-422c-8bed-904d0d79efef"
+        "projectId": "f52fcfed-7c2d-4265-9cf7-5ae87f222951"
       }
     },
     "runtimeVersion": {
