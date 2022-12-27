@@ -63,6 +63,8 @@ export declare global {
 
       DetalhesEquipamento: undefined;
 
+      EquipmentDetails: undefined;
+
       Equipamentos: undefined;
 
       EquipamentoTabRoutes: undefined;

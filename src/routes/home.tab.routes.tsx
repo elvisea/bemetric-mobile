@@ -13,15 +13,13 @@ import { Incluir } from "@screens/AppScreens/Incluir";
 import { Trocar } from "@screens/AppScreens/Trocar";
 import { Marcadores } from "@screens/AppScreens/Marcadores";
 
-import DetalhesEquipamentoTabRoutes from "./equipamento.tab.routes";
-import EquipamentosStackRoutes from "./equipamentos.stack.routes";
-
 const Tab = createBottomTabNavigator();
 
 export default function HomeTabRoutes() {
   return (
     <>
       <StatusBar backgroundColor={THEME.colors.blue[700]} />
+
       <Tab.Navigator
         initialRouteName="Equipamentos"
         screenOptions={{
@@ -33,26 +31,13 @@ export default function HomeTabRoutes() {
       >
         <Tab.Screen
           name="Equipamentos"
-          component={EquipamentosStackRoutes}
+          component={Equipamentos}
           options={{
-            // tabBarStyle: { display: "none" },
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="settings" color={color} size={size} />
             ),
           }}
         />
-        {/* 
-        <Tab.Screen
-          name="DetalhesEquipamento"
-          component={DetalhesEquipamentoTabRoutes}
-
-          options={{
-            tabBarStyle: { display: "none" },
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="settings" color={color} size={size} />
-            ),
-          }}
-        /> */}
 
         <Tab.Screen
           name="Incluir"
@@ -63,6 +48,7 @@ export default function HomeTabRoutes() {
             ),
           }}
         />
+
         <Tab.Screen
           name="Trocar"
           component={Trocar}
@@ -72,6 +58,7 @@ export default function HomeTabRoutes() {
             ),
           }}
         />
+
         <Tab.Screen
           name="Marcadores"
           component={Marcadores}

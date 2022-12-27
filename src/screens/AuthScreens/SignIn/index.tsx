@@ -95,9 +95,8 @@ export function SignIn() {
 
   async function getSetupDateTime() {
     try {
-      const response = await api.get("setup/DateTime")
+      const response = await api.get("setup/DateTime");
       console.log(response.data);
-
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error);
@@ -107,7 +106,7 @@ export function SignIn() {
 
   useEffect(() => {
     getSetupDateTime();
-  }, [])
+  }, []);
 
   return (
     <VStack

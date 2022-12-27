@@ -71,9 +71,8 @@ export function ValidateCode() {
       if (response.data === 0) {
         navigation.navigate("EnterNewPassword", {
           codigoAtivacao: token,
-          email
-        })
-
+          email,
+        });
       }
 
       if (response.data === 1) {
