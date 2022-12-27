@@ -22,7 +22,7 @@ export default function AppDrawerRoutes() {
           drawerLabelStyle: { color: THEME.colors.white },
           drawerContentStyle: {
             backgroundColor: THEME.colors.blue[700],
-          }
+          },
         }}
       >
         <Screen

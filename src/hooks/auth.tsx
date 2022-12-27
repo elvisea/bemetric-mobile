@@ -13,11 +13,11 @@ import api from "@services/api";
 
 import { TOKEN, USER } from "@constants/storage";
 
-import { User } from "@interfaces/User";
+import { IUser } from "@interfaces/IUser";
 
 type AuthContextData = {
-  user: User | null;
-  signIn: (data: User) => Promise<void>;
+  user: IUser | null;
+  signIn: (data: IUser) => Promise<void>;
   resetUserState: () => void;
 };
 
@@ -28,9 +28,9 @@ type AuthProviderProps = {
 export const AuthContext = createContext({} as AuthContextData);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
 
-  const signIn = async (data: User) => {
+  const signIn = async (data: IUser) => {
     try {
       await AsyncStorage.setItem(TOKEN, data.jwtToken);
       await AsyncStorage.setItem(USER, JSON.stringify(data));
@@ -56,7 +56,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const storage = await AsyncStorage.getItem(USER);
 
     if (storage) {
-      const user = (await JSON.parse(storage)) as User;
+      const user = (await JSON.parse(storage)) as IUser;
       setUser(user);
     }
   };

@@ -9,11 +9,11 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { CUSTOMER } from "@constants/storage";
-import { Customer } from "@interfaces/Customer";
+import { ICustomer } from "@interfaces/ICustomer";
 
 type CustomerContextData = {
-  customer: Customer | null;
-  addCustomer: (customer: Customer) => Promise<void>;
+  customer: ICustomer | null;
+  addCustomer: (customer: ICustomer) => Promise<void>;
   resetCustomerState: () => void;
 };
 
@@ -24,9 +24,9 @@ type CustomerProviderProps = {
 export const CustomerContext = createContext({} as CustomerContextData);
 
 const CustomerProvider = ({ children }: CustomerProviderProps) => {
-  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customer, setCustomer] = useState<ICustomer | null>(null);
 
-  const addCustomer = async (customer: Customer) => {
+  const addCustomer = async (customer: ICustomer) => {
     setCustomer(customer);
     await AsyncStorage.setItem(CUSTOMER, JSON.stringify(customer));
   };
@@ -36,7 +36,7 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
   const loadCustomerStorage = async () => {
     const storage = await AsyncStorage.getItem(CUSTOMER);
     if (storage) {
-      const data = (await JSON.parse(storage)) as Customer;
+      const data = (await JSON.parse(storage)) as ICustomer;
       setCustomer(data);
     }
   };

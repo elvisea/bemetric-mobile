@@ -1,4 +1,4 @@
-export interface Customer {
+export interface ICustomer {
   incluir: boolean;
   codigoCliente: number;
   codigoParceiro: number;

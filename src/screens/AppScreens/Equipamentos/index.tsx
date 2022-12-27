@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -13,21 +17,28 @@ import { AccordionList } from "@components/AccordionList";
 import { AccordionItem } from "@components/AccordionItem";
 import { AccordionSession } from "@components/AccordionSession";
 
+import axios from "axios";
+
+import api from "@services/api";
+
 import { THEME } from "@theme/theme";
-import { clients } from "@fakes/clients";
 
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
+import { IGrouping } from "@interfaces/IGrouping";
 import { CUSTOMER, TOKEN, USER } from "@constants/storage";
 
 export function Equipamentos() {
   const navigation = useNavigation();
 
-  const { resetUserState } = useAuth();
+  const { resetUserState, user } = useAuth();
   const { resetCustomerState } = useCustomer();
 
   const [expanded, setExpanded] = useState("");
+  const [groupings, setGroupings] = useState<IGrouping[]>([]);
+
+  console.log("Groupings:", groupings);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -50,6 +61,34 @@ export function Equipamentos() {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const fetchUser = async () => {
+        try {
+          if (user) {
+            const response = await api.post("Agrupamento/ObterLista", {
+              codigoCliente: user.codigoCliente,
+              codigoUsuario: user.codigoUsuario,
+              localDashboard: 3,
+            });
+
+            setGroupings(response.data);
+          }
+        } catch (e) {
+          if (axios.isAxiosError(e)) console.log("ERROR:", e);
+        }
+      };
+
+      fetchUser();
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
+
   return (
     <LayoutDefault
       bg={THEME.colors.white}
@@ -64,26 +103,26 @@ export function Equipamentos() {
         </TouchableOpacity>
 
         <FlatList
-          data={clients}
-          keyExtractor={(item) => item.id.toString()}
+          data={groupings}
+          keyExtractor={(item) => item.codigoAgrupamento.toString()}
           style={{ width: "100%" }}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item: client }) => (
+          renderItem={({ item: grouping }) => (
             <AccordionSession>
               <AccordionList
-                expanded={client.title === expanded}
-                title={client.title}
-                description={client.description}
-                onPress={() => handleExpanded(client.title)}
+                expanded={grouping.nomeAgrupamento === expanded}
+                title={grouping.nomeAgrupamento}
+                description={""}
+                onPress={() => handleExpanded(grouping.nomeAgrupamento)}
               />
 
-              {client.title === expanded &&
-                client.equipaments.map((equipament) => (
+              {grouping.nomeAgrupamento === expanded &&
+                grouping.listaEquipamentos.map((equipament) => (
                   <AccordionItem
-                    key={equipament.id}
+                    key={equipament.codigoEquipamento}
                     expanded={false}
-                    title={equipament.title}
-                    description={equipament.description}
+                    title={equipament.nomeEquipamento}
+                    description={equipament.nomeEquipamento}
                     onPress={() => navigation.navigate("EquipmentDetails")}
                   />
                 ))}

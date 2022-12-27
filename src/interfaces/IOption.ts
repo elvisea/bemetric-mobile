@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 
-export interface Option {
+export interface IOption {
   id: string;
   icon: keyof typeof Feather.glyphMap;
   width: string;

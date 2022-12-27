@@ -11,7 +11,7 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
-import { Customer } from "@interfaces/Customer";
+import { ICustomer } from "@interfaces/ICustomer";
 import { CUSTOMER, TOKEN, USER } from "@constants/storage";
 
 import { Header } from "@components/Header";
@@ -23,8 +23,8 @@ export function Clients() {
   const { resetUserState } = useAuth();
   const { addCustomer, resetCustomerState } = useCustomer();
 
-  const [customer, setCustomer] = useState<Customer | null>(null);
-  const [customers, setCustomers] = useState<Customer[]>([] as Customer[]);
+  const [customer, setCustomer] = useState<ICustomer | null>(null);
+  const [customers, setCustomers] = useState<ICustomer[]>([] as ICustomer[]);
 
   const handleNextPage = () => {
     if (customer) addCustomer(customer);
