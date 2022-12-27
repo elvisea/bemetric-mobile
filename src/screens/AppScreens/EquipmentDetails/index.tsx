@@ -4,7 +4,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { Box } from "native-base";
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 
 import { THEME } from "@theme/theme";
@@ -16,9 +16,8 @@ import { PeriodoPermanencia } from "@components/Options/PeriodoPermanencia";
 import { Trajeto } from "@components/Options/Trajeto";
 import { DispositivoTelemetria } from "@components/Options/DispositivoTelemetria";
 
-import { Option } from "@interfaces/Option";
+import { IOption } from "@interfaces/IOption";
 import { options } from "@constants/options";
-
 
 export function EquipmentDetails() {
   const navigation = useNavigation();
@@ -32,7 +31,7 @@ export function EquipmentDetails() {
     5: <DispositivoTelemetria />,
   };
 
-  const [selectedOption, setSelectedOption] = useState<Option>(options[0]);
+  const [selectedOption, setSelectedOption] = useState<IOption>(options[0]);
 
   return (
     <LayoutDefault

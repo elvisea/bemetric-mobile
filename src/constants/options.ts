@@ -1,6 +1,6 @@
-import { Option } from "@interfaces/Option";
+import { IOption } from "@interfaces/IOption";
 
-export const options: Option[] = [
+export const options: IOption[] = [
   {
     id: "1",
     icon: "settings",
