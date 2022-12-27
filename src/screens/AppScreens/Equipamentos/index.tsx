@@ -84,10 +84,7 @@ export function Equipamentos() {
                     expanded={false}
                     title={equipament.title}
                     description={equipament.description}
-                    // onPress={() => console.log("Próxima Pagina =>")}
-                    onPress={() =>
-                      navigation.navigate("EquipamentoTabRoutes")
-                    }
+                    onPress={() => navigation.navigate("EquipmentDetails")}
                   />
                 ))}
             </AccordionSession>

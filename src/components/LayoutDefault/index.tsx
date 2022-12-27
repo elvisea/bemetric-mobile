@@ -4,7 +4,7 @@ import { Box, VStack, IconButton } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ColorSchemeType } from "native-base/lib/typescript/components/types";
 
-import Logo from "@assets/b2k.svg"
+import Logo from "@assets/b2k.svg";
 import { THEME } from "@theme/theme";
 
 import { Icon } from "./styles";
