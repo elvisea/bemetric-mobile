@@ -38,8 +38,6 @@ export function Equipamentos() {
   const [expanded, setExpanded] = useState("");
   const [groupings, setGroupings] = useState<IGrouping[]>([]);
 
-  console.log("Groupings:", groupings);
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const clearStorage = async () => {
@@ -112,7 +110,7 @@ export function Equipamentos() {
               <AccordionList
                 expanded={grouping.nomeAgrupamento === expanded}
                 title={grouping.nomeAgrupamento}
-                description={""}
+                description={grouping.descricao}
                 onPress={() => handleExpanded(grouping.nomeAgrupamento)}
               />
 
