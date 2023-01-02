@@ -1,5 +1,12 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+  FontAwesome,
+  AntDesign,
+} from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
+import { Path } from "phosphor-react-native";
 
 import { THEME } from "@theme/theme";
 
@@ -25,8 +32,8 @@ export function DetailsTopTabs() {
         name="Equipamento"
         component={Equipamento}
         options={{
-          tabBarIcon: ({}) => (
-            <MaterialIcons name="settings" color="#FFF" size={22} />
+          tabBarIcon: ({ }) => (
+            <FontAwesome name="gears" color="#FFF" size={22} />
           ),
         }}
       />
@@ -34,8 +41,8 @@ export function DetailsTopTabs() {
         name="DadosTelemetria"
         component={DadosTelemetria}
         options={{
-          tabBarIcon: ({}) => (
-            <MaterialIcons name="android" color="#FFF" size={22} />
+          tabBarIcon: ({ }) => (
+            <AntDesign name="database" color="#FFF" size={22} />
           ),
         }}
       />
@@ -43,8 +50,12 @@ export function DetailsTopTabs() {
         name="PeriodoPermanencia"
         component={PeriodoPermanencia}
         options={{
-          tabBarIcon: ({}) => (
-            <MaterialIcons name="data-usage" color="#FFF" size={22} />
+          tabBarIcon: ({ }) => (
+            <MaterialCommunityIcons
+              name="clock-outline"
+              color="#FFF"
+              size={22}
+            />
           ),
         }}
       />
@@ -52,16 +63,14 @@ export function DetailsTopTabs() {
         name="Trajeto"
         component={Trajeto}
         options={{
-          tabBarIcon: ({}) => (
-            <MaterialIcons name="map" color="#FFF" size={22} />
-          ),
+          tabBarIcon: ({ }) => <Path color="#FFF" size={26} />,
         }}
       />
       <Tab.Screen
         name="DispositivoTelemetria"
         component={DispositivoTelemetria}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ }) => (
             <MaterialIcons name="wifi" color="#FFF" size={22} />
           ),
         }}
