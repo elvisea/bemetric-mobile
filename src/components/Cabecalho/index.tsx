@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 
 type Props = {};
 
-export function Cabecalho({ }: Props) {
+export function Cabecalho({}: Props) {
   const navigation = useNavigation();
 
   return (
@@ -26,7 +26,7 @@ export function Cabecalho({ }: Props) {
         onPress={() => navigation.goBack()}
       />
 
-      <Logo />
+      {/* <Logo /> */}
 
       <IconButton
         icon={<Icon name="settings" />}

@@ -147,8 +147,8 @@ export function VerifyToken() {
   return (
     <LayoutDefault
       bg="blue.700"
-      icon="chevron-left"
-      functionIcon={() => navigation.goBack()}
+      firstIcon="chevron-left"
+      handleFirstIcon={() => navigation.goBack()}
       justifyContent="space-between"
     >
       <Box px={4} width="full" alignItems="center" justifyContent="center">

@@ -85,8 +85,8 @@ export function ClientCode() {
   return (
     <LayoutDefault
       bg="blue.700"
-      icon="chevron-left"
-      functionIcon={() => navigation.goBack()}
+      firstIcon="chevron-left"
+      handleFirstIcon={() => navigation.goBack()}
       justifyContent="flex-start"
     >
       <Box

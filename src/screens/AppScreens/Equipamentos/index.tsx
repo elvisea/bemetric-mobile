@@ -90,8 +90,12 @@ export function Equipamentos() {
   return (
     <LayoutDefault
       bg={THEME.colors.white}
-      icon="menu"
-      functionIcon={handleMenu}
+      firstIcon="menu"
+      secondIcon="notifications-on"
+      thirdIcon="message"
+      handleFirstIcon={handleMenu}
+      handleSecondIcon={() => navigation.navigate("Notifications")}
+      handleThirdIcon={() => navigation.navigate("Messages")}
     >
       <VStack flex={1} w="full" px={`${RFValue(12)}px`} pt={`${RFValue(16)}px`}>
         <TouchableOpacity onPress={clearStorage}>

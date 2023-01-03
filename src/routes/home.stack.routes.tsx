@@ -9,6 +9,8 @@ import { THEME } from "@theme/theme";
 import HomeTabRoutes from "./home.tab.routes";
 import { Cabecalho } from "@components/Cabecalho";
 import { DetailsTopTabs } from "./details.top.tabs.routes";
+import { NotificationsTopTabs } from "./notifications.top.tabs.routes";
+import MessagesStackRoutes from "./messages.stack.routes";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +28,24 @@ export default function HomeStackRoutes() {
         <Stack.Screen
           name="EquipmentDetails"
           component={DetailsTopTabs}
+          options={{
+            header: () => <Cabecalho />,
+            animation: "none",
+          }}
+        />
+
+        <Stack.Screen
+          name="Notifications"
+          component={NotificationsTopTabs}
+          options={{
+            header: () => <Cabecalho />,
+            animation: "none",
+          }}
+        />
+
+        <Stack.Screen
+          name="Messages"
+          component={MessagesStackRoutes}
           options={{
             header: () => <Cabecalho />,
             animation: "none",

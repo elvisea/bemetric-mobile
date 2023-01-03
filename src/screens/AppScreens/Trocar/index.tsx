@@ -11,8 +11,8 @@ export function Trocar() {
   return (
     <LayoutDefault
       bg={THEME.colors.shape}
-      icon="menu"
-      functionIcon={handleMenu}
+      firstIcon="menu"
+      handleFirstIcon={handleMenu}
     />
   );
 }
