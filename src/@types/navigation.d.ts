@@ -69,6 +69,9 @@ export declare global {
 
       EquipamentoTabRoutes: undefined;
 
+      Notifications: undefined;
+      Messages: undefined;
+
       // Pra Cima OK
 
       Clients: undefined;
