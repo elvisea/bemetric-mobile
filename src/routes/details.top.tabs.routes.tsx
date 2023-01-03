@@ -10,11 +10,11 @@ import { Path } from "phosphor-react-native";
 
 import { THEME } from "@theme/theme";
 
-import { DadosTelemetria } from "@screens/AppScreens/Options/DadosTelemetria";
-import { DispositivoTelemetria } from "@screens/AppScreens/Options/DispositivoTelemetria";
-import { Equipamento } from "@screens/AppScreens/Options/Equipamento";
-import { PeriodoPermanencia } from "@screens/AppScreens/Options/PeriodoPermanencia";
-import { Trajeto } from "@screens/AppScreens/Options/Trajeto";
+import { DadosTelemetria } from "@screens/AppScreens/EquipmentDetails/DadosTelemetria";
+import { DispositivoTelemetria } from "@screens/AppScreens/EquipmentDetails/DispositivoTelemetria";
+import { Equipamento } from "@screens/AppScreens/EquipmentDetails/Equipamento";
+import { PeriodoPermanencia } from "@screens/AppScreens/EquipmentDetails/PeriodoPermanencia";
+import { Trajeto } from "@screens/AppScreens/EquipmentDetails/Trajeto";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -32,7 +32,7 @@ export function DetailsTopTabs() {
         name="Equipamento"
         component={Equipamento}
         options={{
-          tabBarIcon: ({}) => (
+          tabBarIcon: ({ }) => (
             <FontAwesome name="gears" color="#FFF" size={22} />
           ),
         }}
@@ -41,7 +41,7 @@ export function DetailsTopTabs() {
         name="DadosTelemetria"
         component={DadosTelemetria}
         options={{
-          tabBarIcon: ({}) => (
+          tabBarIcon: ({ }) => (
             <AntDesign name="database" color="#FFF" size={22} />
           ),
         }}
@@ -50,7 +50,7 @@ export function DetailsTopTabs() {
         name="PeriodoPermanencia"
         component={PeriodoPermanencia}
         options={{
-          tabBarIcon: ({}) => (
+          tabBarIcon: ({ }) => (
             <MaterialCommunityIcons
               name="clock-outline"
               color="#FFF"
@@ -63,14 +63,14 @@ export function DetailsTopTabs() {
         name="Trajeto"
         component={Trajeto}
         options={{
-          tabBarIcon: ({}) => <Path color="#FFF" size={26} />,
+          tabBarIcon: ({ }) => <Path color="#FFF" size={26} />,
         }}
       />
       <Tab.Screen
         name="DispositivoTelemetria"
         component={DispositivoTelemetria}
         options={{
-          tabBarIcon: ({}) => (
+          tabBarIcon: ({ }) => (
             <MaterialIcons name="wifi" color="#FFF" size={22} />
           ),
         }}

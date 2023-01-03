@@ -89,7 +89,7 @@ export function Clients() {
       alignItems="center"
       justifyContent="flex-start"
     >
-      <Header firstIcon="chevron-left" functionIcon={clearStorage} />
+      <Header icon="chevron-left" functionIcon={clearStorage} />
 
       {user && <HeaderWelcome name={user.nomeUsuario} />}
       <Box
