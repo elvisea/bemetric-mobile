@@ -8,10 +8,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { THEME } from "@theme/theme";
 
-import { Equipamentos } from "@screens/AppScreens/Equipamentos";
-import { Incluir } from "@screens/AppScreens/Incluir";
-import { Trocar } from "@screens/AppScreens/Trocar";
-import { Marcadores } from "@screens/AppScreens/Marcadores";
+import { Equipments } from "@screens/AppScreens/Equipments";
+import { Include } from "@screens/AppScreens/Include";
+import { Change } from "@screens/AppScreens/Change";
+import { Markers } from "@screens/AppScreens/Markers";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +21,7 @@ export default function HomeTabRoutes() {
       <StatusBar backgroundColor={THEME.colors.blue[700]} />
 
       <Tab.Navigator
-        initialRouteName="Equipamentos"
+        initialRouteName="Equipments"
         screenOptions={{
           headerShown: false,
           tabBarStyle: styles.tabBarStyle,
@@ -30,8 +30,8 @@ export default function HomeTabRoutes() {
         }}
       >
         <Tab.Screen
-          name="Equipamentos"
-          component={Equipamentos}
+          name="Equipments"
+          component={Equipments}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="settings" color={color} size={size} />
@@ -40,8 +40,8 @@ export default function HomeTabRoutes() {
         />
 
         <Tab.Screen
-          name="Incluir"
-          component={Incluir}
+          name="Include"
+          component={Include}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="add" color={color} size={size} />
@@ -50,8 +50,8 @@ export default function HomeTabRoutes() {
         />
 
         <Tab.Screen
-          name="Trocar"
-          component={Trocar}
+          name="Change"
+          component={Change}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="sync" color={color} size={size} />
@@ -60,8 +60,8 @@ export default function HomeTabRoutes() {
         />
 
         <Tab.Screen
-          name="Marcadores"
-          component={Marcadores}
+          name="Markers"
+          component={Markers}
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="location-pin" color={color} size={size} />

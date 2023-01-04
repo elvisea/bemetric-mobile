@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 
 import { Box } from "native-base";
@@ -27,6 +27,8 @@ const schema = yup.object({
 export function NameAndEmail() {
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -37,6 +39,8 @@ export function NameAndEmail() {
 
   const handleNextPage = async ({ name, email }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.get(`/Usuario/ValidarEmail?email=${email}`);
 
       if (response.data === 0) {
@@ -47,7 +51,9 @@ export function NameAndEmail() {
         Alert.alert("Email já cadastrado!", "Email já cadastrado!");
       }
     } catch (error) {
-      console.log("ERROR =>", error);
+      console.log("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,7 +101,11 @@ export function NameAndEmail() {
           )}
         />
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }

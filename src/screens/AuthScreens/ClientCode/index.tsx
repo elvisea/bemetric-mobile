@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -41,6 +41,8 @@ const schema = yup.object({
 export function ClientCode() {
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const route = useRoute();
   const { name, email, type } = route.params as Params;
 
@@ -63,6 +65,8 @@ export function ClientCode() {
     const token = `${firstDigit}${secondDigit}${thirdDigit}${fourthDigit}${fifthDigit}${sixthDigit}`;
 
     try {
+      setIsLoading(true);
+
       const response = await api.get(`/Cliente/ValidarToken?token=${token}`);
 
       if (response.data === 0) {
@@ -79,6 +83,8 @@ export function ClientCode() {
       }
     } catch (error) {
       console.log("ERROR =>", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -197,7 +203,11 @@ export function ClientCode() {
           </Box>
         </HStack>
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }

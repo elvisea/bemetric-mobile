@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -39,6 +39,9 @@ const schema = yup.object({
 export function ValidateCode() {
   const navigation = useNavigation();
 
+  const [isSending, setIsSending] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
   const route = useRoute();
   const { email } = route.params as Params;
 
@@ -61,6 +64,8 @@ export function ValidateCode() {
     const token = `${firstDigit}${secondDigit}${thirdDigit}${fourthDigit}${fifthDigit}${sixthDigit}`;
 
     try {
+      setIsSending(true);
+
       const response = await api.post("/Usuario/ValidarCodigoAtivacao", {
         email,
         codigoAtivacao: Number(token),
@@ -90,12 +95,16 @@ export function ValidateCode() {
       }
     } catch (error) {
       Alert.alert("Erro ao tentar criar conta", `${error}`);
+    } finally {
+      setIsSending(false);
     }
   };
 
   // Arrumar
   const handleResendToken = async () => {
     try {
+      setIsResending(true);
+
       const response = await api.post(
         `/Usuario/GerarCodigoAtivacao?email=${email}`
       );
@@ -111,6 +120,8 @@ export function ValidateCode() {
         "Não foi possível reenviar o código!",
         "Não foi possível reenviar o código. Tente novamente mais tarde."
       );
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -254,6 +265,7 @@ export function ValidateCode() {
           h={52}
           w="full"
           mb={4}
+          isLoading={isResending}
           onPress={handleResendToken}
         />
 
@@ -261,6 +273,7 @@ export function ValidateCode() {
           title="Enviar"
           h={52}
           w="full"
+          isLoading={isSending}
           onPress={handleSubmit(handleNextPage)}
         />
       </Box>

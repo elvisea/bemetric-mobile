@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 import { Box } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -32,6 +32,8 @@ const schema = yup.object({
 export function CreateAccount() {
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const route = useRoute();
   const { name, email, type } = route.params as Params;
 
@@ -45,6 +47,8 @@ export function CreateAccount() {
 
   const handleNextPage = async ({ client, identification }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.get(
         `/Cliente/ValidarCpfCnpj?CpfCnpj=${Number(identification)}`
       );
@@ -64,6 +68,8 @@ export function CreateAccount() {
       }
     } catch (error) {
       Alert.alert("Erro ao tentar validar dados!", `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -110,7 +116,11 @@ export function CreateAccount() {
           )}
         />
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }

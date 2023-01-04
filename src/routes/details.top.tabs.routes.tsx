@@ -10,11 +10,11 @@ import { Path } from "phosphor-react-native";
 
 import { THEME } from "@theme/theme";
 
-import { DadosTelemetria } from "@screens/AppScreens/EquipmentDetails/DadosTelemetria";
-import { DispositivoTelemetria } from "@screens/AppScreens/EquipmentDetails/DispositivoTelemetria";
-import { Equipamento } from "@screens/AppScreens/EquipmentDetails/Equipamento";
-import { PeriodoPermanencia } from "@screens/AppScreens/EquipmentDetails/PeriodoPermanencia";
-import { Trajeto } from "@screens/AppScreens/EquipmentDetails/Trajeto";
+import { TelemetryData } from "@screens/AppScreens/EquipmentDetails/TelemetryData";
+import { TelemetryDevice } from "@screens/AppScreens/EquipmentDetails/TelemetryDevice";
+import { Equipament } from "@screens/AppScreens/EquipmentDetails/Equipament";
+import { Period } from "@screens/AppScreens/EquipmentDetails/Period";
+import { Route } from "@screens/AppScreens/EquipmentDetails/Route";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -29,28 +29,26 @@ export function DetailsTopTabs() {
       }}
     >
       <Tab.Screen
-        name="Equipamento"
-        component={Equipamento}
+        name="Equipament"
+        component={Equipament}
         options={{
-          tabBarIcon: ({ }) => (
-            <FontAwesome name="gears" color="#FFF" size={22} />
-          ),
+          tabBarIcon: () => <FontAwesome name="gears" color="#FFF" size={22} />,
         }}
       />
       <Tab.Screen
-        name="DadosTelemetria"
-        component={DadosTelemetria}
+        name="TelemetryData"
+        component={TelemetryData}
         options={{
-          tabBarIcon: ({ }) => (
+          tabBarIcon: () => (
             <AntDesign name="database" color="#FFF" size={22} />
           ),
         }}
       />
       <Tab.Screen
-        name="PeriodoPermanencia"
-        component={PeriodoPermanencia}
+        name="Period"
+        component={Period}
         options={{
-          tabBarIcon: ({ }) => (
+          tabBarIcon: () => (
             <MaterialCommunityIcons
               name="clock-outline"
               color="#FFF"
@@ -60,17 +58,17 @@ export function DetailsTopTabs() {
         }}
       />
       <Tab.Screen
-        name="Trajeto"
-        component={Trajeto}
+        name="Route"
+        component={Route}
         options={{
-          tabBarIcon: ({ }) => <Path color="#FFF" size={26} />,
+          tabBarIcon: () => <Path color="#FFF" size={26} />,
         }}
       />
       <Tab.Screen
-        name="DispositivoTelemetria"
-        component={DispositivoTelemetria}
+        name="TelemetryDevice"
+        component={TelemetryDevice}
         options={{
-          tabBarIcon: ({ }) => (
+          tabBarIcon: () => (
             <MaterialIcons name="wifi" color="#FFF" size={22} />
           ),
         }}

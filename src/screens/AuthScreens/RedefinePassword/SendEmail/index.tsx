@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 
 import { Box } from "native-base";
@@ -25,6 +25,8 @@ const schema = yup.object({
 export function SendEmail() {
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -35,6 +37,8 @@ export function SendEmail() {
 
   const handleNextPage = async ({ email }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.post("/Usuario/EsqueciSenha", {
         email,
         tipoAplicacao: 0,
@@ -66,6 +70,8 @@ export function SendEmail() {
       }
     } catch (error) {
       Alert.alert("Erro ao tentar redefinir senha!", `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,7 +105,12 @@ export function SendEmail() {
           )}
         />
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box } from "native-base";
 import { Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -38,6 +38,8 @@ export function TemporaryPassword() {
   const route = useRoute();
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { email, password } = route.params as Params;
 
   const {
@@ -50,6 +52,8 @@ export function TemporaryPassword() {
 
   const handleNextPage = async ({ novaSenha }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.put("Usuario/TrocarSenhaTemporaria", {
         email,
         senha: password,
@@ -87,6 +91,8 @@ export function TemporaryPassword() {
         "Erro ao tentar alterar senha!",
         "Erro ao tentar alterar senha!"
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,7 +140,12 @@ export function TemporaryPassword() {
           )}
         />
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }
