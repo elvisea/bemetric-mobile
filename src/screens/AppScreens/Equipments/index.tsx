@@ -34,7 +34,7 @@ export function Equipments() {
   const navigation = useNavigation();
 
   const { resetUserState, user } = useAuth();
-  const { resetCustomerState } = useCustomer();
+  const { resetCustomerState, customer } = useCustomer();
 
   const [expanded, setExpanded] = useState("");
   const [groupings, setGroupings] = useState<IGrouping[]>([]);
@@ -66,9 +66,9 @@ export function Equipments() {
 
       const fetchUser = async () => {
         try {
-          if (user) {
+          if (user && customer) {
             const response = await api.post("Agrupamento/ObterLista", {
-              codigoCliente: user.codigoCliente,
+              codigoCliente: customer.codigoCliente,
               codigoUsuario: user.codigoUsuario,
               localDashboard: 3,
             });

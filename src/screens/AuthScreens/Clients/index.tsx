@@ -37,9 +37,9 @@ export function Clients() {
     }
   };
 
-  const handleAddCustomer = (selected: string) => {
+  const handleAddCustomer = (selected: number) => {
     const selectedCustomer = customers.find(
-      (customer) => customer.token === selected
+      (customer) => customer.codigoCliente === selected
     );
 
     if (selectedCustomer) {
@@ -127,14 +127,14 @@ export function Clients() {
             borderRightWidth={0}
             borderRadius={0}
             borderBottomColor="blue.700"
-            onValueChange={(selected) => handleAddCustomer(selected)}
+            onValueChange={(selected) => handleAddCustomer(Number(selected))}
           >
             {customers.length > 0 &&
-              customers.map((customer, index) => (
+              customers.map((customer) => (
                 <Select.Item
-                  key={index}
+                  key={customer.codigoCliente}
                   alignItems="center"
-                  value={customer.token}
+                  value={customer.codigoCliente.toString()}
                   label={customer.nomeCliente}
                 />
               ))}
