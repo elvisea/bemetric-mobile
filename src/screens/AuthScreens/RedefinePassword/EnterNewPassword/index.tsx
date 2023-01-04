@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 
 import { Box } from "native-base";
@@ -39,6 +39,8 @@ export function EnterNewPassword() {
   const route = useRoute();
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { email, codigoAtivacao } = route.params as Params;
 
   const {
@@ -51,6 +53,8 @@ export function EnterNewPassword() {
 
   const handleNextPage = async ({ password }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.put(`/Usuario/AlterarEsqueciSenha`, {
         email,
         codigoAtivacao,
@@ -107,6 +111,8 @@ export function EnterNewPassword() {
       }
     } catch (error) {
       Alert.alert("Erro ao tentar criar nova senha!", `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -154,7 +160,12 @@ export function EnterNewPassword() {
           )}
         />
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }

@@ -2,9 +2,9 @@ import * as React from "react";
 import { StatusBar } from "expo-status-bar";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
-import { DetalhesConta } from "@screens/AppScreens/DetalhesConta";
-import { AlterarCliente } from "@screens/AppScreens/AlterarCliente";
-import { AtendimentoSuporte } from "@screens/AppScreens/AtendimentoSuporte";
+import { AccountDetails } from "@screens/AppScreens/AccountDetails";
+import { ChangeClient } from "@screens/AppScreens/ChangeClient";
+import { SupportService } from "@screens/AppScreens/SupportService";
 
 import { THEME } from "@theme/theme";
 import HomeStackRoutes from "./home.stack.routes";
@@ -32,21 +32,21 @@ export default function AppDrawerRoutes() {
         />
 
         <Screen
-          name="DetalhesConta"
+          name="AccountDetails"
           options={{ drawerLabel: "Detalhes da Conta" }}
-          component={DetalhesConta}
+          component={AccountDetails}
         />
 
         <Screen
-          name="AlterarCliente"
+          name="ChangeClient"
           options={{ drawerLabel: "Alterar Cliente" }}
-          component={AlterarCliente}
+          component={ChangeClient}
         />
 
         <Screen
-          name="AtendimentoSuporte"
+          name="SupportService"
           options={{ drawerLabel: "Atendimento de Suporte" }}
-          component={AtendimentoSuporte}
+          component={SupportService}
         />
       </Navigator>
     </>

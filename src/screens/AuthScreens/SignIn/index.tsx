@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, TouchableOpacity } from "react-native";
 import { Box, Heading, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
@@ -33,6 +33,8 @@ const schema = yup.object({
 export function SignIn() {
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -45,6 +47,8 @@ export function SignIn() {
 
   const handleLogin = async ({ email, password }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.post("/Usuario/ValidarLogin", {
         email,
         senha: password,
@@ -88,6 +92,8 @@ export function SignIn() {
       }
     } catch (error) {
       Alert.alert("Erro ao tentar fazer login!", `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -153,6 +159,7 @@ export function SignIn() {
           mt={8}
           w={188}
           h={52}
+          isLoading={isLoading}
           onPress={handleSubmit(handleLogin)}
         />
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert } from "react-native";
 import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -45,6 +45,9 @@ const schema = yup.object({
 export function VerifyToken() {
   const navigation = useNavigation();
 
+  const [isSending, setIsSending] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
   const route = useRoute();
   const params = route.params as Params;
 
@@ -78,17 +81,21 @@ export function VerifyToken() {
     };
 
     try {
+      setIsSending(true);
+
       const response = await api.post("/Usuario/CriarContaApp", data);
 
-      console.log("Response =>", response.data);
-
       if (response.data === 0) {
-        Alert.alert("Conta criada com sucesso!", "Conta criada com sucesso!", [
-          {
-            text: "",
-            onPress: () => navigation.navigate("SignIn"),
-          },
-        ]);
+        Alert.alert(
+          "Conta criada com sucesso!",
+          "Conta criada com sucesso. Você já fazer login na sua conta!",
+          [
+            {
+              text: "Login",
+              onPress: () => navigation.navigate("SignIn"),
+            },
+          ]
+        );
       }
 
       if (response.data === 1) {
@@ -127,20 +134,29 @@ export function VerifyToken() {
       }
     } catch (error) {
       Alert.alert("Erro ao tentar criar conta", `${error}`);
+    } finally {
+      setIsSending(false);
     }
   };
 
   const handleResendToken = async () => {
     try {
+      setIsResending(true);
+
       const response = await api.post(
         `/Usuario/GerarCodigoAtivacao?email=${params.email}`
       );
 
       if (response.data === 1) {
-        Alert.alert("OK");
+        Alert.alert(
+          "Código reenviado com sucesso!",
+          "Código reenviado com sucesso. Verifique sua caixa de e-mail."
+        );
       }
     } catch (error) {
-      console.log("ERROR =>", error);
+      console.log("Error:", error);
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -278,6 +294,7 @@ export function VerifyToken() {
           h={52}
           w="full"
           mb={4}
+          isLoading={isResending}
           onPress={handleResendToken}
         />
 
@@ -285,6 +302,7 @@ export function VerifyToken() {
           title="Enviar"
           h={52}
           w="full"
+          isLoading={isSending}
           onPress={handleSubmit(handleNextPage)}
         />
       </Box>

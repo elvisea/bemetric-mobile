@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -41,6 +41,8 @@ export function CreatePassword() {
   const route = useRoute();
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { name, email, client, identification, type, tokenCliente } =
     route.params as Params;
 
@@ -54,6 +56,8 @@ export function CreatePassword() {
 
   const handleNextPage = async ({ password }: FormProps) => {
     try {
+      setIsLoading(true);
+
       const response = await api.post(
         `/Usuario/GerarCodigoAtivacao?email=${email}`
       );
@@ -71,6 +75,8 @@ export function CreatePassword() {
       }
     } catch (error) {
       console.log("ERROR =>", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,7 +124,11 @@ export function CreatePassword() {
           )}
         />
       </Box>
-      <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleNextPage)}
+      />
     </LayoutDefault>
   );
 }
