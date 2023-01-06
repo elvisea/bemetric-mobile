@@ -1,10 +1,14 @@
 import * as React from "react";
-import { Text, View } from "react-native";
+import { VStack } from "native-base";
+
+import { EquipmentDetailsHeader } from "@components/EquipmentDetailsHeader";
+
+import { THEME } from "@theme/theme";
 
 export function Route() {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Trajeto!</Text>
-    </View>
+    <VStack flex={1} width="full" bg={THEME.colors.shape}>
+      <EquipmentDetailsHeader title="Trajeto" />
+    </VStack>
   );
 }

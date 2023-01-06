@@ -64,7 +64,10 @@ export declare global {
 
       DetalhesEquipamento: undefined;
 
-      EquipmentDetails: undefined;
+      EquipmentDetails: {
+        screen: "Equipament";
+        params: { codigoEquipamento: number };
+      };
 
       Equipamentos: undefined;
 

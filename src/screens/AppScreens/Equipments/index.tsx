@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+
 import {
   useNavigation,
   DrawerActions,
@@ -126,7 +127,14 @@ export function Equipments() {
                     expanded={false}
                     title={equipament.nomeEquipamento}
                     description={equipament.nomeEquipamento}
-                    onPress={() => navigation.navigate("EquipmentDetails")}
+                    onPress={() =>
+                      navigation.navigate("EquipmentDetails", {
+                        screen: "Equipament",
+                        params: {
+                          codigoEquipamento: equipament.codigoEquipamento,
+                        },
+                      })
+                    }
                   />
                 ))}
             </AccordionSession>
