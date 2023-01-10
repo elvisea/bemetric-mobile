@@ -2,17 +2,16 @@ import React, { useCallback, useState } from "react";
 import { Box, HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import {
-  FontAwesome,
-  Ionicons,
-  SimpleLineIcons,
-  Entypo,
-} from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
 import axios from "axios";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
+
+import IconSnapshot from "@assets/snapshot.svg";
+import IconSpeedometer from "@assets/speedometer.svg";
+import IconHourMeter from "@assets/hourmeter.svg";
 
 import { IEquipmentDetails } from "@interfaces/IEquipmentDetails";
 
@@ -40,6 +39,9 @@ export function Equipament() {
           const response = await api.post("/Equipamento/ObterLista", {
             codigoEquipamento: params.codigoEquipamento,
           });
+
+          console.log("DATA:", response.data);
+
 
           setEquipment(response.data[0]);
         } catch (error) {
@@ -175,7 +177,7 @@ export function Equipament() {
       </VStack>
 
       <SnapshotDataItem
-        icon={<Entypo name="gauge" color={THEME.colors.blue[700]} size={22} />}
+        icon={<IconSnapshot />}
         title="Dados instantâneos"
         color="blue.700"
         mb="8px"
@@ -192,11 +194,7 @@ export function Equipament() {
         />
       </SnapshotDataItem>
 
-      <SnapshotDataItem
-        icon={<Ionicons name="speedometer" color="#878787" size={22} />}
-        title="Velocimetro"
-        mb="8px"
-      >
+      <SnapshotDataItem icon={<IconSpeedometer />} title="Velocimetro" mb="8px">
         <Text
           color="#0FD329"
           fontSize="16px"
@@ -222,11 +220,7 @@ export function Equipament() {
         </Text>
       </SnapshotDataItem>
 
-      <SnapshotDataItem
-        icon={<SimpleLineIcons name="speedometer" color="#878787" size={22} />}
-        title="Horímetro"
-        mb="8px"
-      >
+      <SnapshotDataItem icon={<IconHourMeter />} title="Horímetro" mb="8px">
         <Text
           color="#0FD329"
           fontSize="16px"

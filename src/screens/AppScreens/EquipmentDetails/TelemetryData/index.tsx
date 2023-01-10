@@ -10,7 +10,7 @@ export function TelemetryData() {
   return (
     <VStack flex={1} width="full" bg={THEME.colors.shape}>
       <EquipmentDetailsHeader title="Dados de telemetria">
-        <IconButton icon={<Icon name="sliders" />} onPress={() => { }} />
+        <IconButton icon={<Icon name="sliders" />} onPress={() => {}} />
       </EquipmentDetailsHeader>
     </VStack>
   );

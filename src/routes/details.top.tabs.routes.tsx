@@ -1,14 +1,12 @@
-import {
-  MaterialIcons,
-  MaterialCommunityIcons,
-  FontAwesome,
-  AntDesign,
-} from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-import { Path } from "phosphor-react-native";
-
 import { THEME } from "@theme/theme";
+
+import IconTelemetryData from "@assets/telemetry-data.svg";
+import IconPeriod from "@assets/period.svg";
+import IconRoute from "@assets/route.svg";
+import IconTelemetryDevice from "@assets/telemetry-device.svg";
 
 import { TelemetryData } from "@screens/AppScreens/EquipmentDetails/TelemetryData";
 import { TelemetryDevice } from "@screens/AppScreens/EquipmentDetails/TelemetryDevice";
@@ -38,40 +36,22 @@ export function DetailsTopTabs() {
       <Tab.Screen
         name="TelemetryData"
         component={TelemetryData}
-        options={{
-          tabBarIcon: () => (
-            <AntDesign name="database" color="#FFF" size={22} />
-          ),
-        }}
+        options={{ tabBarIcon: () => <IconTelemetryData /> }}
       />
       <Tab.Screen
         name="Period"
         component={Period}
-        options={{
-          tabBarIcon: () => (
-            <MaterialCommunityIcons
-              name="clock-outline"
-              color="#FFF"
-              size={22}
-            />
-          ),
-        }}
+        options={{ tabBarIcon: () => <IconPeriod /> }}
       />
       <Tab.Screen
         name="Route"
         component={Route}
-        options={{
-          tabBarIcon: () => <Path color="#FFF" size={26} />,
-        }}
+        options={{ tabBarIcon: () => <IconRoute /> }}
       />
       <Tab.Screen
         name="TelemetryDevice"
         component={TelemetryDevice}
-        options={{
-          tabBarIcon: () => (
-            <MaterialIcons name="wifi" color="#FFF" size={22} />
-          ),
-        }}
+        options={{ tabBarIcon: () => <IconTelemetryDevice /> }}
       />
     </Tab.Navigator>
   );
