@@ -5,7 +5,7 @@ type Props = ITextProps & {
   title: string;
 };
 
-export function EquipmentDetailsDescription({ title, ...rest }: Props) {
+export function DetailsDescription({ title, ...rest }: Props) {
   return (
     <Text
       color="black"

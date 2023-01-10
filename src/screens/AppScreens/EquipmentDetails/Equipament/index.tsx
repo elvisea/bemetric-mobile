@@ -16,9 +16,10 @@ import IconHourMeter from "@assets/hourmeter.svg";
 import { IEquipmentDetails } from "@interfaces/IEquipmentDetails";
 
 import { SnapshotDataItem } from "@components/SnapshotDataItem";
-import { EquipmentDetailsTitle } from "@components/EquipmentDetailsTitle";
-import { EquipmentDetailsHeader } from "@components/EquipmentDetailsHeader";
-import { EquipmentDetailsDescription } from "@components/EquipmentDetailsDescription";
+
+import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
+import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
+import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
 
 interface IParams {
   codigoEquipamento: number;
@@ -40,9 +41,6 @@ export function Equipament() {
             codigoEquipamento: params.codigoEquipamento,
           });
 
-          console.log("DATA:", response.data);
-
-
           setEquipment(response.data[0]);
         } catch (error) {
           if (axios.isAxiosError(error)) console.log("Error:", error);
@@ -59,7 +57,7 @@ export function Equipament() {
 
   return (
     <ScrollView flex={1} width="full" bg={THEME.colors.shape}>
-      <EquipmentDetailsHeader title="Equipamento">
+      <DetailsHeader title="Equipamento">
         <Box h="full" justifyContent="center" alignItems="center">
           <Text
             color="gray.50"
@@ -77,39 +75,37 @@ export function Equipament() {
             24/11/2021 - 15:31
           </Text>
         </Box>
-      </EquipmentDetailsHeader>
+      </DetailsHeader>
 
       <VStack marginBottom="24px" paddingX="16px" width="full">
         <Box marginTop="16px">
-          <EquipmentDetailsTitle title="Nome do equipamento" />
-          <EquipmentDetailsDescription
+          <DetailsTitle title="Nome do equipamento" />
+          <DetailsDescription
             title={equipment ? equipment.nomeEquipamento : ""}
           />
         </Box>
 
         <Box marginTop="16px">
-          <EquipmentDetailsTitle title="Nome do cliente" />
-          <EquipmentDetailsDescription
-            title={equipment ? equipment.nomeCliente : ""}
-          />
+          <DetailsTitle title="Nome do cliente" />
+          <DetailsDescription title={equipment ? equipment.nomeCliente : ""} />
         </Box>
 
         <Box marginTop="16px">
-          <EquipmentDetailsTitle title="Agrupamento" />
-          <EquipmentDetailsDescription title={"Nome Agrupamento"} />
+          <DetailsTitle title="Agrupamento" />
+          <DetailsDescription title={"Nome Agrupamento"} />
         </Box>
 
         <HStack marginTop="16px">
           <Box w="50%">
-            <EquipmentDetailsTitle title="Tipo" />
-            <EquipmentDetailsDescription
+            <DetailsTitle title="Tipo" />
+            <DetailsDescription
               title={equipment ? equipment.tipoEquipamento : ""}
             />
           </Box>
 
           <Box>
-            <EquipmentDetailsTitle title="Data de aquisição" />
-            <EquipmentDetailsDescription
+            <DetailsTitle title="Data de aquisição" />
+            <DetailsDescription
               title={
                 equipment
                   ? new Date(equipment.dataAquisicao).toLocaleString()
@@ -121,15 +117,13 @@ export function Equipament() {
 
         <HStack marginTop="16px">
           <Box w="50%">
-            <EquipmentDetailsTitle title="Placa" />
-            <EquipmentDetailsDescription
-              title={equipment ? equipment.placa : ""}
-            />
+            <DetailsTitle title="Placa" />
+            <DetailsDescription title={equipment ? equipment.placa : ""} />
           </Box>
 
           <Box>
-            <EquipmentDetailsTitle title="Identificador" />
-            <EquipmentDetailsDescription
+            <DetailsTitle title="Identificador" />
+            <DetailsDescription
               title={
                 equipment
                   ? new Date(equipment.identificador).toLocaleString()
@@ -141,24 +135,20 @@ export function Equipament() {
 
         <HStack marginTop="16px">
           <Box w="50%">
-            <EquipmentDetailsTitle title="Modelo" />
-            <EquipmentDetailsDescription
-              title={equipment ? equipment.modelo : ""}
-            />
+            <DetailsTitle title="Modelo" />
+            <DetailsDescription title={equipment ? equipment.modelo : ""} />
           </Box>
 
           <Box>
-            <EquipmentDetailsTitle title="Ano" />
-            <EquipmentDetailsDescription
-              title={equipment ? equipment.ano : ""}
-            />
+            <DetailsTitle title="Ano" />
+            <DetailsDescription title={equipment ? equipment.ano : ""} />
           </Box>
         </HStack>
 
         <HStack marginTop="16px">
           <Box w="50%">
-            <EquipmentDetailsTitle title="Horímetro inicial" />
-            <EquipmentDetailsDescription
+            <DetailsTitle title="Horímetro inicial" />
+            <DetailsDescription
               title={
                 equipment ? `${equipment.horimetroIncial.toString()} horas` : ""
               }
@@ -166,8 +156,8 @@ export function Equipament() {
           </Box>
 
           <Box>
-            <EquipmentDetailsTitle title="Hodômetro inicial" />
-            <EquipmentDetailsDescription
+            <DetailsTitle title="Hodômetro inicial" />
+            <DetailsDescription
               title={
                 equipment ? `${equipment.hodometroIncial.toString()} km` : ""
               }
@@ -183,7 +173,7 @@ export function Equipament() {
         mb="8px"
       >
         <IconButton
-          onPress={() => { }}
+          onPress={() => {}}
           icon={
             <FontAwesome
               name="refresh"
