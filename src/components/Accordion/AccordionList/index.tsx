@@ -24,17 +24,30 @@ export function AccordionList({
   return (
     <Container>
       <Button {...rest}>
-        <Box flexDirection="row" alignItems="center" justifyContent="center">
+        <Box
+          flex={1}
+          width="full"
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="flex-start"
+        >
           <Icone />
 
           <Box
+            width="100%"
             ml={`${RFValue(12)}px`}
             alignItems="flex-start"
             justifyContent="center"
           >
             <Title>{title}</Title>
 
-            <Description>{description}</Description>
+            <Description
+              ellipsizeMode="tail"
+              numberOfLines={1}
+              style={{ width: "80%" }}
+            >
+              {description}
+            </Description>
           </Box>
         </Box>
 
