@@ -69,12 +69,23 @@ export declare global {
         params: { codigoEquipamento: number };
       };
 
+      IncludeStackRoutes: {
+        screen: string;
+        // params: { codigoEquipamento: number };
+      };
+
+      TelemetryDevice: {
+        codigoEquipamento: number;
+      };
+
       Equipamentos: undefined;
 
       EquipamentoTabRoutes: undefined;
 
       Notifications: undefined;
       Messages: undefined;
+
+      Manual: undefined;
 
       // Pra Cima OK
 

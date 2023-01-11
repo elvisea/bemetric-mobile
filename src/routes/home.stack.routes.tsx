@@ -11,6 +11,7 @@ import { Cabecalho } from "@components/Cabecalho";
 import { DetailsTopTabs } from "./details.top.tabs.routes";
 import { NotificationsTopTabs } from "./notifications.top.tabs.routes";
 import MessagesStackRoutes from "./messages.stack.routes";
+import IncludeStackRoutes from "./include.stack.routes";
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,15 @@ export default function HomeStackRoutes() {
           options={{
             header: () => <Cabecalho />,
             animation: "none",
+          }}
+        />
+
+        <Stack.Screen
+          name="IncludeStackRoutes"
+          component={IncludeStackRoutes}
+          options={{
+            animation: "none",
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

@@ -12,15 +12,43 @@ import { DetailsDescription } from "@components/EquipmentDetails/Typography/Deta
 
 import { Registry } from "@components/EquipmentDetails/Registry";
 import { Signals } from "@components/EquipmentDetails/Signals";
+import { useFocusEffect } from "@react-navigation/native";
+import api from "@services/api";
+import axios from "axios";
 
-const registry = [
-  "Última atualização",
-  "Ativa desde",
-  "Fim do suporte",
-  "Data de aquisição",
-];
+const registry = ["Última atualização", "Ativa desde"];
 
 export function TelemetryDevice() {
+  const [data, setData] = React.useState();
+
+  console.log("DATA:", data);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+
+      async function fetchData() {
+        try {
+          const response = await api.post(
+            "/Equipamento/ObterDadosDispositivo",
+            {
+              codigoEquipamento: 16,
+            }
+          );
+
+          setData(response.data[0]);
+        } catch (error) {
+          if (axios.isAxiosError(error)) console.log("Error:", error);
+        }
+      }
+
+      fetchData();
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
   return (
     <VStack flex={1} width="full" bg={THEME.colors.shape}>
       <DetailsHeader title="Dispositivo de Telemetria" />
@@ -61,15 +89,11 @@ export function TelemetryDevice() {
         <Box flexWrap="wrap" w="331px" flexDirection="row">
           <Signals
             icon={
-              <MaterialIcons
-                name="radio-button-on"
-                color="#00C020"
-                size={22}
-              />
+              <MaterialIcons name="radio-button-on" color="#00C020" size={22} />
             }
             title="Status"
             value="Ativo"
-            onPress={() => { }}
+            onPress={() => {}}
           />
 
           <Signals
@@ -79,7 +103,7 @@ export function TelemetryDevice() {
             title="Nível de bateria"
             value="75%"
             ml="10px"
-            onPress={() => { }}
+            onPress={() => {}}
           />
 
           <Signals
@@ -87,7 +111,7 @@ export function TelemetryDevice() {
             title="Sinal de Wi-fi"
             value="100%"
             mt="10px"
-            onPress={() => { }}
+            onPress={() => {}}
           />
 
           <Signals
@@ -96,7 +120,7 @@ export function TelemetryDevice() {
             value="100%"
             mt="10px"
             ml="10px"
-            onPress={() => { }}
+            onPress={() => {}}
           />
         </Box>
       </Center>

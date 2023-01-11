@@ -9,9 +9,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { THEME } from "@theme/theme";
 
 import { Equipments } from "@screens/AppScreens/Equipments";
-import { Include } from "@screens/AppScreens/Include";
 import { Change } from "@screens/AppScreens/Change";
 import { Markers } from "@screens/AppScreens/Markers";
+
+import IncludeStackRoutes from "./include.stack.routes";
+import { Include } from "@screens/AppScreens/Include";
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +35,7 @@ export default function HomeTabRoutes() {
           name="Equipments"
           component={Equipments}
           options={{
+            tabBarLabel: "Equipamentos",
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="settings" color={color} size={size} />
             ),
@@ -43,6 +46,7 @@ export default function HomeTabRoutes() {
           name="Include"
           component={Include}
           options={{
+            tabBarLabel: "Incluir",
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="add" color={color} size={size} />
             ),
@@ -53,6 +57,7 @@ export default function HomeTabRoutes() {
           name="Change"
           component={Change}
           options={{
+            tabBarLabel: "Trocar",
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="sync" color={color} size={size} />
             ),
@@ -63,6 +68,7 @@ export default function HomeTabRoutes() {
           name="Markers"
           component={Markers}
           options={{
+            tabBarLabel: "Marcadores",
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="location-pin" color={color} size={size} />
             ),

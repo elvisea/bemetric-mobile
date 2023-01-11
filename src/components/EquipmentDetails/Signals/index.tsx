@@ -52,7 +52,6 @@ export function Signals({
           {value}
         </Text>
       </VStack>
-
     </Pressable>
   );
 }
