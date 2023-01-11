@@ -36,7 +36,7 @@ export function Include() {
         title="Idendificação manual"
         onPress={() =>
           navigation.navigate("IncludeStackRoutes", {
-            screen: "AddEquipment",
+            screen: "Manual",
           })
         }
       />
