@@ -1,8 +1,11 @@
-import * as React from "react";
+import React, { useCallback, useState } from "react";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { Box, Center, HStack, VStack } from "native-base";
 
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
+import axios from "axios";
+import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
@@ -12,31 +15,36 @@ import { DetailsDescription } from "@components/EquipmentDetails/Typography/Deta
 
 import { Registry } from "@components/EquipmentDetails/Registry";
 import { Signals } from "@components/EquipmentDetails/Signals";
-import { useFocusEffect } from "@react-navigation/native";
-import api from "@services/api";
-import axios from "axios";
+import { ITelemetry } from "@interfaces/ITelemetry";
 
-const registry = ["Última atualização", "Ativa desde"];
+interface IParams {
+  params: {
+    codigoEquipamento: number;
+  };
+}
 
 export function TelemetryDevice() {
-  const [data, setData] = React.useState();
+  const route = useRoute();
+  const { params } = route.params as IParams;
 
-  console.log("DATA:", data);
+  console.log("params TelemetryDevice", params);
+
+  const [telemetry, setTelemetry] = useState<ITelemetry | null>(null);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       let isActive = true;
 
       async function fetchData() {
         try {
           const response = await api.post(
-            "/Equipamento/ObterDadosDispositivo",
+            "/Equipamento/DetalhamentoDispositivoTelemetria",
             {
-              codigoEquipamento: 16,
+              codigoEquipamento: params.codigoEquipamento,
             }
           );
 
-          setData(response.data[0]);
+          setTelemetry(response.data);
         } catch (error) {
           if (axios.isAxiosError(error)) console.log("Error:", error);
         }
@@ -49,6 +57,7 @@ export function TelemetryDevice() {
       };
     }, [])
   );
+
   return (
     <VStack flex={1} width="full" bg={THEME.colors.shape}>
       <DetailsHeader title="Dispositivo de Telemetria" />
@@ -57,67 +66,129 @@ export function TelemetryDevice() {
         <HStack marginTop="16px">
           <Box w="50%">
             <DetailsTitle title="Nº de série" />
-            <DetailsDescription title="741852963" />
+            <DetailsDescription title={telemetry ? telemetry.serial : ""} />
           </Box>
 
           <Box>
             <DetailsTitle title="ID" />
-            <DetailsDescription title="963852741" />
+            <DetailsDescription title={telemetry ? telemetry.serial : ""} />
           </Box>
         </HStack>
 
         <HStack marginTop="16px">
           <Box w="50%">
             <DetailsTitle title="Chave de segurança" />
-            <DetailsDescription title="258369147" />
+            <DetailsDescription title={telemetry ? telemetry.chave : ""} />
           </Box>
 
           <Box>
             <DetailsTitle title="Versão de firmware" />
-            <DetailsDescription title="V.19" />
+            <DetailsDescription title={telemetry ? telemetry.firmware : ""} />
           </Box>
         </HStack>
       </VStack>
 
       <DetailsHeader title="Registros" />
 
-      {registry.map((item) => (
-        <Registry key={item} title={item} date="20/02/2021" mt={1.5} />
-      ))}
+      <Registry
+        title="Última atualização"
+        date={telemetry ? telemetry.dataUltimaAtualizacao : ""}
+        mt={1.5}
+      />
+
+      <Registry
+        title="Ativa desde"
+        date={telemetry ? telemetry.dataAtivacao : ""}
+        mt={1.5}
+      />
 
       <Center mt="16px">
         <Box flexWrap="wrap" w="331px" flexDirection="row">
           <Signals
             icon={
-              <MaterialIcons name="radio-button-on" color="#00C020" size={22} />
+              <MaterialIcons
+                name="bluetooth-connected"
+                color={THEME.colors.blue[700]}
+                size={22}
+              />
             }
-            title="Status"
-            value="Ativo"
+            title="Conectado"
+            mr="10px"
             onPress={() => {}}
           />
 
           <Signals
             icon={
-              <FontAwesome5 name="battery-full" color="#00C020" size={22} />
+              <FontAwesome
+                name="gears"
+                color={THEME.colors.blue[700]}
+                size={22}
+              />
             }
-            title="Nível de bateria"
-            value="75%"
-            ml="10px"
+            title="Teste do Dispositivo"
             onPress={() => {}}
           />
-
           <Signals
-            icon={<FontAwesome5 name="wifi" color="#00C020" size={22} />}
-            title="Sinal de Wi-fi"
-            value="100%"
+            icon={
+              <MaterialIcons
+                name="radio-button-on"
+                color={
+                  telemetry
+                    ? telemetry.status === 0
+                      ? THEME.colors.red[700]
+                      : THEME.colors.green[400]
+                    : ""
+                }
+                size={22}
+              />
+            }
+            title="Status"
+            value={
+              telemetry ? (telemetry.status === 0 ? "Inativo" : "Ativo") : ""
+            }
             mt="10px"
             onPress={() => {}}
           />
 
           <Signals
-            icon={<FontAwesome5 name="signal" color="#00C020" size={22} />}
+            icon={
+              <FontAwesome5
+                name="battery-full"
+                color={THEME.colors.green[400]}
+                size={22}
+              />
+            }
+            title="Nível de bateria"
+            value={telemetry ? `${telemetry.bat.toString()} %` : ""}
+            ml="10px"
+            mt="10px"
+            onPress={() => {}}
+          />
+
+          <Signals
+            icon={
+              <FontAwesome5
+                name="wifi"
+                color={THEME.colors.green[400]}
+                size={22}
+              />
+            }
+            title="Sinal de Wi-fi"
+            value={telemetry ? `${telemetry.wfl.toString()} %` : ""}
+            mt="10px"
+            onPress={() => {}}
+          />
+
+          <Signals
+            icon={
+              <FontAwesome5
+                name="signal"
+                color={THEME.colors.green[400]}
+                size={22}
+              />
+            }
             title="Sinal de dados móveis"
-            value="100%"
+            value={telemetry ? `${telemetry.slt.toString()} %` : ""}
             mt="10px"
             ml="10px"
             onPress={() => {}}

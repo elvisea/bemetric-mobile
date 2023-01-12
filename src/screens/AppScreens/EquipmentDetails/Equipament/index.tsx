@@ -58,7 +58,7 @@ export function Equipament() {
   return (
     <ScrollView flex={1} width="full" bg={THEME.colors.shape}>
       <DetailsHeader title="Equipamento">
-        <Box h="full" justifyContent="center" alignItems="center">
+        {/* <Box h="full" justifyContent="center" alignItems="center">
           <Text
             color="gray.50"
             fontSize="12px"
@@ -74,7 +74,7 @@ export function Equipament() {
           >
             24/11/2021 - 15:31
           </Text>
-        </Box>
+        </Box> */}
       </DetailsHeader>
 
       <VStack marginBottom="24px" paddingX="16px" width="full">
@@ -92,7 +92,9 @@ export function Equipament() {
 
         <Box marginTop="16px">
           <DetailsTitle title="Agrupamento" />
-          <DetailsDescription title={"Nome Agrupamento"} />
+          <DetailsDescription
+            title={equipment ? equipment.nomeEquipamento : ""}
+          />
         </Box>
 
         <HStack marginTop="16px">
@@ -106,11 +108,7 @@ export function Equipament() {
           <Box>
             <DetailsTitle title="Data de aquisição" />
             <DetailsDescription
-              title={
-                equipment
-                  ? new Date(equipment.dataAquisicao).toLocaleString()
-                  : ""
-              }
+              title={equipment ? equipment.dataAquisicaoFormatado : ""}
             />
           </Box>
         </HStack>
@@ -124,11 +122,7 @@ export function Equipament() {
           <Box>
             <DetailsTitle title="Identificador" />
             <DetailsDescription
-              title={
-                equipment
-                  ? new Date(equipment.identificador).toLocaleString()
-                  : ""
-              }
+              title={equipment ? equipment.identificador : ""}
             />
           </Box>
         </HStack>
@@ -173,7 +167,7 @@ export function Equipament() {
         mb="8px"
       >
         <IconButton
-          onPress={() => {}}
+          onPress={() => { }}
           icon={
             <FontAwesome
               name="refresh"

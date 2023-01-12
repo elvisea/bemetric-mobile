@@ -52,12 +52,7 @@ export function AddEquipment() {
     >
       <IncludeHeader title="Adicionar equipamento" />
 
-      <VStack
-        flex={1}
-        w="full"
-        px={`${RFValue(16)}px`}
-        py={`${RFValue(24)}px`}
-      >
+      <VStack flex={1} w="full" px={`${RFValue(16)}px`} py={`${RFValue(24)}px`}>
         <Text
           color="blue.700"
           fontSize="13px"

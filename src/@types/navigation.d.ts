@@ -69,13 +69,14 @@ export declare global {
         params: { codigoEquipamento: number };
       };
 
+      TelemetryDevice: {
+        screen: "TelemetryDevice";
+        params: { codigoEquipamento: number };
+      };
+
       IncludeStackRoutes: {
         screen: string;
         // params: { codigoEquipamento: number };
-      };
-
-      TelemetryDevice: {
-        codigoEquipamento: number;
       };
 
       Equipamentos: undefined;

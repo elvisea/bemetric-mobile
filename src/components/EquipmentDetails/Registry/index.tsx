@@ -2,6 +2,7 @@ import React from "react";
 import { HStack, Text, IStackProps } from "native-base";
 
 import { THEME } from "@theme/theme";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type Props = IStackProps & {
   mt?: number;
@@ -13,7 +14,7 @@ export function Registry({ mt = 0, date, title, ...rest }: Props) {
   return (
     <HStack
       w="full"
-      h={35}
+      h={RFValue(35)}
       mt={mt}
       bg={THEME.colors.white}
       paddingX="16px"

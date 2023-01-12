@@ -1,5 +1,8 @@
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import { Alert } from "react-native";
 import { Text, VStack } from "native-base";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
+
+import axios from "axios";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,6 +15,7 @@ import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { IncludeHeader } from "@components/Include/IncludeHeader";
 
+import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 interface IFormProps {
@@ -37,7 +41,38 @@ export function Manual() {
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   async function handleAdvance({ key, serial }: IFormProps) {
-    console.log(key, serial);
+    try {
+      const response = await api.post("AppMobile/ValidarSerialChave", {
+        serial: serial,
+        chave: key,
+      });
+
+      if (response.data === 0) {
+        Alert.alert(
+          "Dispositivo liberado para ser associado",
+          "Dispositivo liberado para ser associado"
+        );
+      }
+
+      if (response.data === 1) {
+        Alert.alert("Dispositivo não localizado", "Dispositivo não localizado");
+      }
+
+      if (response.data === 2) {
+        Alert.alert(
+          "Dispositivo não liberado para ser associado",
+          "Dispositivo não liberado para ser associado"
+        );
+      }
+
+      if (response.data === 3) {
+        Alert.alert("Falha na verificação", "Falha na verificação");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        Alert.alert("Falha na verificação", "Falha na verificação");
+      }
+    }
   }
 
   return (

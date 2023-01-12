@@ -16,7 +16,7 @@ import { Route } from "@screens/AppScreens/EquipmentDetails/Route";
 
 const Tab = createMaterialTopTabNavigator();
 
-export function DetailsTopTabs() {
+export function DetailsTopTabs({ route }: any) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -29,6 +29,7 @@ export function DetailsTopTabs() {
       <Tab.Screen
         name="Equipament"
         component={Equipament}
+        initialParams={{ route: route.params }}
         options={{
           tabBarIcon: () => <FontAwesome name="gears" color="#FFF" size={22} />,
         }}
@@ -50,6 +51,7 @@ export function DetailsTopTabs() {
       />
       <Tab.Screen
         name="TelemetryDevice"
+        initialParams={route.params}
         component={TelemetryDevice}
         options={{ tabBarIcon: () => <IconTelemetryDevice /> }}
       />

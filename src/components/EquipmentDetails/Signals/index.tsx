@@ -8,7 +8,7 @@ type Props = IPressableProps & {
   ml?: string;
   icon: ReactNode;
   title: string;
-  value: string;
+  value?: string;
 };
 
 export function Signals({
@@ -42,15 +42,17 @@ export function Signals({
 
       <VStack flexDir="row">
         {icon}
-        <Text
-          color="#878787"
-          fontSize="13px"
-          ml="8px"
-          fontFamily="Montserrat_300Light"
-          isTruncated
-        >
-          {value}
-        </Text>
+        {value && (
+          <Text
+            color="#878787"
+            fontSize="13px"
+            ml="8px"
+            fontFamily="Montserrat_300Light"
+            isTruncated
+          >
+            {value}
+          </Text>
+        )}
       </VStack>
     </Pressable>
   );
