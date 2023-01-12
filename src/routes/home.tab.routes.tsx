@@ -12,7 +12,6 @@ import { Equipments } from "@screens/AppScreens/Equipments";
 import { Change } from "@screens/AppScreens/Change";
 import { Markers } from "@screens/AppScreens/Markers";
 
-import IncludeStackRoutes from "./include.stack.routes";
 import { Include } from "@screens/AppScreens/Include";
 
 const Tab = createBottomTabNavigator();

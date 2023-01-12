@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { Box, HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { Box, HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
@@ -57,25 +57,7 @@ export function Equipament() {
 
   return (
     <ScrollView flex={1} width="full" bg={THEME.colors.shape}>
-      <DetailsHeader title="Equipamento">
-        {/* <Box h="full" justifyContent="center" alignItems="center">
-          <Text
-            color="gray.50"
-            fontSize="12px"
-            fontFamily="Montserrat_400Regular"
-          >
-            Última atualização
-          </Text>
-
-          <Text
-            color="gray.50"
-            fontSize="12px"
-            fontFamily="Montserrat_400Regular"
-          >
-            24/11/2021 - 15:31
-          </Text>
-        </Box> */}
-      </DetailsHeader>
+      <DetailsHeader title="Equipamento" />
 
       <VStack marginBottom="24px" paddingX="16px" width="full">
         <Box marginTop="16px">
