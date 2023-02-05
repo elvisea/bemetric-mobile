@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { Box, Center, HStack, VStack } from "native-base";
+import { Box, Center, HStack, ScrollView, Text, VStack } from "native-base";
 
 import { FontAwesome5, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
@@ -8,13 +8,13 @@ import axios from "axios";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
+import { Item } from "@components/Item";
+import { Signals } from "@components/EquipmentDetails/Signals";
 import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
 
 import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
 import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
 
-import { Registry } from "@components/EquipmentDetails/Registry";
-import { Signals } from "@components/EquipmentDetails/Signals";
 import { ITelemetry } from "@interfaces/ITelemetry";
 
 interface IParams {
@@ -27,7 +27,7 @@ export function TelemetryDevice() {
   const route = useRoute();
   const { params } = route.params as IParams;
 
-  console.log("params TelemetryDevice", params);
+  console.log("TelemetryDevice Screen Params:", params);
 
   const [telemetry, setTelemetry] = useState<ITelemetry | null>(null);
 
@@ -59,7 +59,13 @@ export function TelemetryDevice() {
   );
 
   return (
-    <VStack flex={1} width="full" bg={THEME.colors.shape}>
+    <ScrollView
+      bg={THEME.colors.shape}
+      flex={1}
+      width="full"
+      showsVerticalScrollIndicator={false}
+      style={{ marginBottom: 16 }}
+    >
       <DetailsHeader title="Dispositivo de Telemetria" />
 
       <VStack marginBottom="24px" paddingX="16px" width="full">
@@ -88,19 +94,29 @@ export function TelemetryDevice() {
         </HStack>
       </VStack>
 
-      <DetailsHeader title="Registros" />
+      <DetailsHeader title="Registros" mb="8px" />
 
-      <Registry
-        title="Última atualização"
-        date={telemetry ? telemetry.dataUltimaAtualizacao : ""}
-        mt={1.5}
-      />
+      <Item title="Última atualização" mb="8px">
+        <Text
+          color="blue.700"
+          fontSize="16px"
+          fontFamily="Roboto_400Regular"
+          isTruncated
+        >
+          {telemetry ? telemetry.dataUltimaAtualizacao : ""}
+        </Text>
+      </Item>
 
-      <Registry
-        title="Ativa desde"
-        date={telemetry ? telemetry.dataAtivacao : ""}
-        mt={1.5}
-      />
+      <Item title="Ativa desde">
+        <Text
+          color="blue.700"
+          fontSize="16px"
+          fontFamily="Roboto_400Regular"
+          isTruncated
+        >
+          {telemetry ? telemetry.dataAtivacao : ""}
+        </Text>
+      </Item>
 
       <Center mt="16px">
         <Box flexWrap="wrap" w="331px" flexDirection="row">
@@ -195,6 +211,6 @@ export function TelemetryDevice() {
           />
         </Box>
       </Center>
-    </VStack>
+    </ScrollView>
   );
 }

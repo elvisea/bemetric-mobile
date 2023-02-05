@@ -69,6 +69,11 @@ export declare global {
         params: { codigoEquipamento: number };
       };
 
+      TelemetryData: {
+        screen: "TelemetryData";
+        params: { codigoEquipamento: number };
+      };
+
       TelemetryDevice: {
         screen: "TelemetryDevice";
         params: { codigoEquipamento: number };

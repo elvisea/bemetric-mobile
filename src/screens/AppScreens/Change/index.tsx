@@ -16,6 +16,7 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 
+import { Modal } from "@components/Modal";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { EquipmentCard } from "@components/Change/EquipmentCard";
 import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
@@ -33,6 +34,7 @@ export function Change() {
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const [equipments, setEquipments] = useState<IEquipamento[] | null>(null);
+  const [isOpenSensors, setIsOpenSensors] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -64,34 +66,42 @@ export function Change() {
   );
 
   return (
-    <LayoutDefault
-      bg={THEME.colors.shape}
-      firstIcon="menu"
-      handleFirstIcon={handleMenu}
-    >
-      <DetailsHeader title="Selecione o equipamento" />
+    <>
+      <Modal
+        isOpen={isOpenSensors}
+        title="TESTE"
+        closeModal={() => setIsOpenSensors(!isOpenSensors)}
+      />
+      <LayoutDefault
+        bg={THEME.colors.shape}
+        firstIcon="menu"
+        handleFirstIcon={handleMenu}
+      >
+        <DetailsHeader title="Selecione o equipamento" />
 
-      <VStack paddingY="16px" paddingX="16px" width="full">
-        <FlatList
-          data={equipments}
-          style={{ width: "100%" }}
-          keyExtractor={(item) => item.codigoEquipamento.toString()}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <EquipmentCard
-              icon={
-                <FontAwesome
-                  name="gears"
-                  color={THEME.colors.blue[700]}
-                  size={30}
-                />
-              }
-              title={item.nomeEquipamento}
-              description={item.dispositivoSerial}
-            />
-          )}
-        />
-      </VStack>
-    </LayoutDefault>
+        <VStack paddingY="16px" paddingX="16px" width="full">
+          <FlatList
+            data={equipments}
+            style={{ width: "100%" }}
+            keyExtractor={(item) => item.codigoEquipamento.toString()}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <EquipmentCard
+                onPress={() => setIsOpenSensors(!isOpenSensors)}
+                icon={
+                  <FontAwesome
+                    name="gears"
+                    color={THEME.colors.blue[700]}
+                    size={30}
+                  />
+                }
+                title={item.nomeEquipamento}
+                description={item.dispositivoSerial}
+              />
+            )}
+          />
+        </VStack>
+      </LayoutDefault>
+    </>
   );
 }

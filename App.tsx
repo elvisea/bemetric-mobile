@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler';
+import "react-native-gesture-handler";
 
 import React from "react";
 
@@ -9,32 +9,31 @@ import {
   useFonts,
   Roboto_500Medium,
   Roboto_700Bold,
-  Roboto_400Regular
-} from '@expo-google-fonts/roboto';
+  Roboto_400Regular,
+} from "@expo-google-fonts/roboto";
 
 import {
   Montserrat_400Regular,
   Montserrat_600SemiBold,
-  Montserrat_300Light
-} from '@expo-google-fonts/montserrat';
+  Montserrat_300Light,
+} from "@expo-google-fonts/montserrat";
 
-import { AuthProvider } from '@hooks/auth';
-import { CustomerProvider } from "@hooks/customer"
+import { AuthProvider } from "./src/hooks/auth";
+import { CustomerProvider } from "./src/hooks/customer";
 
-import { THEME } from '@theme/theme';
-import { Routes } from '@routes/index';
+import { THEME } from "./src/theme/theme";
+import { Routes } from "./src/routes";
 
-import { Loading } from "@components/Loading";
+import { Loading } from "./src/components/Loading";
 
 export default function App() {
-
   let [fontsLoaded] = useFonts({
     Montserrat_600SemiBold,
     Montserrat_400Regular,
     Montserrat_300Light,
     Roboto_500Medium,
     Roboto_700Bold,
-    Roboto_400Regular
+    Roboto_400Regular,
   });
 
   return (

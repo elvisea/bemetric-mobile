@@ -14,7 +14,7 @@ export function Registry({ mt = 0, date, title, ...rest }: Props) {
   return (
     <HStack
       w="full"
-      h={RFValue(35)}
+      h={RFValue(58)}
       mt={mt}
       bg={THEME.colors.white}
       paddingX="16px"

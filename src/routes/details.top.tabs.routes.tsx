@@ -29,7 +29,7 @@ export function DetailsTopTabs({ route }: any) {
       <Tab.Screen
         name="Equipament"
         component={Equipament}
-        initialParams={{ route: route.params }}
+        initialParams={route.params}
         options={{
           tabBarIcon: () => <FontAwesome name="gears" color="#FFF" size={22} />,
         }}
@@ -37,16 +37,19 @@ export function DetailsTopTabs({ route }: any) {
       <Tab.Screen
         name="TelemetryData"
         component={TelemetryData}
+        initialParams={route.params}
         options={{ tabBarIcon: () => <IconTelemetryData /> }}
       />
       <Tab.Screen
         name="Period"
         component={Period}
+        initialParams={route.params}
         options={{ tabBarIcon: () => <IconPeriod /> }}
       />
       <Tab.Screen
         name="Route"
         component={Route}
+        initialParams={route.params}
         options={{ tabBarIcon: () => <IconRoute /> }}
       />
       <Tab.Screen
