@@ -39,6 +39,7 @@ export function Equipments() {
 
   const [expanded, setExpanded] = useState("");
   const [groupings, setGroupings] = useState<IGrouping[]>([]);
+  const [notifications, setNotifications] = useState();
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -52,12 +53,24 @@ export function Equipments() {
   };
 
   const handleExpanded = (item: string) => {
-    if (item === expanded) {
-      setExpanded("");
-    }
+    if (item === expanded) setExpanded("");
 
-    if (item !== expanded) {
-      setExpanded(item);
+    if (item !== expanded) setExpanded(item);
+  };
+
+  const fetchGroupings = async () => {
+    try {
+      if (user && customer) {
+        const response = await api.post("Agrupamento/ObterLista", {
+          codigoUsuario: user.codigoUsuario,
+          codigoCliente: customer.codigoCliente,
+          localDashboard: 3,
+        });
+
+        setGroupings(response.data);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) console.log("Error:", error);
     }
   };
 
@@ -65,23 +78,32 @@ export function Equipments() {
     useCallback(() => {
       let isActive = true;
 
-      const fetchUser = async () => {
-        try {
-          if (user && customer) {
-            const response = await api.post("Agrupamento/ObterLista", {
-              codigoCliente: customer.codigoCliente,
-              codigoUsuario: user.codigoUsuario,
-              localDashboard: 3,
-            });
+      if (isActive) fetchGroupings();
 
-            setGroupings(response.data);
-          }
-        } catch (error) {
-          if (axios.isAxiosError(error)) console.log("Error:", error);
-        }
+      return () => {
+        isActive = false;
       };
+    }, [])
+  );
 
-      fetchUser();
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.post("/AppMobile/ObterListaIndicadores", {
+        codigoUsuario: user?.codigoUsuario,
+        codigoCliente: user?.codigoCliente,
+      });
+
+      setNotifications(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) console.log("Error:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      if (isActive) fetchNotifications();
 
       return () => {
         isActive = false;

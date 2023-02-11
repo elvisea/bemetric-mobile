@@ -115,16 +115,18 @@ export function TelemetryData() {
   const fetchData = async () => {
     const data = {
       codigoEquipamento: params.codigoEquipamento,
-      dataDe: !selectedRange ? initialDate?.toISOString() : "",
-      dataAte: !selectedRange ? finalDate?.toISOString() : "",
+      dataDe: initialDate?.toISOString(),
+      dataAte: finalDate?.toISOString(),
       tipoIntervalo: selectedRange ? selectedRange : 0,
-      usaData: selectedRange ? false : true,
+      usaData: true,
     };
 
     console.log("Dados enviados:", data);
 
     try {
       const response = await api.post("/Equipamento/DadosTelemetrias", data);
+
+      console.log("=>", response.data);
 
       setData(response.data);
       setIsOpenModal(false);

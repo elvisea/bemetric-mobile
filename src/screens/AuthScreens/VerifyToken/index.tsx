@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
-import { Box, Heading, HStack } from "native-base";
+import { Box, Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
@@ -13,6 +13,7 @@ import { THEME } from "@theme/theme";
 import { Button } from "@components/Button";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { InputToken } from "@components/InputToken";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface FormProps {
   firstDigit: string;
@@ -165,37 +166,31 @@ export function VerifyToken() {
       bg="blue.700"
       firstIcon="chevron-left"
       handleFirstIcon={() => navigation.goBack()}
-      justifyContent="space-between"
+      justifyContent="flex-start"
+      alignItems="flex-start"
     >
-      <Box px={4} width="full" alignItems="center" justifyContent="center">
-        <Heading
-          size={"sm"}
-          mb={8}
-          textAlign="center"
+      <VStack
+        px="16px"
+        pb="16px"
+        flex={1}
+        width="full"
+        justifyContent="space-between"
+      >
+        <Text
+          fontSize={16}
           color={THEME.colors.white}
+          fontFamily="Roboto_400Regular"
         >
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-        </Heading>
+          Um código de ativação foi enviado para o{"\n"}e-mail cadastrado.{"\n"}
+          {"\n"}
+          Aguarde alguns minutos e confira seu{"\n"}e-mail. Se não visualizar na
+          caixa principal,{"\n"}confira no lixo eletrônico.{"\n"}
+          Caso não receba solicite o reenvio do código no aplicativo.{"\n"}
+          {"\n"}
+          Preencha os campos abaixo com o código de validação recebido.
+        </Text>
 
-        <Heading
-          size={"sm"}
-          mb={8}
-          textAlign="center"
-          color={THEME.colors.white}
-        >
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-        </Heading>
-
-        <Heading size={"sm"} textAlign="center" color={THEME.colors.white}>
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-        </Heading>
-
-        <HStack mt={8} justifyContent="space-between" w="100%">
+        <HStack justifyContent="space-between" w="100%">
           <Box width="14%">
             <Controller
               control={control}
@@ -286,26 +281,26 @@ export function VerifyToken() {
             />
           </Box>
         </HStack>
-      </Box>
 
-      <Box w="full" px={4} mb={8}>
-        <Button
-          title="Reenviar Código"
-          h={52}
-          w="full"
-          mb={4}
-          isLoading={isResending}
-          onPress={handleResendToken}
-        />
+        <Box>
+          <Button
+            title="Reenviar Código"
+            h={52}
+            w="full"
+            mb={4}
+            isLoading={isResending}
+            onPress={handleResendToken}
+          />
 
-        <Button
-          title="Enviar"
-          h={52}
-          w="full"
-          isLoading={isSending}
-          onPress={handleSubmit(handleNextPage)}
-        />
-      </Box>
+          <Button
+            title="Enviar"
+            h={52}
+            w="full"
+            isLoading={isSending}
+            onPress={handleSubmit(handleNextPage)}
+          />
+        </Box>
+      </VStack>
     </LayoutDefault>
   );
 }

@@ -32,7 +32,9 @@ const ModalPeriod = ({
       <Box>
         <Body>
           <Header>
-            <Text fontSize={16} color={THEME.colors.blue[700]}>{title}</Text>
+            <Text fontSize={16} color={THEME.colors.blue[700]}>
+              {title}
+            </Text>
             <TouchableOpacity onPress={closeModal}>
               <AntDesign name="close" size={20} color={THEME.colors.red[600]} />
             </TouchableOpacity>

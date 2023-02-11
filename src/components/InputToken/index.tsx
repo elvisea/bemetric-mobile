@@ -29,6 +29,9 @@ export function InputToken({
         textAlign="center"
         fontFamily="Montserrat_400Regular"
         placeholderTextColor="white"
+        borderTopWidth={0}
+        borderLeftWidth={0}
+        borderRightWidth={0}
         maxLength={1}
         _focus={{
           bg: "transparent",
