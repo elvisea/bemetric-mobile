@@ -9,8 +9,8 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { Item } from "@components/Item";
+import { HeaderDefault } from "@components/HeaderDefault";
 import { Signals } from "@components/EquipmentDetails/Signals";
-import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
 
 import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
 import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
@@ -66,7 +66,7 @@ export function TelemetryDevice() {
       showsVerticalScrollIndicator={false}
       style={{ marginBottom: 16 }}
     >
-      <DetailsHeader title="Dispositivo de Telemetria" />
+      <HeaderDefault title="Dispositivo de Telemetria" />
 
       <VStack marginBottom="24px" paddingX="16px" width="full">
         <HStack marginTop="16px">
@@ -94,7 +94,7 @@ export function TelemetryDevice() {
         </HStack>
       </VStack>
 
-      <DetailsHeader title="Registros" mb="8px" />
+      <HeaderDefault title="Registros" mb="8px" />
 
       <Item title="Última atualização" mb="8px">
         <Text

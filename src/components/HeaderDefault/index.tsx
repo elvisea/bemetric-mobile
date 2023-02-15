@@ -8,7 +8,7 @@ type Props = IStackProps & {
   children?: ReactNode;
 };
 
-export function DetailsHeader({ title, children, ...rest }: Props) {
+export function HeaderDefault({ title, children, ...rest }: Props) {
   return (
     <HStack
       w="full"

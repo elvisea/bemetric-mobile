@@ -101,6 +101,8 @@ export declare global {
       AtivarCodigo: undefined;
       // Equipamentos: undefined;
       EquipamentosScreen: undefined;
+
+      HomePage: undefined;
     }
   }
 }

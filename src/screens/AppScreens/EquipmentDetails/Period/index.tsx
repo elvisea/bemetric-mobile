@@ -3,10 +3,10 @@ import { ScrollView, VStack } from "native-base";
 import { useRoute } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
+import { Permanencia } from "../components/Permanencia";
+import { HeaderDefault } from "@components/HeaderDefault";
 
 import { THEME } from "@theme/theme";
-import { Permanencia } from "../components/Permanencia";
 
 interface IParams {
   params: {
@@ -22,7 +22,7 @@ export function Period() {
 
   return (
     <VStack flex={1} width="full" pb="16px" bg={THEME.colors.shape}>
-      <DetailsHeader title="Periodo de permanência" />
+      <HeaderDefault title="Periodo de permanência" />
 
       <ScrollView
         w="full"

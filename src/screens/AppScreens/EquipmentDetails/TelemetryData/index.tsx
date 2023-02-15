@@ -11,7 +11,11 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { Item } from "@components/Item";
-import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
+import { Button } from "@components/Button/index";
+import { ButtonDate } from "@components/ButtonDate";
+import { ModalPeriod } from "@components/ModalPeriod";
+import { PeriodOption } from "@components/PeriodOption";
+import { HeaderDefault } from "@components/HeaderDefault";
 
 import api from "@services/api";
 
@@ -20,11 +24,6 @@ import WorkedHours from "@assets/worked-hours.svg";
 
 import { Icon } from "./styles";
 import { THEME } from "@theme/theme";
-
-import { Button } from "@components/Button/index";
-import { ButtonDate } from "@components/ButtonDate";
-import { ModalPeriod } from "@components/ModalPeriod";
-import { PeriodOption } from "@components/PeriodOption";
 
 interface IParams {
   params: {
@@ -149,12 +148,12 @@ export function TelemetryData() {
 
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
-      <DetailsHeader title="Dados de telemetria" mb="16px">
+      <HeaderDefault title="Dados de telemetria" mb="16px">
         <IconButton
           icon={<Icon name="sliders" />}
           onPress={() => setIsOpenModal(!isOpenModal)}
         />
-      </DetailsHeader>
+      </HeaderDefault>
 
       <Item
         icon={

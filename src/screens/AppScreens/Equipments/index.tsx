@@ -39,7 +39,6 @@ export function Equipments() {
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-
   const handleExpanded = (item: string) => {
     if (item === expanded) setExpanded("");
 

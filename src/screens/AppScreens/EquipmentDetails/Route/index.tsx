@@ -2,7 +2,7 @@ import * as React from "react";
 import { VStack } from "native-base";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
+import { HeaderDefault } from "@components/HeaderDefault";
 
 import axios from "axios";
 import api from "@services/api";
@@ -32,8 +32,6 @@ export function Route() {
           });
 
           console.log(response.data);
-
-          // setEquipment(response.data[0]);
         } catch (error) {
           if (axios.isAxiosError(error)) console.log("Error:", error);
         }
@@ -48,7 +46,7 @@ export function Route() {
   );
   return (
     <VStack flex={1} width="full" bg={THEME.colors.shape}>
-      <DetailsHeader title="Trajeto" />
+      <HeaderDefault title="Trajeto" />
     </VStack>
   );
 }

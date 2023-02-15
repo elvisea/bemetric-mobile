@@ -18,8 +18,8 @@ import { useCustomer } from "@hooks/customer";
 
 import { Modal } from "@components/Modal";
 import { LayoutDefault } from "@components/LayoutDefault";
+import { HeaderDefault } from "@components/HeaderDefault";
 import { EquipmentCard } from "@components/Change/EquipmentCard";
-import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
 
 interface IEquipamento {
   nomeEquipamento: string;
@@ -77,7 +77,7 @@ export function Change() {
         firstIcon="menu"
         handleFirstIcon={handleMenu}
       >
-        <DetailsHeader title="Selecione o equipamento" />
+        <HeaderDefault title="Selecione o equipamento" />
 
         <VStack paddingY="16px" paddingX="16px" width="full">
           <FlatList

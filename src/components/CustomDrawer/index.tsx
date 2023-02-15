@@ -76,7 +76,6 @@ const CustomDrawer = (props: any) => {
               />
             )}
           />
-
         </Content>
       </DrawerContentScrollView>
     </Container>

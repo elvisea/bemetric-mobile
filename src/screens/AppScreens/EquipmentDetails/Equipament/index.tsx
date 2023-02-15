@@ -17,7 +17,7 @@ import { IEquipmentDetails } from "@interfaces/IEquipmentDetails";
 
 import { Item } from "@components/Item";
 
-import { DetailsHeader } from "@components/EquipmentDetails/DetailsHeader";
+import { HeaderDefault } from "@components/HeaderDefault";
 import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
 import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
 
@@ -98,7 +98,7 @@ export function Equipament() {
 
   return (
     <ScrollView flex={1} width="full" bg={colors.shape}>
-      <DetailsHeader title="Equipamento" />
+      <HeaderDefault title="Equipamento" />
 
       <VStack marginBottom="24px" paddingX="16px" width="full">
         <Box marginTop="16px">
