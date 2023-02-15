@@ -1,8 +1,12 @@
 import { Alert } from "react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Select, VStack } from "native-base";
 import { Feather } from "@expo/vector-icons";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 import { Button } from "@components/Button";
 import { HeaderDefault } from "@components/HeaderDefault";
@@ -62,30 +66,40 @@ export function ChangeClient() {
     }
   };
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const response = await api.post("/Usuario/ListaClientesUsuario", {
-          codigoUsuario: user?.codigoUsuario,
-        });
+  const getListClients = async () => {
+    try {
+      const response = await api.post("/Usuario/ListaClientesUsuario", {
+        codigoUsuario: user?.codigoUsuario,
+      });
 
-        if (response.status === 204) {
-          Alert.alert(
-            "Usuário não possui Clientes!",
-            "Usuário não possui Clientes cadastrados."
-          );
-        }
-
-        if (response.status === 200) {
-          setCustomers(response.data);
-        }
-      } catch (error) {
-        Alert.alert("Erro ao tentar listar Clientes!", `${error}`);
+      if (response.status === 204) {
+        Alert.alert(
+          "Usuário não possui Clientes!",
+          "Usuário não possui Clientes cadastrados."
+        );
       }
-    };
 
-    if (user) fetch();
-  }, []);
+      if (response.status === 200) {
+        setCustomers(response.data);
+      }
+    } catch (error) {
+      Alert.alert("Erro ao tentar listar Clientes!", `${error}`);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      if (isActive) {
+        if (user) getListClients();
+      }
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
   return (
     <LayoutDefault

@@ -34,8 +34,10 @@ export function Equipments() {
   const { customer } = useCustomer();
 
   const [expanded, setExpanded] = useState("");
-  const [groupings, setGroupings] = useState<IGrouping[]>([]);
   const [notifications, setNotifications] = useState();
+  const [groupings, setGroupings] = useState<IGrouping[]>([]);
+
+  console.log("notifications:", notifications);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -75,7 +77,7 @@ export function Equipments() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await api.post("/AppMobile/ObterListaIndicadores", {
+      const response = await api.post("/Dashboard/ObterListaIndicadores", {
         codigoUsuario: user?.codigoUsuario,
         codigoCliente: user?.codigoCliente,
       });

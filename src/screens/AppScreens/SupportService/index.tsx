@@ -1,16 +1,68 @@
+import { useCallback, useState } from "react";
+
+import axios from "axios";
 import { Box, Text, VStack } from "native-base";
+
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
+
+import { useCustomer } from "@hooks/customer";
 
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-import { useNavigation, DrawerActions } from "@react-navigation/native";
-
+import api from "@services/api";
 import { THEME } from "@theme/theme";
+
+interface IContact {
+  codigoContato: number;
+  codigoParceiro: number;
+  descritivo: string;
+  emailSuporte: string;
+  incluir: false;
+  nomeParceiro: string;
+  telefone: string;
+  whatsapp: string;
+}
 
 export function SupportService() {
   const navigation = useNavigation();
 
+  const { customer } = useCustomer();
+
+  const [contact, setContact] = useState<IContact | null>(null);
+
+  console.log("Contact:", contact);
+
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+
+  const getContact = async () => {
+    try {
+      const response = await api.post("/ContatosParceiro/ObterListaSuporte", {
+        codigoCliente: customer?.codigoCliente,
+      });
+
+      setContact(response.data[0]);
+    } catch (error) {
+      if (axios.isAxiosError(error)) console.log(error);
+    } finally {
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      if (isActive) getContact();
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
   return (
     <LayoutDefault
@@ -36,7 +88,7 @@ export function SupportService() {
               fontFamily="Roboto_400Regular"
               mb="16px"
             >
-              suporte@b2k.com.br
+              {contact?.emailSuporte}
             </Text>
 
             <Text
@@ -52,7 +104,7 @@ export function SupportService() {
               fontFamily="Roboto_400Regular"
               mb="16px"
             >
-              (41) 3333-3333
+              {contact?.telefone}
             </Text>
 
             <Text
@@ -63,7 +115,7 @@ export function SupportService() {
               Whatsapp
             </Text>
             <Text color="black" fontSize="16px" fontFamily="Roboto_400Regular">
-              (41) 9 8888-8888
+              {contact?.whatsapp}
             </Text>
           </Box>
         </VStack>
@@ -75,7 +127,8 @@ export function SupportService() {
             fontFamily="Roboto_400Regular"
             textAlign="center"
           >
-            Horário de atendimento{"\n"} De segunda a sexta, das 08:00 às 18:00
+            {contact?.descritivo}
+            {/* Horário de atendimento{"\n"} De segunda a sexta, das 08:00 às 18:00 */}
           </Text>
         </VStack>
       </VStack>

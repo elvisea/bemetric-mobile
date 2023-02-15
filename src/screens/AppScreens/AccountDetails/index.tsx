@@ -19,15 +19,21 @@ import { Alert } from "react-native";
 import { useAuth } from "@hooks/auth";
 
 interface FormProps {
-  email: string;
   name: string;
-  password: string;
+  email: string;
+  current: string;
+  newPassword: string;
+  confirmNewPassword: string;
 }
 
 const schema = yup.object({
   name: yup.string().required("Informe seu nome."),
   email: yup.string().required("Informe seu e-mail.").email("E-mail inválido"),
   password: yup
+    .string()
+    .required("Informe sua senha")
+    .min(4, "A senha deve ter pelo menos 4 dígitos."),
+  current: yup
     .string()
     .required("Informe sua senha")
     .min(4, "A senha deve ter pelo menos 4 dígitos."),
@@ -52,16 +58,23 @@ export function AccountDetails() {
     resolver: yupResolver(schema),
   });
 
-  const handleUpdateUser = async ({ email, password, name }: FormProps) => {
-    console.log(email, password, name);
+  const handleUpdateUser = async ({
+    email,
+    current,
+    newPassword,
+    name,
+  }: FormProps) => {
+    console.log(email, newPassword, name);
 
     try {
       setIsLoading(true);
 
       const response = await api.post("Usuario/AlterarSenha", {
         codigoUsuario: user?.codigoUsuario,
-        senha: "string",
-        novaSenha: "string",
+        nomeUsuario: name,
+        email: email,
+        senha: current,
+        novaSenha: newPassword,
       });
 
       console.log(response.data);
@@ -131,12 +144,12 @@ export function AccountDetails() {
             fontSize="12px"
             fontFamily="Roboto_400Regular"
           >
-            Senha
+            Senha atual
           </Text>
 
           <Controller
             control={control}
-            name="password"
+            name="current"
             render={({ field: { onChange, value } }) => (
               <Input
                 color="#000"
@@ -145,7 +158,81 @@ export function AccountDetails() {
                 secureTextEntry={isVisible}
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.password?.message}
+                errorMessage={errors.current?.message}
+                InputRightElement={
+                  <IconButton
+                    onPress={() => setIsVisible(!isVisible)}
+                    icon={
+                      <MaterialIcons
+                        name={isVisible ? "visibility" : "visibility-off"}
+                        size={20}
+                        color={colors.blue[700]}
+                      />
+                    }
+                  />
+                }
+              />
+            )}
+          />
+
+          <Text
+            mt="16px"
+            color="blue.700"
+            fontSize="12px"
+            fontFamily="Roboto_400Regular"
+          >
+            Nova Senha
+          </Text>
+
+          <Controller
+            control={control}
+            name="newPassword"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                color="#000"
+                fontFamily="Roboto_400Regular"
+                borderBottomColor={colors.blue[700]}
+                secureTextEntry={isVisible}
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.newPassword?.message}
+                InputRightElement={
+                  <IconButton
+                    onPress={() => setIsVisible(!isVisible)}
+                    icon={
+                      <MaterialIcons
+                        name={isVisible ? "visibility" : "visibility-off"}
+                        size={20}
+                        color={colors.blue[700]}
+                      />
+                    }
+                  />
+                }
+              />
+            )}
+          />
+
+          <Text
+            mt="16px"
+            color="blue.700"
+            fontSize="12px"
+            fontFamily="Roboto_400Regular"
+          >
+            Confirmar Nova Senha
+          </Text>
+
+          <Controller
+            control={control}
+            name="confirmNewPassword"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                color="#000"
+                fontFamily="Roboto_400Regular"
+                borderBottomColor={colors.blue[700]}
+                secureTextEntry={isVisible}
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.confirmNewPassword?.message}
                 InputRightElement={
                   <IconButton
                     onPress={() => setIsVisible(!isVisible)}
