@@ -90,6 +90,10 @@ export declare global {
 
       Notifications: undefined;
       Messages: undefined;
+      MessageDetails: {
+        tipoMensagem: number;
+        codigoMensagem: number;
+      };
 
       Manual: undefined;
 

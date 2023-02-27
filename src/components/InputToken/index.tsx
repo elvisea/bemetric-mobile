@@ -27,12 +27,10 @@ export function InputToken({
         color="white"
         fontSize="sm"
         textAlign="center"
-        fontFamily="Montserrat_400Regular"
+        fontFamily="Roboto_400Regular"
         placeholderTextColor="white"
-        borderTopWidth={0}
-        borderLeftWidth={0}
-        borderRightWidth={0}
         maxLength={1}
+        _input={{ cursorColor: "#FFF" }}
         _focus={{
           bg: "transparent",
           borderColor: "white",

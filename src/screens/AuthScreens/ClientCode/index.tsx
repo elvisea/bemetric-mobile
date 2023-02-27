@@ -10,17 +10,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api from "@services/api";
 
 import { THEME } from "@theme/theme";
+
 import { ButtonFull } from "@components/ButtonFull";
-import { LayoutDefault } from "@components/LayoutDefault";
 import { InputToken } from "@components/InputToken";
+import { LayoutDefault } from "@components/LayoutDefault";
 
 interface FormProps {
-  firstDigit: string;
-  secondDigit: string;
-  thirdDigit: string;
-  fourthDigit: string;
-  fifthDigit: string;
-  sixthDigit: string;
+  [index: string]: string;
 }
 
 interface Params {
@@ -30,12 +26,12 @@ interface Params {
 }
 
 const schema = yup.object({
-  firstDigit: yup.string().required("Inválido"),
-  secondDigit: yup.string().required("Inválido"),
-  thirdDigit: yup.string().required("Inválido"),
-  fourthDigit: yup.string().required("Inválido"),
-  fifthDigit: yup.string().required("Inválido"),
-  sixthDigit: yup.string().required("Inválido"),
+  "1": yup.string().required("Inválido"),
+  "2": yup.string().required("Inválido"),
+  "3": yup.string().required("Inválido"),
+  "4": yup.string().required("Inválido"),
+  "5": yup.string().required("Inválido"),
+  "6": yup.string().required("Inválido"),
 });
 
 export function ClientCode() {
@@ -54,15 +50,8 @@ export function ClientCode() {
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({
-    firstDigit,
-    secondDigit,
-    thirdDigit,
-    fourthDigit,
-    fifthDigit,
-    sixthDigit,
-  }: FormProps) => {
-    const token = `${firstDigit}${secondDigit}${thirdDigit}${fourthDigit}${fifthDigit}${sixthDigit}`;
+  const handleNextPage = async (props: FormProps) => {
+    const token = `${props[1]}${props[2]}${props[3]}${props[4]}${props[5]}${props[6]}`;
 
     try {
       setIsLoading(true);
@@ -106,101 +95,27 @@ export function ClientCode() {
           Insira o token fornecido pelo{"\n"}administrador do cliente.
         </Heading>
 
-        <HStack mt={8} justifyContent="space-between" w="100%">
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="firstDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.firstDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="secondDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  keyboardType="numeric"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.secondDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="thirdDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  keyboardType="numeric"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.thirdDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="fourthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  keyboardType="numeric"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.fourthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="fifthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  keyboardType="numeric"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.fifthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="sixthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  keyboardType="numeric"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.sixthDigit?.message}
-                />
-              )}
-            />
-          </Box>
+        <HStack mt={12} justifyContent="space-between" w="100%">
+          {Array.of("1", "2", "3", "4", "5", "6").map((item) => (
+            <Box key={item} width="52px">
+              <Controller
+                control={control}
+                name={item}
+                render={({ field: { onChange, value } }) => (
+                  <InputToken
+                    value={value}
+                    placeholder="0"
+                    borderWidth={1}
+                    borderRadius={6}
+                    keyboardType="numeric"
+                    h="52px"
+                    onChangeText={onChange}
+                    errorMessage={errors[item]?.message}
+                  />
+                )}
+              />
+            </Box>
+          ))}
         </HStack>
       </Box>
       <ButtonFull

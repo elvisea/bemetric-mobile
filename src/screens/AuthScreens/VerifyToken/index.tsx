@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Alert } from "react-native";
+
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  KeyboardAvoidingView,
+} from "react-native";
+
 import { Box, Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -11,17 +18,11 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
-import { LayoutDefault } from "@components/LayoutDefault";
 import { InputToken } from "@components/InputToken";
-import { RFValue } from "react-native-responsive-fontsize";
+import { LayoutDefault } from "@components/LayoutDefault";
 
 interface FormProps {
-  firstDigit: string;
-  secondDigit: string;
-  thirdDigit: string;
-  fourthDigit: string;
-  fifthDigit: string;
-  sixthDigit: string;
+  [index: string]: string;
 }
 
 interface Params {
@@ -35,12 +36,12 @@ interface Params {
 }
 
 const schema = yup.object({
-  firstDigit: yup.string().required("Inválido"),
-  secondDigit: yup.string().required("Inválido"),
-  thirdDigit: yup.string().required("Inválido"),
-  fourthDigit: yup.string().required("Inválido"),
-  fifthDigit: yup.string().required("Inválido"),
-  sixthDigit: yup.string().required("Inválido"),
+  "1": yup.string().required("Inválido"),
+  "2": yup.string().required("Inválido"),
+  "3": yup.string().required("Inválido"),
+  "4": yup.string().required("Inválido"),
+  "5": yup.string().required("Inválido"),
+  "6": yup.string().required("Inválido"),
 });
 
 export function VerifyToken() {
@@ -52,6 +53,8 @@ export function VerifyToken() {
   const route = useRoute();
   const params = route.params as Params;
 
+  const behavior = Platform.OS === "ios" ? "padding" : "height";
+
   const {
     control,
     handleSubmit,
@@ -60,15 +63,8 @@ export function VerifyToken() {
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({
-    firstDigit,
-    secondDigit,
-    thirdDigit,
-    fourthDigit,
-    fifthDigit,
-    sixthDigit,
-  }: FormProps) => {
-    const token = `${firstDigit}${secondDigit}${thirdDigit}${fourthDigit}${fifthDigit}${sixthDigit}`;
+  const handleNextPage = async (props: FormProps) => {
+    const token = `${props[1]}${props[2]}${props[3]}${props[4]}${props[5]}${props[6]}`;
 
     const data = {
       nomeUsuario: params.name,
@@ -165,142 +161,80 @@ export function VerifyToken() {
     <LayoutDefault
       bg="blue.700"
       firstIcon="chevron-left"
-      handleFirstIcon={() => navigation.goBack()}
-      justifyContent="flex-start"
       alignItems="flex-start"
+      justifyContent="flex-start"
+      handleFirstIcon={() => navigation.goBack()}
     >
-      <VStack
-        px="16px"
-        pb="16px"
-        flex={1}
-        width="full"
-        justifyContent="space-between"
-      >
-        <Text
-          fontSize={16}
-          color={THEME.colors.white}
-          fontFamily="Roboto_400Regular"
-        >
-          Um código de ativação foi enviado para o{"\n"}e-mail cadastrado.{"\n"}
-          {"\n"}
-          Aguarde alguns minutos e confira seu{"\n"}e-mail. Se não visualizar na
-          caixa principal,{"\n"}confira no lixo eletrônico.{"\n"}
-          Caso não receba solicite o reenvio do código no aplicativo.{"\n"}
-          {"\n"}
-          Preencha os campos abaixo com o código de validação recebido.
-        </Text>
+      <KeyboardAvoidingView style={styles.keyboard} behavior={behavior}>
+        <VStack flex={1} w="full" justifyContent="space-between" bg="blue.700">
+          <VStack flex={1} w="full" p={4} bg="blue.700">
+            <Text
+              fontSize={16}
+              color={THEME.colors.white}
+              fontFamily="Roboto_400Regular"
+            >
+              Um código de ativação foi enviado para o{"\n"}e-mail cadastrado.
+              {"\n"}
+              {"\n"}
+              Aguarde alguns minutos e confira seu{"\n"}e-mail. Se não
+              visualizar na caixa principal,{"\n"}confira no lixo eletrônico.
+              {"\n"}
+              Caso não receba solicite o reenvio do código no aplicativo.{"\n"}
+              {"\n"}
+              Preencha os campos abaixo com o código de validação recebido.
+            </Text>
 
-        <HStack justifyContent="space-between" w="100%">
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="firstDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.firstDigit?.message}
-                />
-              )}
+            <HStack mt={12} justifyContent="space-between" w="100%">
+              {Array.of("1", "2", "3", "4", "5", "6").map((item) => (
+                <Box key={item} width="52px">
+                  <Controller
+                    control={control}
+                    name={item}
+                    render={({ field: { onChange, value } }) => (
+                      <InputToken
+                        value={value}
+                        placeholder="0"
+                        borderWidth={1}
+                        borderRadius={6}
+                        keyboardType="numeric"
+                        h="52px"
+                        onChangeText={onChange}
+                        errorMessage={errors[item]?.message}
+                      />
+                    )}
+                  />
+                </Box>
+              ))}
+            </HStack>
+          </VStack>
+
+          <VStack w="full" p={4} bg="blue.700">
+            <Button
+              title="Reenviar Código"
+              h="52px"
+              w="full"
+              mb={4}
+              isLoading={isResending}
+              onPress={handleResendToken}
             />
-          </Box>
 
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="secondDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.secondDigit?.message}
-                />
-              )}
+            <Button
+              title="Enviar"
+              h="52px"
+              w="full"
+              isLoading={isSending}
+              onPress={handleSubmit(handleNextPage)}
             />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="thirdDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.thirdDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="fourthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.fourthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="fifthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.fifthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="sixthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.sixthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-        </HStack>
-
-        <Box>
-          <Button
-            title="Reenviar Código"
-            h={52}
-            w="full"
-            mb={4}
-            isLoading={isResending}
-            onPress={handleResendToken}
-          />
-
-          <Button
-            title="Enviar"
-            h={52}
-            w="full"
-            isLoading={isSending}
-            onPress={handleSubmit(handleNextPage)}
-          />
-        </Box>
-      </VStack>
+          </VStack>
+        </VStack>
+      </KeyboardAvoidingView>
     </LayoutDefault>
   );
 }
+
+const styles = StyleSheet.create({
+  keyboard: {
+    flex: 1,
+    width: "100%",
+  },
+});

@@ -29,9 +29,6 @@ export function ChangeClient() {
   const [selected, setSelected] = useState<ICustomer | null>(null);
   const [customers, setCustomers] = useState<ICustomer[]>([] as ICustomer[]);
 
-  console.log("Cliente Selecionado:", selected);
-  console.log("Qtd Clientes:", customers.length);
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const handleSelectCustomer = (selected: number) => {
@@ -44,9 +41,9 @@ export function ChangeClient() {
 
   const goToHomePage = () => navigation.navigate("HomePage");
 
-  const handleChangeCustomer = () => {
+  const handleChangeCustomer = async () => {
     if (selected) {
-      addCustomer(selected);
+      await addCustomer(selected);
 
       Alert.alert("Cliente Alterado!", "Cliente alterado com sucesso.", [
         {

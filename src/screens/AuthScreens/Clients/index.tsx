@@ -26,8 +26,8 @@ export function Clients() {
   const [customer, setCustomer] = useState<ICustomer | null>(null);
   const [customers, setCustomers] = useState<ICustomer[]>([] as ICustomer[]);
 
-  const handleNextPage = () => {
-    if (customer) addCustomer(customer);
+  const handleNextPage = async () => {
+    if (customer) await addCustomer(customer);
 
     if (!customer) {
       Alert.alert(

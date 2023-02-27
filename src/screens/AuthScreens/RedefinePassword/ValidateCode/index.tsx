@@ -1,7 +1,13 @@
 import React, { useState } from "react";
-import { Alert } from "react-native";
-import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from "react-native";
+
+import { HStack, Text, VStack } from "native-base";
 
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -11,16 +17,11 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
-import { LayoutDefault } from "@components/LayoutDefault";
 import { InputToken } from "@components/InputToken";
+import { LayoutDefault } from "@components/LayoutDefault";
 
 interface FormProps {
-  firstDigit: string;
-  secondDigit: string;
-  thirdDigit: string;
-  fourthDigit: string;
-  fifthDigit: string;
-  sixthDigit: string;
+  [index: string]: string;
 }
 
 interface Params {
@@ -28,22 +29,23 @@ interface Params {
 }
 
 const schema = yup.object({
-  firstDigit: yup.string().required("Inválido"),
-  secondDigit: yup.string().required("Inválido"),
-  thirdDigit: yup.string().required("Inválido"),
-  fourthDigit: yup.string().required("Inválido"),
-  fifthDigit: yup.string().required("Inválido"),
-  sixthDigit: yup.string().required("Inválido"),
+  "1": yup.string().required("Inválido"),
+  "2": yup.string().required("Inválido"),
+  "3": yup.string().required("Inválido"),
+  "4": yup.string().required("Inválido"),
+  "5": yup.string().required("Inválido"),
+  "6": yup.string().required("Inválido"),
 });
 
 export function ValidateCode() {
+  const route = useRoute();
   const navigation = useNavigation();
+  const { email } = route.params as Params;
 
   const [isSending, setIsSending] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
-  const route = useRoute();
-  const { email } = route.params as Params;
+  const behavior = Platform.OS === "ios" ? "padding" : "height";
 
   const {
     control,
@@ -53,15 +55,8 @@ export function ValidateCode() {
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async ({
-    firstDigit,
-    secondDigit,
-    thirdDigit,
-    fourthDigit,
-    fifthDigit,
-    sixthDigit,
-  }: FormProps) => {
-    const token = `${firstDigit}${secondDigit}${thirdDigit}${fourthDigit}${fifthDigit}${sixthDigit}`;
+  const handleNextPage = async (props: FormProps) => {
+    const token = `${props[1]}${props[2]}${props[3]}${props[4]}${props[5]}${props[6]}`;
 
     try {
       setIsSending(true);
@@ -132,151 +127,79 @@ export function ValidateCode() {
       handleFirstIcon={() => navigation.goBack()}
       justifyContent="space-between"
     >
-      <Box px={4} width="full" alignItems="center" justifyContent="center">
-        <Heading
-          size={"sm"}
-          mb={8}
-          textAlign="center"
-          color={THEME.colors.white}
-        >
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-        </Heading>
+      <KeyboardAvoidingView style={styles.keyboard} behavior={behavior}>
+        <VStack flex={1} w="full" justifyContent="space-between" bg="blue.700">
+          <VStack flex={1} w="full" p={4} bg="blue.700">
+            <Text
+              fontSize={16}
+              color={THEME.colors.white}
+              fontFamily="Roboto_400Regular"
+            >
+              Um código de ativação foi enviado para o{"\n"}e-mail cadastrado.
+              {"\n"}
+              {"\n"}
+              Aguarde alguns minutos e confira seu{"\n"}e-mail. Se não
+              visualizar na caixa principal,{"\n"}confira no lixo eletrônico.
+              {"\n"}
+              Caso não receba solicite o reenvio do código no aplicativo.{"\n"}
+              {"\n"}
+              Preencha os campos abaixo com o código de validação recebido.
+            </Text>
 
-        <Heading
-          size={"sm"}
-          mb={8}
-          textAlign="center"
-          color={THEME.colors.white}
-        >
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-        </Heading>
-
-        <Heading size={"sm"} textAlign="center" color={THEME.colors.white}>
-          Lorem ipsum is placeholder text commonly used in the graphic, print,
-          and publishing industries for previewing layouts and visual mockups.
-        </Heading>
-
-        <HStack mt={8} justifyContent="space-between" w="100%">
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="firstDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="numeric"
-                  errorMessage={errors.firstDigit?.message}
+            <HStack mt={12} justifyContent="space-between" w="100%">
+              {Array.of("1", "2", "3", "4", "5", "6").map((item) => (
+                <Controller
+                  key={item}
+                  control={control}
+                  name={item}
+                  render={({ field: { onChange, value } }) => (
+                    <InputToken
+                      value={value}
+                      placeholder="0"
+                      borderWidth={1}
+                      borderRadius={6}
+                      // keyboardType="numeric"
+                      returnKeyType="go"
+                      h="52px"
+                      // w="52px"
+                      onChangeText={onChange}
+                      errorMessage={errors[item]?.message}
+                    />
+                  )}
                 />
-              )}
+                // <Box key={item} width="52px">
+                // </Box>
+              ))}
+            </HStack>
+          </VStack>
+
+          <VStack w="full" p={4} bg="blue.700">
+            <Button
+              title="Reenviar Código"
+              h="52px"
+              w="full"
+              mb={4}
+              isLoading={isResending}
+              onPress={handleResendToken}
             />
-          </Box>
 
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="secondDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="numeric"
-                  errorMessage={errors.secondDigit?.message}
-                />
-              )}
+            <Button
+              title="Enviar"
+              h="52px"
+              w="full"
+              isLoading={isSending}
+              onPress={handleSubmit(handleNextPage)}
             />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="thirdDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="numeric"
-                  errorMessage={errors.thirdDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="fourthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="numeric"
-                  errorMessage={errors.fourthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="fifthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="numeric"
-                  errorMessage={errors.fifthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-
-          <Box width="14%">
-            <Controller
-              control={control}
-              name="sixthDigit"
-              render={({ field: { onChange, value } }) => (
-                <InputToken
-                  placeholder="0"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="numeric"
-                  errorMessage={errors.sixthDigit?.message}
-                />
-              )}
-            />
-          </Box>
-        </HStack>
-      </Box>
-
-      <Box w="full" px={4} mb={8}>
-        <Button
-          title="Reenviar Código"
-          h={52}
-          w="full"
-          mb={4}
-          isLoading={isResending}
-          onPress={handleResendToken}
-        />
-
-        <Button
-          title="Enviar"
-          h={52}
-          w="full"
-          isLoading={isSending}
-          onPress={handleSubmit(handleNextPage)}
-        />
-      </Box>
+          </VStack>
+        </VStack>
+      </KeyboardAvoidingView>
     </LayoutDefault>
   );
 }
+
+const styles = StyleSheet.create({
+  keyboard: {
+    flex: 1,
+    width: "100%",
+  },
+});

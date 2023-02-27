@@ -34,9 +34,9 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
   const resetCustomerState = () => setCustomer(null);
 
   const loadCustomerStorage = async () => {
-    const storage = await AsyncStorage.getItem(CUSTOMER);
-    if (storage) {
-      const data = (await JSON.parse(storage)) as ICustomer;
+    const customerStorage = await AsyncStorage.getItem(CUSTOMER);
+    if (customerStorage) {
+      const data = (await JSON.parse(customerStorage)) as ICustomer;
       setCustomer(data);
     }
   };

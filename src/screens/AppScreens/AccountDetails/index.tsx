@@ -64,8 +64,6 @@ export function AccountDetails() {
     newPassword,
     name,
   }: FormProps) => {
-    console.log(email, newPassword, name);
-
     try {
       setIsLoading(true);
 

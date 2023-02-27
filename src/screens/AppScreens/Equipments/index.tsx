@@ -72,7 +72,7 @@ export function Equipments() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, [customer])
   );
 
   const fetchNotifications = async () => {

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import {
@@ -9,8 +10,12 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import * as Linking from "expo-linking";
+
+import api from "@services/api";
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
@@ -22,16 +27,42 @@ import { IconMenuDrawer } from "@components/IconMenuDrawer";
 
 const CustomDrawer = (props: any) => {
   const { resetUserState } = useAuth();
-  const { resetCustomerState } = useCustomer();
+  const { resetCustomerState, customer } = useCustomer();
+
+  const [whatsApp, setWhatsApp] = useState<string | null>(null);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem(USER);
     await AsyncStorage.removeItem(CUSTOMER);
     await AsyncStorage.removeItem(TOKEN);
 
+    setWhatsApp(null);
     resetUserState();
     resetCustomerState();
   };
+
+  const getWhatsApp = async () => {
+    try {
+      const response = await api.post("/ContatosParceiro/ObterListaSuporte", {
+        codigoCliente: customer?.codigoCliente,
+      });
+
+      setWhatsApp(response.data[0].whatsapp);
+    } catch (error) {
+      if (axios.isAxiosError(error)) console.log(error);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (isActive) getWhatsApp();
+
+    return () => {
+      isActive = false;
+    };
+  }, [customer]);
 
   return (
     <Container>
@@ -40,7 +71,9 @@ const CustomDrawer = (props: any) => {
           <DrawerItemList {...props} />
 
           <DrawerItem
-            onPress={() => console.log("WhatsApp...")}
+            onPress={() => {
+              Linking.openURL(`http://api.whatsapp.com/send?phone=${whatsApp}`);
+            }}
             pressColor="transparent"
             style={{
               ...styles.item,

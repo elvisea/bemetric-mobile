@@ -26,13 +26,15 @@ export function Input({
       <NativeBaseInput
         px={0}
         color="white"
-        fontSize="sm"
-        fontFamily="Montserrat_400Regular"
+        fontSize={16}
+        letterSpacing={1}
+        fontFamily="Roboto_400Regular"
         placeholderTextColor="white"
         borderTopWidth={0}
         borderLeftWidth={0}
         borderRightWidth={0}
         borderBottomWidth={1}
+        _input={{ cursorColor: "#FFF" }}
         _focus={{
           bg: "transparent",
           borderColor: "white",
