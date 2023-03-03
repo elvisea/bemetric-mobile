@@ -1,10 +1,23 @@
-import { Platform } from "react-native";
-import React, { useCallback, useState } from "react";
+import { Platform, TouchableOpacity } from "react-native";
+import React, { ReactNode, useCallback, useState } from "react";
 import { HStack, IconButton, Text, VStack } from "native-base";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 
 import axios from "axios";
-import { subDays, format } from "date-fns";
+
+import {
+  subDays,
+  format,
+  startOfDay,
+  endOfDay,
+  differenceInDays,
+  addDays,
+} from "date-fns";
+
 import { RFValue } from "react-native-responsive-fontsize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
@@ -54,10 +67,28 @@ interface IDate {
   [index: number]: Date;
 }
 
+interface IList {
+  [index: number]: {
+    url: string;
+    icon: ReactNode;
+    title: string;
+    value: number | null;
+    label: string;
+  };
+}
+
+interface IUrl {
+  kmRodados: string;
+  horasLigadas: string;
+  horasTrabalhadas: string;
+  velocidadeMedia: string;
+}
+
 export function TelemetryData() {
-  const { colors } = THEME;
+  const { colors, fonts } = THEME;
 
   const route = useRoute();
+  const navigation = useNavigation();
   const { params } = route.params as IParams;
 
   console.log("TelemetryData Screen Params:", params);
@@ -65,33 +96,90 @@ export function TelemetryData() {
   const [data, setData] = useState<IData | null>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const [finalDate, setFinalDate] = useState(new Date());
-  const [initialDate, setInitialDate] = useState(subDays(new Date(), 1));
+  const [finalDate, setFinalDate] = useState(endOfDay(new Date()));
+  const [initialDate, setInitialDate] = useState(
+    startOfDay(subDays(new Date(), 1))
+  );
 
   const [selectStartDate, setSelectStartDate] = useState(false);
   const [selectFinalDate, setSelectFinalDate] = useState(false);
 
-  console.log("State Data Inicial:", initialDate);
-  console.log("State Data Final:", finalDate);
+  const [useData, setUseData] = useState(false);
+  const [selectedRange, setSelectedRange] = useState(1);
 
-  const [selectedRange, setSelectedRange] = useState<number | null>(0);
+  console.log("Periodo selecionado:", selectedRange);
+  console.log("State:", typeof data);
+
+  console.log("initialDate", initialDate);
+  console.log("finalDate", finalDate);
 
   const date: IDate = {
-    0: subDays(new Date(), 1),
-    1: subDays(new Date(), 7),
-    2: subDays(new Date(), 15),
-    3: subDays(new Date(), 30),
+    0: startOfDay(subDays(new Date(), 1)),
+    1: startOfDay(subDays(new Date(), 7)),
+    2: startOfDay(subDays(new Date(), 15)),
+    3: startOfDay(subDays(new Date(), 30)),
+  };
+
+  const url: IUrl = {
+    kmRodados: "GraficoKmRodados",
+    horasLigadas: "GraficoHorasLigadas",
+    horasTrabalhadas: "GraficoHorasTrabalhadas",
+    velocidadeMedia: "GraficoVelocidadeMedia",
+  };
+
+  const list: IList = {
+    0: {
+      url: url.kmRodados,
+      icon: <MaterialCommunityIcons name="highway" color="#878787" size={22} />,
+      title: "Kms Rodados",
+      value: data ? data.kmRodados : null,
+      label: "Km/h",
+    },
+    1: {
+      url: url.horasLigadas,
+      icon: <Ionicons name="time" color="#878787" size={22} />,
+      title: "Horas Ligado",
+      value: data ? data.horasLigadas : null,
+      label: "horas",
+    },
+    2: {
+      url: url.horasTrabalhadas,
+      icon: <WorkedHours />,
+      title: "Horas Trabalhado",
+      value: data ? data.horasTrabalhadas : null,
+      label: "horas",
+    },
+    3: {
+      url: url.velocidadeMedia,
+      icon: <Speedometer />,
+      title: "Velocidade Média",
+      value: data ? data.velocidadeMedia : null,
+      label: "Km/h",
+    },
+  };
+
+  const handleRenderChart = (url: string) => {
+    navigation.navigate("Chart", {
+      url,
+      dataDe: initialDate.toISOString(),
+      dataAte: finalDate.toISOString(),
+      usaData: useData,
+      tipoIntervalo: selectedRange,
+      codigoEquipamento: params.codigoEquipamento,
+    });
   };
 
   const handleSelectPeriod = (value: number) => {
     setSelectedRange(value);
     setInitialDate(date[value]);
-    setFinalDate(new Date());
+    setFinalDate(endOfDay(new Date()));
+    setUseData(false);
   };
 
   const handleStartSate = useCallback(
     (_event: unknown, date: Date | undefined) => {
-      setSelectedRange(null);
+      setSelectedRange(5);
+      setUseData(true);
 
       if (Platform.OS === "android") setSelectStartDate(!selectStartDate);
 
@@ -102,36 +190,44 @@ export function TelemetryData() {
 
   const handleEndDate = useCallback(
     (_event: unknown, date: Date | undefined) => {
-      setSelectedRange(null);
+      setSelectedRange(5);
+      setUseData(true);
 
       if (Platform.OS === "android") setSelectFinalDate(!selectFinalDate);
 
-      if (date) setFinalDate(date);
+      if (date) setFinalDate(endOfDay(date));
     },
     [selectFinalDate]
   );
 
   const fetchData = async () => {
     const data = {
-      codigoEquipamento: params.codigoEquipamento,
       dataDe: initialDate?.toISOString(),
       dataAte: finalDate?.toISOString(),
+      usaData: useData,
       tipoIntervalo: selectedRange ? selectedRange : 0,
-      usaData: true,
+      codigoEquipamento: params.codigoEquipamento,
     };
 
-    console.log("Dados enviados:", data);
+    console.log("Enviados", data);
 
     try {
       const response = await api.post("/Equipamento/DadosTelemetrias", data);
 
-      console.log("=>", response.data);
-
       setData(response.data);
       setIsOpenModal(false);
+
+      console.log("RESPONSE:", response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) console.log("Error:", error);
     }
+  };
+
+  const maximumDate = () => {
+    const difference = differenceInDays(new Date(), initialDate);
+    if (difference < 30) return new Date();
+    if (difference >= 30) return addDays(initialDate, 30);
+    return new Date();
   };
 
   useFocusEffect(
@@ -155,59 +251,28 @@ export function TelemetryData() {
         />
       </HeaderDefault>
 
-      <Item
-        icon={
-          <MaterialCommunityIcons name="highway" color="#878787" size={22} />
-        }
-        title="Kms Rodados"
-        mb="8px"
-      >
-        <Text
-          color="blue.700"
-          fontSize="16px"
-          fontFamily="Roboto_400Regular"
-          isTruncated
+      {Array.of(0, 1, 2, 3).map((item) => (
+        <TouchableOpacity
+          key={item}
+          activeOpacity={0.7}
+          onPress={() => handleRenderChart(list[item].url)}
         >
-          {data ? `${data.kmRodados} Km/h` : ""}
-        </Text>
-      </Item>
-
-      <Item
-        icon={<Ionicons name="time" color="#878787" size={22} />}
-        title="Horas Ligado"
-        mb="8px"
-      >
-        <Text
-          color="blue.700"
-          fontSize="16px"
-          fontFamily="Roboto_400Regular"
-          isTruncated
-        >
-          {data ? `${data.horasLigadas} horas` : ""}
-        </Text>
-      </Item>
-
-      <Item icon={<WorkedHours />} title="Horas Trabalhado" mb="8px">
-        <Text
-          color="blue.700"
-          fontSize="16px"
-          fontFamily="Roboto_400Regular"
-          isTruncated
-        >
-          {data ? `${data.horasTrabalhadas} horas` : ""}
-        </Text>
-      </Item>
-
-      <Item icon={<Speedometer />} title="Velocidade Média" mb="8px">
-        <Text
-          color="blue.700"
-          fontSize="16px"
-          fontFamily="Roboto_400Regular"
-          isTruncated
-        >
-          {data ? `${data.velocidadeMedia} Km/h` : ""}
-        </Text>
-      </Item>
+          <Item icon={list[item].icon} title={list[item].title} mb="8px">
+            <Text
+              color={
+                typeof data === "object" ? colors.blue[700] : colors.red[600]
+              }
+              fontSize="16px"
+              fontFamily={fonts.Roboto_400Regular}
+              isTruncated
+            >
+              {typeof data === "object"
+                ? `${list[item].value} ${list[item].label}`
+                : "Not Found"}
+            </Text>
+          </Item>
+        </TouchableOpacity>
+      ))}
 
       <ModalPeriod
         title="Período"
@@ -257,6 +322,7 @@ export function TelemetryData() {
         <DateTimePicker
           mode="date"
           value={initialDate}
+          maximumDate={new Date()}
           testID="dateTimePicker"
           display="default"
           onChange={handleStartSate}
@@ -267,7 +333,8 @@ export function TelemetryData() {
         <DateTimePicker
           mode="date"
           value={finalDate}
-          maximumDate={new Date()}
+          minimumDate={initialDate}
+          maximumDate={maximumDate()}
           testID="dateTimePicker"
           display="default"
           onChange={handleEndDate}

@@ -74,6 +74,15 @@ export declare global {
         params: { codigoEquipamento: number };
       };
 
+      Chart: {
+        url: string;
+        dataDe: string;
+        dataAte: string;
+        usaData: boolean;
+        tipoIntervalo: number;
+        codigoEquipamento: number;
+      };
+
       TelemetryDevice: {
         screen: "TelemetryDevice";
         params: { codigoEquipamento: number };

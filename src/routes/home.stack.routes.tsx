@@ -13,6 +13,8 @@ import { NotificationsTopTabs } from "./notifications.top.tabs.routes";
 import MessagesStackRoutes from "./messages.stack.routes";
 import IncludeStackRoutes from "./include.stack.routes";
 
+import { ChartTelemetryData } from "@screens/AppScreens/EquipmentDetails/ChartTelemetryData";
+
 const Stack = createNativeStackNavigator();
 
 export default function HomeStackRoutes() {
@@ -47,6 +49,15 @@ export default function HomeStackRoutes() {
         <Stack.Screen
           name="Messages"
           component={MessagesStackRoutes}
+          options={{
+            header: () => <Cabecalho />,
+            animation: "none",
+          }}
+        />
+
+        <Stack.Screen
+          name="Chart"
+          component={ChartTelemetryData}
           options={{
             header: () => <Cabecalho />,
             animation: "none",
