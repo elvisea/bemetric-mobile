@@ -37,7 +37,8 @@ export function Equipments() {
   const [notifications, setNotifications] = useState();
   const [groupings, setGroupings] = useState<IGrouping[]>([]);
 
-  console.log("notifications:", notifications);
+  console.log("notifications", notifications);
+
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -57,6 +58,8 @@ export function Equipments() {
         });
 
         setGroupings(response.data);
+
+        console.log("CHAMOU");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) console.log("Error:", error);
@@ -133,9 +136,9 @@ export function Equipments() {
                 grouping.listaEquipamentos.map((equipament) => (
                   <AccordionItem
                     key={equipament.codigoEquipamento}
-                    expanded={false}
+                    velocity={equipament.velocidade}
                     title={equipament.nomeEquipamento}
-                    description={equipament.nomeEquipamento}
+                    status={equipament.ligado ? "Ligado" : "Desligado"}
                     onPress={() =>
                       navigation.navigate("EquipmentDetails", {
                         screen: "Equipament",
