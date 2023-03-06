@@ -16,11 +16,11 @@ export const IconMenuDrawer = ({
 }: Props) => (
   <Box
     bg={bg}
-    h={RFValue(34)}
-    w={RFValue(34)}
+    h={`${RFValue(34)}px`}
+    w={`${RFValue(34)}px`}
     alignItems="center"
     justifyContent="center"
-    borderRadius={RFValue(17)}
+    borderRadius={`${RFValue(17)}px`}
     {...rest}
   >
     {icon}

@@ -1,6 +1,7 @@
 import { Platform, TouchableOpacity } from "react-native";
 import React, { ReactNode, useCallback, useState } from "react";
 import { HStack, IconButton, Text, VStack } from "native-base";
+
 import {
   useFocusEffect,
   useNavigation,
@@ -158,7 +159,7 @@ export function TelemetryData() {
     },
   };
 
-  const handleRenderChart = (url: string) => {
+  const handleNextPage = (url: string) => {
     navigation.navigate("Chart", {
       url,
       dataDe: initialDate.toISOString(),
@@ -255,7 +256,7 @@ export function TelemetryData() {
         <TouchableOpacity
           key={item}
           activeOpacity={0.7}
-          onPress={() => handleRenderChart(list[item].url)}
+          onPress={() => handleNextPage(list[item].url)}
         >
           <Item icon={list[item].icon} title={list[item].title} mb="8px">
             <Text

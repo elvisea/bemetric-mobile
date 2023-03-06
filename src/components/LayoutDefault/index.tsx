@@ -44,7 +44,7 @@ export function LayoutDefault({
     >
       <HStack
         w="full"
-        h={RFValue(82)}
+        h={`${RFValue(82)}px`}
         bg={THEME.colors.blue[700]}
         alignItems="center"
         flexDirection="row"

@@ -16,7 +16,7 @@ export function Cabecalho({}: Props) {
   return (
     <HStack
       w="full"
-      h={RFValue(82)}
+      h={`${RFValue(82)}px`}
       bg={THEME.colors.blue[700]}
       alignItems="center"
       justifyContent="space-between"

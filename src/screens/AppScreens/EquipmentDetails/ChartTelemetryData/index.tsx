@@ -122,8 +122,8 @@ export function ChartTelemetryData() {
 
           console.log("Response:", response.data);
 
-          // isActive && setChart(formatDataForChart(response.data));
-          isActive && setChart(dadosFake());
+          isActive && setChart(formatDataForChart(response.data));
+          // isActive && setChart(dadosFake());
         } catch (error) {
           if (axios.isAxiosError(error)) console.log("Error:", error);
         }
