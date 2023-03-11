@@ -39,7 +39,6 @@ export function Equipments() {
 
   console.log("notifications", notifications);
 
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const handleExpanded = (item: string) => {

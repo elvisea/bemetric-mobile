@@ -11,8 +11,8 @@ import IconTelemetryDevice from "@assets/telemetry-device.svg";
 import { TelemetryData } from "@screens/AppScreens/EquipmentDetails/TelemetryData";
 import { TelemetryDevice } from "@screens/AppScreens/EquipmentDetails/TelemetryDevice";
 import { Equipament } from "@screens/AppScreens/EquipmentDetails/Equipament";
-import { Period } from "@screens/AppScreens/EquipmentDetails/Period";
 import { Route } from "@screens/AppScreens/EquipmentDetails/Route";
+import { PeriodoPermanencia } from "@screens/AppScreens/EquipmentDetails/PeriodoPermanencia";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -41,8 +41,8 @@ export function DetailsTopTabs({ route }: any) {
         options={{ tabBarIcon: () => <IconTelemetryData /> }}
       />
       <Tab.Screen
-        name="Period"
-        component={Period}
+        name="PeriodoPermanencia"
+        component={PeriodoPermanencia}
         initialParams={route.params}
         options={{ tabBarIcon: () => <IconPeriod /> }}
       />

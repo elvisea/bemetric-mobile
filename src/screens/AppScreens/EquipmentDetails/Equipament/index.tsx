@@ -13,26 +13,15 @@ import IconSnapshot from "@assets/snapshot.svg";
 import IconHourMeter from "@assets/hourmeter.svg";
 import IconSpeedometer from "@assets/speedometer.svg";
 
-import { IEquipmentDetails } from "@interfaces/IEquipmentDetails";
+import { IData } from "./interfaces/IData";
+import { IParams } from "../interfaces/IEquipamentDetails";
+import { IEquipmentDetails } from "./interfaces/IEquipamentDetails";
 
 import { Item } from "@components/Item";
 
 import { HeaderDefault } from "@components/HeaderDefault";
 import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
 import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
-
-interface IParams {
-  params: {
-    codigoEquipamento: number;
-  };
-}
-
-interface IData {
-  hodometro: number;
-  horimetro: number;
-  status: number;
-  velocimetro: number;
-}
 
 export function Equipament() {
   const route = useRoute();

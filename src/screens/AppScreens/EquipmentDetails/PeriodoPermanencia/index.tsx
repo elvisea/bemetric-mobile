@@ -1,61 +1,52 @@
-import { Platform, TouchableOpacity } from "react-native";
+import { Platform } from "react-native";
 import React, { useCallback, useState } from "react";
-import { HStack, IconButton, Text, VStack } from "native-base";
+import { HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import axios from "axios";
+import { RFValue } from "react-native-responsive-fontsize";
 
 import {
   subDays,
-  format,
   startOfDay,
   endOfDay,
   differenceInDays,
   addDays,
+  format,
 } from "date-fns";
 
-import { RFValue } from "react-native-responsive-fontsize";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import api from "@services/api";
 
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-
-import { Item } from "@components/Item";
-import { Button } from "@components/Button/index";
+import { Button } from "@components/Button";
 import { ButtonDate } from "@components/ButtonDate";
 import { ModalPeriod } from "@components/ModalPeriod";
 import { PeriodOption } from "@components/PeriodOption";
 import { HeaderDefault } from "@components/HeaderDefault";
 
-import api from "@services/api";
-
-import Speedometer from "@assets/speedometer.svg";
-import WorkedHours from "@assets/worked-hours.svg";
-
+import { Permanencia } from "../components/Permanencia";
 import { IParams } from "../interfaces/IEquipamentDetails";
-import { IList, ITelemetryData } from "./interfaces/TelemetryData";
 
 import { Icon } from "./styles";
 import { THEME } from "@theme/theme";
 
-import { url } from "@constants/url";
+import { IPeriodStay } from "@interfaces/IPeriodStay";
+
 import { date } from "@constants/date";
 import { dateOptions } from "@constants/dateOptions";
 
-export function TelemetryData() {
-  const { colors, fonts } = THEME;
+export function PeriodoPermanencia() {
+  const { colors } = THEME;
 
   const route = useRoute();
-  const navigation = useNavigation();
   const { params } = route.params as IParams;
 
   console.log("TelemetryData Screen Params:", params);
 
-  const [data, setData] = useState<ITelemetryData | null>(null);
+  const [data, setData] = useState<IPeriodStay | null>(null);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -68,46 +59,16 @@ export function TelemetryData() {
   const [useData, setUseData] = useState(false);
   const [selectedRange, setSelectedRange] = useState(1);
 
-  const list: IList = {
-    0: {
-      url: url.kmRodados,
-      icon: <MaterialCommunityIcons name="highway" color="#878787" size={22} />,
-      title: "Kms Rodados",
-      value: data ? data.kmRodados : null,
-      label: "Km/h",
-    },
-    1: {
-      url: url.horasLigadas,
-      icon: <Ionicons name="time" color="#878787" size={22} />,
-      title: "Horas Ligado",
-      value: data ? data.horasLigadas : null,
-      label: "horas",
-    },
-    2: {
-      url: url.horasTrabalhadas,
-      icon: <WorkedHours />,
-      title: "Horas Trabalhado",
-      value: data ? data.horasTrabalhadas : null,
-      label: "horas",
-    },
-    3: {
-      url: url.velocidadeMedia,
-      icon: <Speedometer />,
-      title: "Velocidade Média",
-      value: data ? data.velocidadeMedia : null,
-      label: "Km/h",
-    },
-  };
+  const formatHours = (time: number) => {
+    const hour = Math.floor(time);
+    const decimal = (time - hour).toFixed(2);
+    const minutes = parseInt(decimal.replace(".", ""));
 
-  const handleNextPage = (url: string) => {
-    navigation.navigate("Chart", {
-      url,
-      dataDe: start.toISOString(),
-      dataAte: end.toISOString(),
-      usaData: useData,
-      tipoIntervalo: selectedRange,
-      codigoEquipamento: params.codigoEquipamento,
-    });
+    if (minutes === 0) {
+      return `${hour}h`;
+    } else {
+      return `${hour}h e ${minutes}min`;
+    }
   };
 
   const handleSelectPeriod = (value: number) => {
@@ -141,19 +102,24 @@ export function TelemetryData() {
     [selectFinalDate]
   );
 
-  const fetchData = async () => {
+  const maximumDate = () => {
+    const difference = differenceInDays(new Date(), start);
+    if (difference < 30) return new Date();
+    if (difference >= 30) return addDays(start, 30);
+    return new Date();
+  };
+
+  async function fetchData() {
     const data = {
-      dataDe: start?.toISOString(),
-      dataAte: end?.toISOString(),
+      dataDe: end?.toISOString(),
+      dataAte: start?.toISOString(),
       usaData: useData,
       tipoIntervalo: selectedRange ? selectedRange : 0,
       codigoEquipamento: params.codigoEquipamento,
     };
 
-    console.log("Enviados", data);
-
     try {
-      const response = await api.post("/Equipamento/DadosTelemetrias", data);
+      const response = await api.post("/Equipamento/PeriodoPermanencia", data);
 
       setData(response.data);
       setIsOpenModal(false);
@@ -162,20 +128,13 @@ export function TelemetryData() {
     } catch (error) {
       if (axios.isAxiosError(error)) console.log("Error:", error);
     }
-  };
-
-  const maximumDate = () => {
-    const difference = differenceInDays(new Date(), start);
-    if (difference < 30) return new Date();
-    if (difference >= 30) return addDays(start, 30);
-    return new Date();
-  };
+  }
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
-      if (isActive) fetchData();
+      isActive && fetchData();
 
       return () => {
         isActive = false;
@@ -192,28 +151,46 @@ export function TelemetryData() {
         />
       </HeaderDefault>
 
-      {Array.of(0, 1, 2, 3).map((item) => (
-        <TouchableOpacity
-          key={item}
-          activeOpacity={0.7}
-          onPress={() => handleNextPage(list[item].url)}
-        >
-          <Item icon={list[item].icon} title={list[item].title} mb="8px">
-            <Text
-              color={
-                typeof data === "object" ? colors.blue[700] : colors.red[600]
-              }
-              fontSize="16px"
-              fontFamily={fonts.Roboto_400Regular}
-              isTruncated
-            >
-              {typeof data === "object"
-                ? `${list[item].value} ${list[item].label}`
-                : "Not Found"}
-            </Text>
-          </Item>
-        </TouchableOpacity>
-      ))}
+      <ScrollView w="full" px="16px" showsVerticalScrollIndicator={false}>
+        <Permanencia
+          icon={<MaterialCommunityIcons name="filter" size={22} color="#FFF" />}
+          title="Em geocercas"
+          total={data ? formatHours(data.totalHorasGeocerca) : "-"}
+          hours={data ? formatHours(data.horasTrabalhadasGeocerca) : "-"}
+          on={data ? formatHours(data.paradoIgnicaoLigadaGeocerca) : "-"}
+          off={data ? formatHours(data.paradoIgnicaoDesligadaGeocerca) : "-"}
+        />
+
+        <Permanencia
+          icon={
+            <MaterialCommunityIcons name="arrow-right" size={22} color="#FFF" />
+          }
+          title="Em pontos de interesse"
+          total={data ? formatHours(data.totalHorasPontoInteresse) : "-"}
+          hours={data ? formatHours(data.horasTrabalhadasPontoInteresse) : "-"}
+          on={data ? formatHours(data.paradoIgnicaoLigadaPontoInteresse) : "-"}
+          off={
+            data ? formatHours(data.paradoIgnicaoDesligadaPontoInteresse) : "-"
+          }
+        />
+
+        <Permanencia
+          icon={
+            <MaterialCommunityIcons name="map-marker" size={22} color="#FFF" />
+          }
+          title="Outras localizações"
+          total={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
+          hours={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
+          on={
+            data ? formatHours(data.paradoIgnicaoLigadaOutrasLocalizacoes) : "-"
+          }
+          off={
+            data
+              ? formatHours(data.paradoIgnicaoDesligadaOutrasLocalizacoes)
+              : "-"
+          }
+        />
+      </ScrollView>
 
       <ModalPeriod
         title="Período"

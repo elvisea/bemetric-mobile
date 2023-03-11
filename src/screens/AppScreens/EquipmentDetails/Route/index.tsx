@@ -12,12 +12,7 @@ import api from "@services/api";
 
 import { styles } from "./styles";
 import { THEME } from "@theme/theme";
-
-interface IParams {
-  params: {
-    codigoEquipamento: number;
-  };
-}
+import { IParams } from "../interfaces/IEquipamentDetails";
 
 interface ILocation {
   lat: number;

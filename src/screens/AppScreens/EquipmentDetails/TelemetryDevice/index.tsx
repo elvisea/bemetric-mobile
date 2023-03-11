@@ -16,12 +16,7 @@ import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTit
 import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
 
 import { ITelemetry } from "@interfaces/ITelemetry";
-
-interface IParams {
-  params: {
-    codigoEquipamento: number;
-  };
-}
+import { IParams } from "../interfaces/IEquipamentDetails";
 
 export function TelemetryDevice() {
   const route = useRoute();
@@ -44,7 +39,7 @@ export function TelemetryDevice() {
             }
           );
 
-          setTelemetry(response.data);
+          isActive && setTelemetry(response.data);
         } catch (error) {
           if (axios.isAxiosError(error)) console.log("Error:", error);
         }

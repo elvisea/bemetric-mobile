@@ -4,10 +4,10 @@ import { Box, HStack, IBoxProps, Text } from "native-base";
 interface IProps extends IBoxProps {
   icon: ReactNode;
   title: string;
-  total: number;
-  hours: number;
-  on: number;
-  off: number;
+  total: string;
+  hours: string;
+  on: string;
+  off: string;
 }
 
 function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
@@ -55,7 +55,7 @@ function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
           color="blue.700"
           fontSize="18px"
         >
-          {total === 1 ? `${total} hora` : `${total} horas`}
+          {total}
         </Text>
       </HStack>
 
@@ -77,7 +77,7 @@ function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
           color="blue.700"
           fontSize="18px"
         >
-          {hours === 1 ? `${hours} hora` : `${hours} horas`}
+          {hours}
         </Text>
       </HStack>
 
@@ -99,7 +99,7 @@ function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
           color="blue.700"
           fontSize="18px"
         >
-          {on === 1 ? `${on} hora` : `${on} horas`}
+          {on}
         </Text>
       </HStack>
 
@@ -121,7 +121,7 @@ function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
           color="blue.700"
           fontSize="18px"
         >
-          {off === 1 ? `${off} hora` : `${off} horas`}
+          {off}
         </Text>
       </HStack>
     </Box>
