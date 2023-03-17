@@ -3,7 +3,7 @@ import { Text, IPressableProps, Pressable, VStack } from "native-base";
 
 import { THEME } from "@theme/theme";
 
-type Props = IPressableProps & {
+type IProps = IPressableProps & {
   mt?: string;
   ml?: string;
   icon: ReactNode;
@@ -18,7 +18,7 @@ export function Signals({
   title,
   value,
   ...rest
-}: Props) {
+}: IProps) {
   return (
     <Pressable
       w="156px"
@@ -34,7 +34,7 @@ export function Signals({
         color="#878787"
         fontSize="12px"
         mb="8px"
-        fontFamily="Montserrat_300Light"
+        fontFamily="Roboto_400Regular"
         isTruncated
       >
         {title}

@@ -1,19 +1,25 @@
 import React, { ReactNode } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Box, VStack, IconButton, HStack } from "native-base";
+import { Box, VStack, IconButton, HStack, Text } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ColorSchemeType } from "native-base/lib/typescript/components/types";
 
-import Logo from "@assets/b2k.svg";
 import { THEME } from "@theme/theme";
 
-import { Icon } from "./styles";
+import { BadgeCustom, Icon } from "./styles";
+
+type ICount = {
+  contadorAlerta: number;
+  contadorMensagem: number;
+};
 
 type Props = {
   bg: ColorSchemeType;
   firstIcon: keyof typeof MaterialIcons.glyphMap;
   secondIcon?: keyof typeof MaterialIcons.glyphMap;
   thirdIcon?: keyof typeof MaterialIcons.glyphMap;
+
+  count?: ICount;
   children?: ReactNode;
   handleFirstIcon: () => void;
   handleSecondIcon?: () => void;
@@ -28,6 +34,7 @@ export function LayoutDefault({
   secondIcon,
   thirdIcon,
   children,
+  count,
   alignItems = "center",
   justifyContent,
   handleFirstIcon,
@@ -57,19 +64,43 @@ export function LayoutDefault({
 
         {/* <Logo /> */}
 
-        <Box flexDirection="row" alignItems="center" justifyContent="center">
+        <Box
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="center"
+          mr={count?.contadorMensagem !== 0 ? 3 : 0}
+        >
           {secondIcon && (
-            <IconButton
-              icon={<Icon name={secondIcon} />}
-              onPress={handleSecondIcon}
-            />
+            <Box>
+              {count?.contadorAlerta !== 0 && (
+                <BadgeCustom>
+                  <Text textAlign="center" fontSize={12} color="white">
+                    {count?.contadorAlerta}
+                  </Text>
+                </BadgeCustom>
+              )}
+              <IconButton
+                icon={<Icon name={secondIcon} />}
+                onPress={handleSecondIcon}
+              />
+            </Box>
           )}
 
           {thirdIcon && (
-            <IconButton
-              icon={<Icon name={thirdIcon} />}
-              onPress={handleThirdIcon}
-            />
+            <VStack>
+              {count?.contadorMensagem !== 0 && (
+                <BadgeCustom>
+                  <Text textAlign="center" fontSize={12} color="white">
+                    {count?.contadorMensagem}
+                  </Text>
+                </BadgeCustom>
+              )}
+
+              <IconButton
+                icon={<Icon name={thirdIcon} />}
+                onPress={handleThirdIcon}
+              />
+            </VStack>
           )}
         </Box>
       </HStack>

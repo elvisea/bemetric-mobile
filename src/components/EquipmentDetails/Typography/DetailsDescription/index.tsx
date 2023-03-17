@@ -9,8 +9,8 @@ export function DetailsDescription({ title, ...rest }: Props) {
   return (
     <Text
       color="black"
-      fontSize="13px"
-      fontFamily="Montserrat_300Light"
+      fontSize="12px"
+      fontFamily="Roboto_400Regular"
       {...rest}
     >
       {title}

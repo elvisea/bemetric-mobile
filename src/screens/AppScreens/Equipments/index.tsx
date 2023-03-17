@@ -34,10 +34,8 @@ export function Equipments() {
   const { customer } = useCustomer();
 
   const [expanded, setExpanded] = useState("");
-  const [notifications, setNotifications] = useState();
+  const [count, setCount] = useState();
   const [groupings, setGroupings] = useState<IGrouping[]>([]);
-
-  console.log("notifications", notifications);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -57,8 +55,6 @@ export function Equipments() {
         });
 
         setGroupings(response.data);
-
-        console.log("CHAMOU");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) console.log("Error:", error);
@@ -84,7 +80,7 @@ export function Equipments() {
         codigoCliente: user?.codigoCliente,
       });
 
-      setNotifications(response.data);
+      setCount(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) console.log("Error:", error);
     }
@@ -108,9 +104,10 @@ export function Equipments() {
       firstIcon="menu"
       secondIcon="notifications-on"
       thirdIcon="message"
+      count={count}
       handleFirstIcon={handleMenu}
-      handleSecondIcon={() => navigation.navigate("Notifications")}
       handleThirdIcon={() => navigation.navigate("Messages")}
+      handleSecondIcon={() => navigation.navigate("Notifications")}
     >
       <VStack flex={1} w="full" px={`${RFValue(12)}px`} pt={`${RFValue(16)}px`}>
         <Text ml="8px" mb="12px" fontSize="20px">

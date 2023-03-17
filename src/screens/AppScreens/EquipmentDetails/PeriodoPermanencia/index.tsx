@@ -144,7 +144,7 @@ export function PeriodoPermanencia() {
 
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
-      <HeaderDefault title="Dados de telemetria" mb="16px">
+      <HeaderDefault title="Período de permanência" mb="16px">
         <IconButton
           icon={<Icon name="sliders" />}
           onPress={() => setIsOpenModal(!isOpenModal)}
