@@ -59,7 +59,7 @@ export default function HomeStackRoutes() {
           name="Chart"
           component={ChartTelemetryData}
           options={{
-            header: () => <Cabecalho />,
+            header: () => <Cabecalho hasIcon={false} />,
             animation: "none",
           }}
         />

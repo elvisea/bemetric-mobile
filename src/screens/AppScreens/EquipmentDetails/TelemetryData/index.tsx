@@ -195,6 +195,7 @@ export function TelemetryData() {
       {Array.of(0, 1, 2, 3).map((item) => (
         <TouchableOpacity
           key={item}
+          disabled={typeof data !== "object"}
           activeOpacity={0.7}
           onPress={() => handleNextPage(list[item].url)}
         >
@@ -209,7 +210,7 @@ export function TelemetryData() {
             >
               {typeof data === "object"
                 ? `${list[item].value} ${list[item].label}`
-                : "Not Found"}
+                : "has no values"}
             </Text>
           </Item>
         </TouchableOpacity>

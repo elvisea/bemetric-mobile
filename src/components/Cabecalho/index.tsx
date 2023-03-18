@@ -8,9 +8,11 @@ import { THEME } from "@theme/theme";
 import { Icon } from "./styles";
 import { useNavigation } from "@react-navigation/native";
 
-type Props = {};
+type Props = {
+  hasIcon?: boolean;
+};
 
-export function Cabecalho({}: Props) {
+export function Cabecalho({ hasIcon = true }: Props) {
   const navigation = useNavigation();
 
   return (
@@ -28,10 +30,12 @@ export function Cabecalho({}: Props) {
 
       {/* <Logo /> */}
 
-      <IconButton
-        icon={<Icon name="settings" />}
-        onPress={() => navigation.goBack()}
-      />
+      {hasIcon && (
+        <IconButton
+          icon={<Icon name="settings" />}
+          onPress={() => navigation.goBack()}
+        />
+      )}
     </HStack>
   );
 }
