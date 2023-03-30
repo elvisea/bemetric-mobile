@@ -1,11 +1,12 @@
 import React from "react";
-import { Button as NativeBaseButton, IButtonProps, Heading } from "native-base";
+import { Button as NativeBaseButton, IButtonProps, Text } from "native-base";
 
 type Props = IButtonProps & {
   title: string;
+  color?: string;
 };
 
-export function Button({ title, ...rest }: Props) {
+export function Button({ title, color = "#FFF", ...rest }: Props) {
   return (
     <NativeBaseButton
       bg="blue.700"
@@ -14,9 +15,9 @@ export function Button({ title, ...rest }: Props) {
       borderRadius={6}
       {...rest}
     >
-      <Heading color="white" fontSize={16} fontFamily="Montserrat_600SemiBold">
+      <Text color={color} fontSize={16} fontFamily="Roboto_400Regular">
         {title}
-      </Heading>
+      </Text>
     </NativeBaseButton>
   );
 }

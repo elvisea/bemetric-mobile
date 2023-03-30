@@ -105,6 +105,7 @@ export declare global {
       };
 
       Manual: undefined;
+      ChangePassword: undefined;
 
       // Pra Cima OK
 

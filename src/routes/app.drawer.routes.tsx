@@ -6,7 +6,6 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
-import { AccountDetails } from "@screens/AppScreens/AccountDetails";
 import { ChangeClient } from "@screens/AppScreens/ChangeClient";
 import { SupportService } from "@screens/AppScreens/SupportService";
 
@@ -16,6 +15,7 @@ import { IconMenuDrawer } from "@components/IconMenuDrawer";
 import { THEME } from "@theme/theme";
 
 import HomeStackRoutes from "./home.stack.routes";
+import AccountDetailsStackRoutes from "./account.details.stack.routes";
 
 const { Navigator, Screen } = createDrawerNavigator();
 
@@ -54,8 +54,8 @@ export default function AppDrawerRoutes() {
         />
 
         <Screen
-          name="AccountDetails"
-          component={AccountDetails}
+          name="AccountDetailsStackRoutes"
+          component={AccountDetailsStackRoutes}
           options={{
             drawerLabel: "Detalhes da Conta",
             drawerIcon: () => (

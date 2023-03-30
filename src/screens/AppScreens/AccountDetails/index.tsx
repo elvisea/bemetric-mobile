@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { IconButton, Text, VStack } from "native-base";
+import { Text, VStack, Button as ButtonNativeBase } from "native-base";
 
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -20,64 +19,72 @@ import { useAuth } from "@hooks/auth";
 
 interface FormProps {
   name: string;
-  email: string;
-  current: string;
-  newPassword: string;
-  confirmNewPassword: string;
+  email?: string;
+  celular?: string;
+  telefone?: string;
 }
 
 const schema = yup.object({
-  name: yup.string().required("Informe seu nome."),
-  email: yup.string().required("Informe seu e-mail.").email("E-mail inválido"),
-  password: yup
-    .string()
-    .required("Informe sua senha")
-    .min(4, "A senha deve ter pelo menos 4 dígitos."),
-  current: yup
-    .string()
-    .required("Informe sua senha")
-    .min(4, "A senha deve ter pelo menos 4 dígitos."),
+  name: yup.string().required("Informe seu email."),
+  celular: yup.string().optional(),
+  telefone: yup.string().optional(),
 });
 
-export function AccountDetails() {
-  const { colors } = THEME;
+interface IResponses {
+  [index: number]: string;
+}
 
+const responses: IResponses = {
+  0: "Usuário alterado com sucesso",
+  1: "Usuário não existe",
+  2: "Usuário não pode ser alterado",
+};
+
+export function AccountDetails() {
   const { user } = useAuth();
+  const { colors } = THEME;
   const navigation = useNavigation();
 
-  const [isVisible, setIsVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+
+  console.log("USER CTX", user);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<FormProps>({
+    defaultValues: {
+      name: user?.nomeUsuario,
+      email: user?.email,
+      celular: user?.celular,
+      telefone: user?.telefone,
+    },
     resolver: yupResolver(schema),
   });
 
-  const handleUpdateUser = async ({
-    email,
-    current,
-    newPassword,
-    name,
-  }: FormProps) => {
+  const handleUpdateUser = async ({ name, celular, telefone }: FormProps) => {
     try {
       setIsLoading(true);
 
-      const response = await api.post("Usuario/AlterarSenha", {
+      const data = {
         codigoUsuario: user?.codigoUsuario,
         nomeUsuario: name,
-        email: email,
-        senha: current,
-        novaSenha: newPassword,
-      });
+        telefone: telefone,
+        celular: celular,
+      };
 
-      console.log(response.data);
+      console.log("Enviado:", data);
+
+      const response = await api.post("Usuario/AlterarUsuarioApp", data);
+
+      console.log("Response:", responses[response.data]);
+      Alert.alert(responses[response.data], responses[response.data]);
     } catch (error) {
       Alert.alert(`${error}`, `${error}`);
+      console.log(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -113,12 +120,12 @@ export function AccountDetails() {
           />
 
           <Text
-            mt="16px"
             color="blue.700"
+            mt={4}
             fontSize="12px"
             fontFamily="Roboto_400Regular"
           >
-            E-mail
+            Email
           </Text>
 
           <Controller
@@ -127,6 +134,7 @@ export function AccountDetails() {
             render={({ field: { onChange, value } }) => (
               <Input
                 color="#000"
+                isDisabled
                 fontFamily="Roboto_400Regular"
                 borderBottomColor={colors.blue[700]}
                 onChangeText={onChange}
@@ -137,115 +145,62 @@ export function AccountDetails() {
           />
 
           <Text
-            mt="16px"
             color="blue.700"
+            mt={4}
             fontSize="12px"
             fontFamily="Roboto_400Regular"
           >
-            Senha atual
+            Celular
           </Text>
 
           <Controller
             control={control}
-            name="current"
+            name="celular"
             render={({ field: { onChange, value } }) => (
               <Input
                 color="#000"
                 fontFamily="Roboto_400Regular"
                 borderBottomColor={colors.blue[700]}
-                secureTextEntry={isVisible}
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.current?.message}
-                InputRightElement={
-                  <IconButton
-                    onPress={() => setIsVisible(!isVisible)}
-                    icon={
-                      <MaterialIcons
-                        name={isVisible ? "visibility" : "visibility-off"}
-                        size={20}
-                        color={colors.blue[700]}
-                      />
-                    }
-                  />
-                }
+                errorMessage={errors.celular?.message}
               />
             )}
           />
 
           <Text
-            mt="16px"
             color="blue.700"
+            mt={4}
             fontSize="12px"
             fontFamily="Roboto_400Regular"
           >
-            Nova Senha
+            Telefone
           </Text>
 
           <Controller
             control={control}
-            name="newPassword"
+            name="telefone"
             render={({ field: { onChange, value } }) => (
               <Input
                 color="#000"
                 fontFamily="Roboto_400Regular"
                 borderBottomColor={colors.blue[700]}
-                secureTextEntry={isVisible}
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.newPassword?.message}
-                InputRightElement={
-                  <IconButton
-                    onPress={() => setIsVisible(!isVisible)}
-                    icon={
-                      <MaterialIcons
-                        name={isVisible ? "visibility" : "visibility-off"}
-                        size={20}
-                        color={colors.blue[700]}
-                      />
-                    }
-                  />
-                }
+                errorMessage={errors.telefone?.message}
               />
             )}
           />
 
-          <Text
-            mt="16px"
-            color="blue.700"
-            fontSize="12px"
-            fontFamily="Roboto_400Regular"
+          <ButtonNativeBase
+            mt={6}
+            variant="link"
+            onPress={() => navigation.navigate("ChangePassword")}
           >
-            Confirmar Nova Senha
-          </Text>
-
-          <Controller
-            control={control}
-            name="confirmNewPassword"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                color="#000"
-                fontFamily="Roboto_400Regular"
-                borderBottomColor={colors.blue[700]}
-                secureTextEntry={isVisible}
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.confirmNewPassword?.message}
-                InputRightElement={
-                  <IconButton
-                    onPress={() => setIsVisible(!isVisible)}
-                    icon={
-                      <MaterialIcons
-                        name={isVisible ? "visibility" : "visibility-off"}
-                        size={20}
-                        color={colors.blue[700]}
-                      />
-                    }
-                  />
-                }
-              />
-            )}
-          />
+            <Text color="cyan.100" fontSize="md">
+              Alterar Senha
+            </Text>
+          </ButtonNativeBase>
         </VStack>
       </VStack>
 
