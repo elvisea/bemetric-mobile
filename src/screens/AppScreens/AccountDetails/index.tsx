@@ -41,7 +41,7 @@ const responses: IResponses = {
 };
 
 export function AccountDetails() {
-  const { user } = useAuth();
+  const { user, fetchDataUser } = useAuth();
   const { colors } = THEME;
   const navigation = useNavigation();
 
@@ -79,6 +79,8 @@ export function AccountDetails() {
       console.log("Enviado:", data);
 
       const response = await api.post("Usuario/AlterarUsuarioApp", data);
+
+      if (response.status === 200) fetchDataUser();
 
       console.log("Response:", responses[response.data]);
       Alert.alert(responses[response.data], responses[response.data]);

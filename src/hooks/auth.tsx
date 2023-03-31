@@ -19,6 +19,7 @@ type AuthContextData = {
   user: IUser | null;
   signIn: (data: IUser) => Promise<void>;
   resetUserState: () => void;
+  fetchDataUser: () => void;
 };
 
 type AuthProviderProps = {
@@ -30,14 +31,33 @@ export const AuthContext = createContext({} as AuthContextData);
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<IUser | null>(null);
 
+  const fetchDataUser = async () => {
+    console.log("fetchDataUser:", user?.codigoUsuario);
+
+    const response = await api.post("/Usuario/ListaUsuarios", {
+      codigoUsuario: user?.codigoUsuario,
+    });
+
+    await AsyncStorage.setItem(USER, JSON.stringify(response.data[0]));
+
+    setUser(response.data[0]);
+  };
+
   const signIn = async (data: IUser) => {
     try {
       await AsyncStorage.setItem(TOKEN, data.jwtToken);
-      await AsyncStorage.setItem(USER, JSON.stringify(data));
 
       api.defaults.headers.common.Authorization = `Bearer ${data.jwtToken}`;
 
       setUser(data);
+
+      const response = await api.post("/Usuario/ListaUsuarios", {
+        codigoUsuario: data.codigoUsuario,
+      });
+
+      await AsyncStorage.setItem(USER, JSON.stringify(response.data[0]));
+
+      setUser(response.data[0]);
     } catch (error) {
       Alert.alert("Erro ao tentar fazer login!", `${error}`);
       console.log(error);
@@ -74,6 +94,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         user,
         signIn,
         resetUserState,
+        fetchDataUser,
       }}
     >
       {children}
