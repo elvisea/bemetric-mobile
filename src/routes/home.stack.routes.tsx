@@ -50,7 +50,7 @@ export default function HomeStackRoutes() {
           name="Messages"
           component={MessagesStackRoutes}
           options={{
-            header: () => <Cabecalho />,
+            headerShown: false,
             animation: "none",
           }}
         />

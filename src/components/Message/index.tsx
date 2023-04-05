@@ -8,6 +8,7 @@ import { TouchableOpacityProps } from "react-native";
 
 interface IMessageProps extends TouchableOpacityProps {
   icon: ReactNode;
+  exclude: () => void;
   date: string;
   color: string;
   title: string;
@@ -16,6 +17,7 @@ interface IMessageProps extends TouchableOpacityProps {
 
 function Message({
   icon,
+  exclude,
   date,
   color,
   title,
@@ -58,6 +60,7 @@ function Message({
 
       <VStack alignItems="center" justifyContent="flex-start">
         <IconButton
+          onPress={exclude}
           icon={<FontAwesome size={22} name="trash" color={colors.blue[700]} />}
         />
       </VStack>

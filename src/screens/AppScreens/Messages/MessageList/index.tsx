@@ -16,6 +16,8 @@ import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
 import { Message } from "@components/Message";
+import { Alert } from "react-native";
+import { MessageHeader } from "@components/MessageHeader";
 
 interface IMessageType {
   [index: number]: {
@@ -29,6 +31,24 @@ interface IMessageType {
     };
   };
 }
+
+interface IResponses {
+  [index: number]: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+const responses: IResponses = {
+  0: {
+    title: "OK - Excluído com sucesso",
+    subtitle: "Mensagem excluída com sucesso",
+  },
+  1: {
+    title: "Erro - Falha na exclusão",
+    subtitle: "Erro ao tentar excluir a mensagem",
+  },
+};
 
 export function MessageList() {
   const navigation = useNavigation();
@@ -71,9 +91,7 @@ export function MessageList() {
     },
   };
 
-  const [messages, setMessages] = useState<IMessage[] | null>(null);
-
-  console.log("messages:", messages);
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   const fetchMessages = async () => {
     try {
@@ -82,27 +100,41 @@ export function MessageList() {
         codigoCliente: customer?.codigoCliente,
       });
 
-      console.log("=>", response.data);
       setMessages(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) console.log("Error:", error);
     }
   };
 
-  async function handleIndicateExclusion() {
-    try {
-      const response = await api.put("/Mensagem/IndicarExclusao", {
-        tipoMensagem: "number",
-        codigoMensagem: "number",
-        codigoUsuario: "number",
-        codigoCliente: "number",
-      });
+  const handleIndicateExclusion = useCallback(
+    async (message: IMessage) => {
+      try {
+        const response = await api.put("/Mensagem/IndicarExclusao", {
+          tipoMensagem: message.tipoMensagem,
+          codigoMensagem: message.codigoMensagem,
+          codigoUsuario: user?.codigoUsuario,
+          codigoCliente: customer?.codigoCliente,
+        });
 
-      console.log(response.data);
-    } catch (error) {
-    } finally {
-    }
-  }
+        if (response.data === 0) {
+          const filtered = messages?.filter(
+            (item) => item.codigoMensagem !== message.codigoMensagem
+          );
+          setMessages(filtered);
+        }
+
+        Alert.alert(
+          responses[response.data].subtitle,
+          responses[response.data].subtitle
+        );
+
+        console.log(responses[response.data].subtitle);
+      } catch (error) {
+      } finally {
+      }
+    },
+    [messages]
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -117,40 +149,46 @@ export function MessageList() {
   );
 
   return (
-    <VStack flex={1} w="full" p={4} bg={colors.shape}>
-      <Text fontFamily={fonts.Roboto_700Bold} fontSize={fontSizes.md} mb={3}>
-        Mensagens
-      </Text>
+    <>
+      <MessageHeader goback={() => navigation.goBack()} />
+      <VStack flex={1} w="full" p={4} bg={colors.shape}>
+        <Text fontFamily={fonts.Roboto_700Bold} fontSize={fontSizes.md} mb={3}>
+          Mensagens
+        </Text>
 
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.codigoMensagem.toString()}
-        style={{ width: "100%" }}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item: message }) => (
-          <Message
-            icon={
-              message.mensagemLida
-                ? messageType[message.tipoMensagem].read.icon
-                : messageType[message.tipoMensagem].unread.icon
-            }
-            date={message.dataEnvio}
-            color={
-              message.mensagemLida
-                ? messageType[message.tipoMensagem].read.color
-                : messageType[message.tipoMensagem].unread.color
-            }
-            title={message.titulo}
-            description={message.descricaosemhtml}
-            onPress={() =>
-              navigation.navigate("MessageDetails", {
-                tipoMensagem: message.tipoMensagem,
-                codigoMensagem: message.codigoMensagem,
-              })
-            }
+        {messages.length > 0 && (
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item.codigoMensagem.toString()}
+            style={{ width: "100%" }}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item: message }) => (
+              <Message
+                exclude={() => handleIndicateExclusion(message)}
+                icon={
+                  message.mensagemLida
+                    ? messageType[message.tipoMensagem].read.icon
+                    : messageType[message.tipoMensagem].unread.icon
+                }
+                date={message.dataEnvio}
+                color={
+                  message.mensagemLida
+                    ? messageType[message.tipoMensagem].read.color
+                    : messageType[message.tipoMensagem].unread.color
+                }
+                title={message.titulo}
+                description={message.descricaosemhtml}
+                onPress={() =>
+                  navigation.navigate("MessageDetails", {
+                    tipoMensagem: message.tipoMensagem,
+                    codigoMensagem: message.codigoMensagem,
+                  })
+                }
+              />
+            )}
           />
         )}
-      />
-    </VStack>
+      </VStack>
+    </>
   );
 }
