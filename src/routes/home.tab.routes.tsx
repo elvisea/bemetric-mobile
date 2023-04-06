@@ -10,9 +10,9 @@ import { THEME } from "@theme/theme";
 
 import { Equipments } from "@screens/AppScreens/Equipments";
 import { Change } from "@screens/AppScreens/Change";
-import { Markers } from "@screens/AppScreens/Markers";
 
 import { Include } from "@screens/AppScreens/Include";
+import MarkersStackRoutes from "./markers.stack.routes";
 
 const Tab = createBottomTabNavigator();
 
@@ -64,10 +64,11 @@ export default function HomeTabRoutes() {
         />
 
         <Tab.Screen
-          name="Markers"
-          component={Markers}
+          name="MarkersStackRoutes"
+          component={MarkersStackRoutes}
           options={{
             tabBarLabel: "Marcadores",
+            tabBarStyle: { display: "none" },
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="location-pin" color={color} size={size} />
             ),

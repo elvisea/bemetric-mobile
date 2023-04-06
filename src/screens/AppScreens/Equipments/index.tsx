@@ -7,7 +7,7 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import { Text, VStack } from "native-base";
+import { Spinner, Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
 import { LayoutDefault } from "@components/LayoutDefault";
@@ -35,7 +35,7 @@ export function Equipments() {
 
   const [expanded, setExpanded] = useState("");
   const [count, setCount] = useState();
-  const [groupings, setGroupings] = useState<IGrouping[]>([]);
+  const [groupings, setGroupings] = useState<IGrouping[] | null>(null);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -114,40 +114,48 @@ export function Equipments() {
           Grupos
         </Text>
 
-        <FlatList
-          data={groupings}
-          keyExtractor={(item) => item.codigoAgrupamento.toString()}
-          style={{ width: "100%" }}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item: grouping }) => (
-            <AccordionSession>
-              <AccordionList
-                expanded={grouping.nomeAgrupamento === expanded}
-                title={grouping.nomeAgrupamento}
-                description={grouping.descricao}
-                onPress={() => handleExpanded(grouping.nomeAgrupamento)}
-              />
+        {!groupings && (
+          <VStack flex={1} alignItems="center" justifyContent="center">
+            <Spinner size={30} color="blue.700" />
+          </VStack>
+        )}
 
-              {grouping.nomeAgrupamento === expanded &&
-                grouping.listaEquipamentos.map((equipament) => (
-                  <AccordionItem
-                    key={equipament.codigoEquipamento}
-                    velocity={equipament.velocidade}
-                    title={equipament.nomeEquipamento}
-                    status={equipament.ligado ? "Ligado" : "Desligado"}
-                    onPress={() =>
-                      navigation.navigate("EquipmentDetails", {
-                        screen: "Equipament",
-                        params: {
-                          codigoEquipamento: equipament.codigoEquipamento,
-                        },
-                      })
-                    }
-                  />
-                ))}
-            </AccordionSession>
-          )}
-        />
+        {groupings && (
+          <FlatList
+            data={groupings}
+            keyExtractor={(item) => item.codigoAgrupamento.toString()}
+            style={{ width: "100%" }}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item: grouping }) => (
+              <AccordionSession>
+                <AccordionList
+                  expanded={grouping.nomeAgrupamento === expanded}
+                  title={grouping.nomeAgrupamento}
+                  description={grouping.descricao}
+                  onPress={() => handleExpanded(grouping.nomeAgrupamento)}
+                />
+
+                {grouping.nomeAgrupamento === expanded &&
+                  grouping.listaEquipamentos.map((equipament) => (
+                    <AccordionItem
+                      key={equipament.codigoEquipamento}
+                      velocity={equipament.velocidade}
+                      title={equipament.nomeEquipamento}
+                      status={equipament.ligado ? "Ligado" : "Desligado"}
+                      onPress={() =>
+                        navigation.navigate("EquipmentDetails", {
+                          screen: "Equipament",
+                          params: {
+                            codigoEquipamento: equipament.codigoEquipamento,
+                          },
+                        })
+                      }
+                    />
+                  ))}
+              </AccordionSession>
+            )}
+          />
+        )}
       </VStack>
     </LayoutDefault>
   );

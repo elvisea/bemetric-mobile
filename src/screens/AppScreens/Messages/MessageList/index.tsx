@@ -1,8 +1,9 @@
+import { Alert } from "react-native";
 import React, { ReactNode, useCallback, useState } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import axios from "axios";
-import { FlatList, Text, VStack } from "native-base";
+import { FlatList, Spinner, Text, VStack } from "native-base";
 
 import api from "@services/api";
 
@@ -16,7 +17,6 @@ import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
 import { Message } from "@components/Message";
-import { Alert } from "react-native";
 import { MessageHeader } from "@components/MessageHeader";
 
 interface IMessageType {
@@ -91,7 +91,7 @@ export function MessageList() {
     },
   };
 
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useState<IMessage[] | null>(null);
 
   const fetchMessages = async () => {
     try {
@@ -117,10 +117,12 @@ export function MessageList() {
         });
 
         if (response.data === 0) {
-          const filtered = messages?.filter(
-            (item) => item.codigoMensagem !== message.codigoMensagem
-          );
-          setMessages(filtered);
+          if (messages) {
+            const filtered = messages.filter(
+              (item) => item.codigoMensagem !== message.codigoMensagem
+            );
+            setMessages(filtered);
+          }
         }
 
         Alert.alert(
@@ -156,7 +158,13 @@ export function MessageList() {
           Mensagens
         </Text>
 
-        {messages.length > 0 && (
+        {!messages && (
+          <VStack flex={1} alignItems="center" justifyContent="center">
+            <Spinner size={30} color="blue.700" />
+          </VStack>
+        )}
+
+        {messages && (
           <FlatList
             data={messages}
             keyExtractor={(item) => item.codigoMensagem.toString()}

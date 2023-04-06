@@ -107,6 +107,10 @@ export declare global {
       Manual: undefined;
       ChangePassword: undefined;
 
+      UpdateGeofences: {
+        codigoGeocerca: number;
+      };
+
       // Pra Cima OK
 
       Clients: undefined;

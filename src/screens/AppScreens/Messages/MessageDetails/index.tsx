@@ -1,15 +1,15 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 
-import { Text, VStack } from "native-base";
+import axios from "axios";
 import WebView from "react-native-webview";
+import { Spinner, Text, VStack } from "native-base";
+
 import {
   useFocusEffect,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-
-import axios from "axios";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
@@ -101,12 +101,21 @@ export function MessageDetails() {
         </Text>
       </VStack>
 
-      <WebView
-        style={styles.container}
-        originWhitelist={["*"]}
-        scalesPageToFit={false}
-        source={{ html: message ? message.descricao : "undefined" }}
-      />
+      {!message && (
+        <VStack flex={1} alignItems="center" justifyContent="center">
+          <Spinner size={30} color="blue.700" />
+        </VStack>
+      )}
+
+      {message && (
+        <WebView
+          style={styles.container}
+          originWhitelist={["*"]}
+          scalesPageToFit={false}
+          showsVerticalScrollIndicator={false}
+          source={{ html: message.descricao }}
+        />
+      )}
     </>
   );
 }
