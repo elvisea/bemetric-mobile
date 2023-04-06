@@ -7,11 +7,11 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import { Spinner, Text, VStack } from "native-base";
+import { Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
 import { LayoutDefault } from "@components/LayoutDefault";
-
+import { LoadingSpinner } from "@components/LoadingSpinner";
 import { AccordionList } from "@components/Accordion/AccordionList";
 import { AccordionItem } from "@components/Accordion/AccordionItem";
 import { AccordionSession } from "@components/Accordion/AccordionSession";
@@ -114,11 +114,7 @@ export function Equipments() {
           Grupos
         </Text>
 
-        {!groupings && (
-          <VStack flex={1} alignItems="center" justifyContent="center">
-            <Spinner size={30} color="blue.700" />
-          </VStack>
-        )}
+        {!groupings && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
         {groupings && (
           <FlatList

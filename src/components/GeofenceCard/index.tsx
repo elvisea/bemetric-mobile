@@ -17,7 +17,11 @@ interface IGeofenceCardProps extends TouchableOpacityProps {
 function GeofenceCard({ title, description, ...rest }: IGeofenceCardProps) {
   const { colors } = THEME;
   return (
-    <Container activeOpacity={0.75} {...rest}>
+    <Container
+      style={{ backgroundColor: "#FFF" }}
+      activeOpacity={0.75}
+      {...rest}
+    >
       <Box
         flex={1}
         width="full"

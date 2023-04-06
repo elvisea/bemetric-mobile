@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 import axios from "axios";
 import WebView from "react-native-webview";
-import { Spinner, Text, VStack } from "native-base";
+import { Text, VStack } from "native-base";
 
 import {
   useFocusEffect,
@@ -13,9 +13,12 @@ import {
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
+
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
+
 import { MessageHeader } from "@components/MessageHeader";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 interface IMessage {
   codigoParceiro: number;
@@ -101,11 +104,7 @@ export function MessageDetails() {
         </Text>
       </VStack>
 
-      {!message && (
-        <VStack flex={1} alignItems="center" justifyContent="center">
-          <Spinner size={30} color="blue.700" />
-        </VStack>
-      )}
+      {!message && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
       {message && (
         <WebView

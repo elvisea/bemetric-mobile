@@ -105,7 +105,7 @@ export function UpdateGeofences() {
       <HeaderDefault title="Geocerca">
         <IconButton
           icon={<Feather name="edit" size={22} color={colors.blue[700]} />}
-          onPress={fetchGeofence}
+          onPress={() => console.log("Update Geofence")}
         />
       </HeaderDefault>
 

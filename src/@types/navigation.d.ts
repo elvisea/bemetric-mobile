@@ -111,6 +111,10 @@ export declare global {
         codigoGeocerca: number;
       };
 
+      UpdatePointsInterest: {
+        codigoPontoInteresse: number;
+      };
+
       // Pra Cima OK
 
       Clients: undefined;

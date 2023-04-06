@@ -3,7 +3,7 @@ import React, { ReactNode, useCallback, useState } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import axios from "axios";
-import { FlatList, Spinner, Text, VStack } from "native-base";
+import { FlatList, Text, VStack } from "native-base";
 
 import api from "@services/api";
 
@@ -18,6 +18,7 @@ import { useCustomer } from "@hooks/customer";
 
 import { Message } from "@components/Message";
 import { MessageHeader } from "@components/MessageHeader";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 interface IMessageType {
   [index: number]: {
@@ -158,11 +159,7 @@ export function MessageList() {
           Mensagens
         </Text>
 
-        {!messages && (
-          <VStack flex={1} alignItems="center" justifyContent="center">
-            <Spinner size={30} color="blue.700" />
-          </VStack>
-        )}
+        {!messages && <LoadingSpinner color={colors.blue[700]} />}
 
         {messages && (
           <FlatList

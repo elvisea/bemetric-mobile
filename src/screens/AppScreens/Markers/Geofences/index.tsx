@@ -1,16 +1,15 @@
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList } from "react-native";
 import { useCallback, useState } from "react";
+import { Feather } from "@expo/vector-icons";
 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 import axios from "axios";
-import { Text, VStack } from "native-base";
-import { RFValue } from "react-native-responsive-fontsize";
+import { IconButton, VStack } from "native-base";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
-import AddGeofence from "@assets/add-geocerca.svg";
 
 import { GeofenceCard } from "@components/GeofenceCard";
 import { HeaderDefault } from "@components/HeaderDefault";
@@ -56,38 +55,35 @@ export function Geofences() {
   );
 
   return (
-    <VStack flex={1} w="full" bg="white">
+    <VStack flex={1} w="full" bg={colors.shape}>
       <HeaderDefault title="Geocerca">
-        <TouchableOpacity style={{ flexDirection: "row" }}>
-          <AddGeofence />
-          <Text ml={"12px"} color={colors.blue[700]}>
-            Criar
-          </Text>
-        </TouchableOpacity>
+        <IconButton
+          icon={<Feather name="plus" size={22} color={colors.blue[700]} />}
+          onPress={() => console.log("Add Geofence")}
+        />
       </HeaderDefault>
-      <VStack flex={1} w="full" p={`${RFValue(16)}px`}>
-        {!geofences && <LoadingSpinner color={colors.blue[700]} />}
 
-        {geofences && (
-          <FlatList
-            data={geofences}
-            keyExtractor={(item) => item.codigoGeocerca.toString()}
-            style={{ width: "100%" }}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item: geofence }) => (
-              <GeofenceCard
-                title={geofence.nomeGeocerca}
-                description={geofence.descricao}
-                onPress={() =>
-                  navigation.navigate("UpdateGeofences", {
-                    codigoGeocerca: geofence.codigoGeocerca,
-                  })
-                }
-              />
-            )}
-          />
-        )}
-      </VStack>
+      {!geofences && <LoadingSpinner color={colors.blue[700]} />}
+
+      {geofences && (
+        <FlatList
+          data={geofences}
+          keyExtractor={(item) => item.codigoGeocerca.toString()}
+          style={{ width: "100%", padding: 16 }}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item: geofence }) => (
+            <GeofenceCard
+              title={geofence.nomeGeocerca}
+              description={geofence.descricao}
+              onPress={() =>
+                navigation.navigate("UpdateGeofences", {
+                  codigoGeocerca: geofence.codigoGeocerca,
+                })
+              }
+            />
+          )}
+        />
+      )}
     </VStack>
   );
 }
