@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import axios from "axios";
@@ -63,7 +63,13 @@ export function PointsInterest() {
     <VStack flex={1} width="full" bg={colors.shape}>
       <HeaderDefault title="Ponto de interesse">
         <IconButton
-          icon={<Feather name="plus" size={22} color={colors.blue[700]} />}
+          icon={
+            <MaterialCommunityIcons
+              name="map-marker-plus-outline"
+              size={26}
+              color={colors.blue[700]}
+            />
+          }
           onPress={() => console.log("Add Ponto de interesse")}
         />
       </HeaderDefault>

@@ -1,18 +1,25 @@
+import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
-import { Feather } from "@expo/vector-icons";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
+
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 
 import axios from "axios";
-import { IconButton, VStack } from "native-base";
+import { Feather } from "@expo/vector-icons";
+
 import MapView, { Polygon } from "react-native-maps";
+import { HStack, IconButton, VStack } from "native-base";
 
 import { HeaderDefault } from "@components/HeaderDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { calculateDelta, calculateInitialRegion } from "../utils/";
-import { LoadingSpinner } from "@components/LoadingSpinner";
 
 interface IListaPontosGeocerca {
   codigoGeocerca: number;
@@ -51,9 +58,22 @@ interface IDelta {
   longitudeDelta: number;
 }
 
+interface IResponses {
+  [index: number]: string;
+}
+
+const responses: IResponses = {
+  0: "Geocerca excluída com sucesso",
+  1: "Geocerca não localizada",
+  2: "Falha ao tentar excluir Geocerca",
+};
+
 export function UpdateGeofences() {
-  const route = useRoute();
   const { colors } = THEME;
+
+  const route = useRoute();
+  const navigation = useNavigation();
+
   const { codigoGeocerca } = route.params as IParams;
 
   const [geofence, setGeofence] = useState<IGeofence | null>(null);
@@ -88,6 +108,29 @@ export function UpdateGeofences() {
     }
   }
 
+  async function handleDeleteGeofence() {
+    try {
+      if (geofence) {
+        const response = await api.delete("/Geocerca/Excluir", {
+          data: { codigoGeocerca: geofence.codigoGeocerca },
+        });
+
+        console.log("response", response.data);
+
+        if (response.data === 0 || 1 || 2) {
+          Alert.alert(responses[response.data], responses[response.data], [
+            {
+              text: "Visualizar Geocercas",
+              onPress: () => navigation.navigate("Geofences"),
+            },
+          ]);
+        }
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) console.log("Error:", error);
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -103,10 +146,17 @@ export function UpdateGeofences() {
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
       <HeaderDefault title="Geocerca">
-        <IconButton
-          icon={<Feather name="edit" size={22} color={colors.blue[700]} />}
-          onPress={() => console.log("Update Geofence")}
-        />
+        <HStack>
+          <IconButton
+            icon={<Feather name="edit" size={22} color={colors.blue[700]} />}
+            onPress={() => console.log("Update Geofence")}
+          />
+          <IconButton
+            style={{ marginLeft: 8 }}
+            icon={<Feather name="trash" size={22} color={colors.red[600]} />}
+            onPress={handleDeleteGeofence}
+          />
+        </HStack>
       </HeaderDefault>
 
       {!geofence && <LoadingSpinner color={colors.blue[700]} />}

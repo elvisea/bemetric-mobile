@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { THEME } from "@theme/theme";
 
 import { Geofences } from "@screens/AppScreens/Markers/Geofences";
-import { CreateGeofences } from "@screens/AppScreens/Markers/CreateGeofences";
+import { CreateGeofence } from "@screens/AppScreens/Markers/CreateGeofence";
 import { UpdateGeofences } from "@screens/AppScreens/Markers/UpdateGeofences";
 
 const Stack = createNativeStackNavigator();
@@ -24,8 +24,8 @@ export default function GeofencesStackRoutes() {
         />
 
         <Stack.Screen
-          name="CreateGeofences"
-          component={CreateGeofences}
+          name="CreateGeofence"
+          component={CreateGeofence}
           options={{ headerShown: false }}
         />
 

@@ -3,7 +3,7 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
 import axios from "axios";
-import { IconButton, VStack } from "native-base";
+import { HStack, IconButton, VStack } from "native-base";
 import MapView, { Circle, Marker } from "react-native-maps";
 
 import { HeaderDefault } from "@components/HeaderDefault";
@@ -40,7 +40,7 @@ export function UpdatePointsInterest() {
 
   const [point, setPoint] = useState<IPoint | null>(null);
 
-  async function fetchGeofence() {
+  async function fetchPointsInterest() {
     try {
       const { data } = await api.post<IPoint[]>("/PontoInteresse/ObterLista", {
         codigoPontoInteresse,
@@ -56,7 +56,7 @@ export function UpdatePointsInterest() {
     useCallback(() => {
       let isActive = true;
 
-      isActive && fetchGeofence();
+      isActive && fetchPointsInterest();
 
       return () => {
         isActive = false;
@@ -66,11 +66,18 @@ export function UpdatePointsInterest() {
 
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
-      <HeaderDefault title="Geocerca">
-        <IconButton
-          icon={<Feather name="edit" size={22} color={colors.blue[700]} />}
-          onPress={() => console.log("Update Point Interest")}
-        />
+      <HeaderDefault title="Ponto de Interesse">
+        <HStack>
+          <IconButton
+            icon={<Feather name="edit" size={22} color={colors.blue[700]} />}
+            onPress={() => console.log("Update Point Interest")}
+          />
+          <IconButton
+            style={{ marginLeft: 8 }}
+            icon={<Feather name="trash" size={22} color={colors.red[600]} />}
+            onPress={() => console.log("Exclude Point Interest")}
+          />
+        </HStack>
       </HeaderDefault>
 
       {!point && <LoadingSpinner color={colors.blue[700]} />}

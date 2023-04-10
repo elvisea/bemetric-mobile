@@ -111,6 +111,10 @@ export declare global {
         codigoGeocerca: number;
       };
 
+      Geofences: undefined;
+
+      CreateGeofence: undefined;
+
       UpdatePointsInterest: {
         codigoPontoInteresse: number;
       };

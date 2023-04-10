@@ -26,23 +26,32 @@ export function Geofences() {
   const navigation = useNavigation();
   const { colors } = THEME;
 
-  const [geofences, setGeofences] = useState<IGeofences[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [geofences, setGeofences] = useState<IGeofences[]>([]);
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
       async function fetchData() {
+        setIsLoading(true);
+
         try {
           if (customer) {
             const response = await api.post("/Geocerca/ObterListaGeocercaApp", {
               codigoCliente: customer.codigoCliente,
             });
 
-            isActive && setGeofences(response.data);
+            if (response.data === 204) {
+              setGeofences([]);
+            } else {
+              setGeofences(response.data);
+            }
           }
         } catch (error) {
           if (axios.isAxiosError(error)) console.log(error);
+        } finally {
+          setIsLoading(false);
         }
       }
 
@@ -58,14 +67,16 @@ export function Geofences() {
     <VStack flex={1} w="full" bg={colors.shape}>
       <HeaderDefault title="Geocerca">
         <IconButton
-          icon={<Feather name="plus" size={22} color={colors.blue[700]} />}
-          onPress={() => console.log("Add Geofence")}
+          icon={
+            <Feather name="plus-circle" size={22} color={colors.blue[700]} />
+          }
+          onPress={() => navigation.navigate("CreateGeofence")}
         />
       </HeaderDefault>
 
-      {!geofences && <LoadingSpinner color={colors.blue[700]} />}
+      {isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-      {geofences && (
+      {geofences.length > 0 && !isLoading && (
         <FlatList
           data={geofences}
           keyExtractor={(item) => item.codigoGeocerca.toString()}

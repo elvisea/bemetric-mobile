@@ -15,7 +15,7 @@ export function ButtonFull({ title, ...rest }: Props) {
       borderRadius={0}
       {...rest}
     >
-      <Text color="white" fontSize={16} fontFamily="Montserrat_400Regular">
+      <Text color="white" fontSize={20} fontFamily="Roboto_400Regular">
         {title}
       </Text>
     </NativeBaseButton>
