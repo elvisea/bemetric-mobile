@@ -1,29 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 
+import axios from "axios";
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
+import { IconButton, Text, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import MapView, {
-  MapPressEvent,
-  Polygon,
-  Marker,
-} from "react-native-maps";
+import MapView, { MapPressEvent, Polygon, Marker } from "react-native-maps";
 
-import axios from "axios";
-
-import { IconButton, Text, VStack } from "native-base";
+import {
+  LocationAccuracy,
+  getCurrentPositionAsync,
+  requestForegroundPermissionsAsync,
+  watchPositionAsync,
+} from "expo-location";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
 import { ModalPeriod } from "@components/ModalPeriod";
 import { HeaderDefault } from "@components/HeaderDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-
 import { useCustomer } from "@hooks/customer";
 
 import { ContainerCheckbox } from "./styles";
@@ -66,6 +67,8 @@ export function CreateGeofence() {
 
   const [isOpenModal, setIsOpenModal] = useState(false);
 
+  const [location, setLocation] = useState<IPontoGeocerca | null>(null);
+
   const [geofence, setGeofence] = useState<IGeofence>({
     incluir: true,
     codigoCliente: customer?.codigoCliente,
@@ -77,11 +80,11 @@ export function CreateGeofence() {
   } as IGeofence);
 
   const handleMapPress = (event: MapPressEvent) => {
-    const coordenada = event.nativeEvent.coordinate;
+    const { coordinate } = event.nativeEvent;
 
     setGeofence((oldState) => ({
       ...oldState,
-      listaPontosGeocerca: [...oldState.listaPontosGeocerca, coordenada],
+      listaPontosGeocerca: [...oldState.listaPontosGeocerca, coordinate],
     }));
   };
 
@@ -101,6 +104,11 @@ export function CreateGeofence() {
         nomeGeocerca: "",
       });
     }
+  };
+
+  const hancleCloseModal = () => {
+    setStateDefault();
+    setIsOpenModal(!isOpenModal);
   };
 
   const handleSaveGeofence = async () => {
@@ -146,12 +154,48 @@ export function CreateGeofence() {
     }
   };
 
+  const requestLocationPermission = async () => {
+    const { status } = await requestForegroundPermissionsAsync();
+
+    if (status !== "granted") {
+      console.log("Location access permission denied. Set default location");
+      setLocation({ latitude: -23.5505, longitude: -46.6333 });
+    }
+
+    if (status === "granted") {
+      const { coords } = await getCurrentPositionAsync();
+      setLocation({ latitude: coords.latitude, longitude: coords.longitude });
+    }
+  };
+
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
+
+  useEffect(() => {
+    watchPositionAsync(
+      {
+        accuracy: LocationAccuracy.Highest,
+        timeInterval: 10000,
+        distanceInterval: 1,
+      },
+      (response) => {
+        setLocation({
+          latitude: response.coords.latitude,
+          longitude: response.coords.longitude,
+        });
+
+        console.log("New Location:", response.coords);
+      }
+    );
+  }, []);
+
   return (
     <>
       <ModalPeriod
         title="Criar Geocerca"
         isOpen={isOpenModal}
-        closeModal={() => setIsOpenModal(!isOpenModal)}
+        closeModal={hancleCloseModal}
       >
         <Input
           mb={4}
@@ -190,7 +234,7 @@ export function CreateGeofence() {
           Gerar alerta de evento
         </Text>
 
-        <ContainerCheckbox style={{ marginBottom: 8 }}>
+        <ContainerCheckbox mb={8}>
           <Checkbox
             style={styles.checkbox}
             value={geofence.alertaEntrada}
@@ -202,7 +246,7 @@ export function CreateGeofence() {
           <Text style={styles.paragraph}>Entrada</Text>
         </ContainerCheckbox>
 
-        <ContainerCheckbox style={{ marginBottom: 8 }}>
+        <ContainerCheckbox mb={8}>
           <Checkbox
             style={styles.checkbox}
             value={geofence.alertaSaida}
@@ -214,9 +258,7 @@ export function CreateGeofence() {
           <Text style={styles.paragraph}>Saída</Text>
         </ContainerCheckbox>
 
-        <ContainerCheckbox
-          style={{ marginBottom: 8, justifyContent: "space-between" }}
-        >
+        <ContainerCheckbox mb={8} style={{ justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Checkbox
               style={styles.checkbox}
@@ -259,7 +301,7 @@ export function CreateGeofence() {
           />
         </ContainerCheckbox>
 
-        <ContainerCheckbox style={{ justifyContent: "space-between" }}>
+        <ContainerCheckbox mb={0} style={{ justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row" }}>
             <Checkbox
               style={styles.checkbox}
@@ -320,43 +362,50 @@ export function CreateGeofence() {
           />
         </HeaderDefault>
 
-        <MapView
-          style={{ flex: 1 }}
-          onPress={handleMapPress}
-        // initialRegion={{
-        //   latitude: initialRegion.latitude,
-        //   longitude: initialRegion.longitude,
-        //   latitudeDelta: delta.latitudeDelta,
-        //   longitudeDelta: delta.longitudeDelta,
-        // }}
-        >
-          {geofence.listaPontosGeocerca.length > 0 && (
-            <>
-              <Polygon
-                coordinates={geofence.listaPontosGeocerca}
-                fillColor="rgba(160, 198, 229, 0.3)"
-                strokeColor="rgba(0, 105, 192, 1)"
-                strokeWidth={2}
-              />
+        {!location && <LoadingSpinner color={colors.blue[700]} />}
 
-              {geofence.listaPontosGeocerca.map((location, index) => (
-                <Marker
-                  key={index}
-                  coordinate={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                  }}
+        {location && (
+          <MapView
+            style={{ flex: 1 }}
+            onPress={handleMapPress}
+            zoomControlEnabled
+            initialRegion={{
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            }}
+          >
+            {geofence.listaPontosGeocerca.length > 0 && (
+              <>
+                <Polygon
+                  coordinates={geofence.listaPontosGeocerca}
+                  fillColor="rgba(160, 198, 229, 0.3)"
+                  strokeColor="rgba(0, 105, 192, 1)"
+                  strokeWidth={2}
                 />
-              ))}
-            </>
-          )}
-        </MapView>
 
-        <ButtonFull
-          disabled={geofence.listaPontosGeocerca.length < 2}
-          title="Criar"
-          onPress={() => setIsOpenModal(true)}
-        />
+                {geofence.listaPontosGeocerca.map((location, index) => (
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: location.latitude,
+                      longitude: location.longitude,
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </MapView>
+        )}
+
+        {geofence.listaPontosGeocerca.length > 2 && (
+          <ButtonFull
+            disabled={geofence.listaPontosGeocerca.length < 2}
+            title="Criar"
+            onPress={() => setIsOpenModal(true)}
+          />
+        )}
       </VStack>
     </>
   );

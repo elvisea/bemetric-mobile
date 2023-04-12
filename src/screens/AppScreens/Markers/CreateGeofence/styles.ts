@@ -1,9 +1,14 @@
-import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
+import { RFValue } from "react-native-responsive-fontsize";
 
-export const ContainerCheckbox = styled.View`
+interface IStyleProps {
+  mb: number;
+}
+
+export const ContainerCheckbox = styled.View<IStyleProps>`
   width: 100%;
   height: ${RFValue(50)}px;
+  margin-bottom: ${({ mb }) => `${RFValue(mb)}px`};
 
   border-color: #e6e6e6;
   border-width: ${RFValue(1)}px;
