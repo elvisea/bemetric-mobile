@@ -39,9 +39,8 @@ interface IGeofence {
   codigoCliente: number;
   nomeGeocerca: string;
   descricao: string;
-  alertaEntrada: boolean;
-  alertaSaida: boolean;
   alertaPermanencia: boolean;
+  alertaEntradaSaida: boolean;
   alertaPermanenciaTempo?: number;
   alertaVelocidade: boolean;
   alertaVelocidadeQuilometro?: number;
@@ -98,8 +97,7 @@ export function CreateGeofence() {
         alertaPermanencia: false,
         alertaVelocidade: false,
         listaPontosGeocerca: [],
-        alertaEntrada: false,
-        alertaSaida: false,
+        alertaEntradaSaida: false,
         descricao: "",
         nomeGeocerca: "",
       });
@@ -237,25 +235,18 @@ export function CreateGeofence() {
         <ContainerCheckbox mb={8}>
           <Checkbox
             style={styles.checkbox}
-            value={geofence.alertaEntrada}
+            value={geofence.alertaEntradaSaida}
             onValueChange={(value) =>
-              setGeofence((oldState) => ({ ...oldState, alertaEntrada: value }))
+              setGeofence((oldState) => ({
+                ...oldState,
+                alertaEntradaSaida: value,
+              }))
             }
-            color={geofence.alertaEntrada ? THEME.colors.blue[700] : undefined}
-          />
-          <Text style={styles.paragraph}>Entrada</Text>
-        </ContainerCheckbox>
-
-        <ContainerCheckbox mb={8}>
-          <Checkbox
-            style={styles.checkbox}
-            value={geofence.alertaSaida}
-            onValueChange={(value) =>
-              setGeofence((oldState) => ({ ...oldState, alertaSaida: value }))
+            color={
+              geofence.alertaEntradaSaida ? THEME.colors.blue[700] : undefined
             }
-            color={geofence.alertaSaida ? THEME.colors.blue[700] : undefined}
           />
-          <Text style={styles.paragraph}>Saída</Text>
+          <Text style={styles.paragraph}>Entrada e Saída</Text>
         </ContainerCheckbox>
 
         <ContainerCheckbox mb={8} style={{ justifyContent: "space-between" }}>

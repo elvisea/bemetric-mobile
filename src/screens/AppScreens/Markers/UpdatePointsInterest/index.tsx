@@ -85,6 +85,7 @@ export function UpdatePointsInterest() {
       {point && (
         <MapView
           style={{ flex: 1 }}
+          zoomControlEnabled
           initialRegion={{
             latitude: point.latitude,
             longitude: point.longitude,

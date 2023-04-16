@@ -64,6 +64,7 @@ export function Route() {
 
       {location && (
         <MapView
+          zoomControlEnabled
           initialRegion={{
             latitude: location.lat,
             longitude: location.lon,
