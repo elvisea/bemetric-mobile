@@ -115,6 +115,10 @@ export declare global {
 
       CreateGeofence: undefined;
 
+      PointsInterest: undefined;
+
+      CreatePointsInterest: undefined;
+
       UpdatePointsInterest: {
         codigoPontoInteresse: number;
       };

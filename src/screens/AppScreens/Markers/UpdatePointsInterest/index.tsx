@@ -89,8 +89,8 @@ export function UpdatePointsInterest() {
           initialRegion={{
             latitude: point.latitude,
             longitude: point.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+            latitudeDelta: 0.075,
+            longitudeDelta: 0.075,
           }}
         >
           <Circle

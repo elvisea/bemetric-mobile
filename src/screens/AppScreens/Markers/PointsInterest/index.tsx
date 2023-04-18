@@ -70,7 +70,7 @@ export function PointsInterest() {
               color={colors.blue[700]}
             />
           }
-          onPress={() => console.log("Add Ponto de interesse")}
+          onPress={() => navigation.navigate("CreatePointsInterest")}
         />
       </HeaderDefault>
 
