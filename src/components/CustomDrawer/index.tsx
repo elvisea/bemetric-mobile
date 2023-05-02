@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 import {
   DrawerContentScrollView,
@@ -49,7 +49,7 @@ const CustomDrawer = (props: any) => {
 
       setWhatsApp(response.data[0].whatsapp);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
     }
   };

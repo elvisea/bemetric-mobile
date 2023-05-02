@@ -15,7 +15,7 @@ interface ModalSelectProps extends ModalProps {
   closeModal: () => void;
 }
 
-const ModalPeriod = ({
+const GenericModal = ({
   isOpen,
   title,
   closeModal,
@@ -46,4 +46,4 @@ const ModalPeriod = ({
     </Modal>
   );
 };
-export { ModalPeriod };
+export { GenericModal };

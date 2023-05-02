@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
-import { Box } from "native-base";
+import { Box, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -11,6 +12,7 @@ import api from "@services/api";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
+import { RadioButton } from "@components/RadioButton";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 interface FormProps {
@@ -33,6 +35,7 @@ export function CreateAccount() {
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [document, setDocument] = useState(0);
 
   const route = useRoute();
   const { name, email, type } = route.params as Params;
@@ -60,6 +63,7 @@ export function CreateAccount() {
           client,
           identification,
           type,
+          tipoCNPJCPF: document,
         });
       }
 
@@ -67,7 +71,7 @@ export function CreateAccount() {
         Alert.alert("CPF/CNPJ já cadastrado!", "CPF/CNPJ já cadastrado!");
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar validar dados!", `${error}`);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +97,7 @@ export function CreateAccount() {
           render={({ field: { onChange, value } }) => (
             <Input
               placeholder="Nome do Cliente"
-              mb={4}
+              mb={8}
               onChangeText={onChange}
               value={value}
               errorMessage={errors.client?.message}
@@ -101,12 +105,25 @@ export function CreateAccount() {
           )}
         />
 
+        <HStack w="full" mb="12px" justifyContent="flex-start">
+          <RadioButton
+            label="CPF"
+            picked={document === 1}
+            onPress={() => setDocument(1)}
+          />
+          <RadioButton
+            label="CNPJ"
+            picked={document === 0}
+            onPress={() => setDocument(0)}
+          />
+        </HStack>
+
         <Controller
           control={control}
           name="identification"
           render={({ field: { onChange, value } }) => (
             <Input
-              placeholder="CPF ou CNPJ"
+              placeholder={document === 0 ? "CNPJ" : "CPF"}
               onChangeText={onChange}
               keyboardType="numeric"
               returnKeyType="send"

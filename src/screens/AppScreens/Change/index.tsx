@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import { useCallback, useState } from "react";
 import { FlatList, VStack } from "native-base";
 
@@ -53,7 +54,7 @@ export function Change() {
             setEquipments(response.data);
           }
         } catch (error) {
-          if (axios.isAxiosError(error)) console.log("Error:", error);
+          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
         }
       }
 

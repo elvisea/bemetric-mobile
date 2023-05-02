@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import { useCallback, useState } from "react";
 
 import axios from "axios";
@@ -35,8 +36,6 @@ export function SupportService() {
 
   const [contact, setContact] = useState<IContact | null>(null);
 
-  console.log("Contact:", contact);
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const getContact = async () => {
@@ -47,7 +46,7 @@ export function SupportService() {
 
       setContact(response.data[0]);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
     }
   };

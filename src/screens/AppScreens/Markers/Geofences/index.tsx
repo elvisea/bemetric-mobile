@@ -1,33 +1,36 @@
-import { FlatList } from "react-native";
+import { Alert, FlatList } from "react-native";
 import { useCallback, useState } from "react";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Entypo } from "@expo/vector-icons";
 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 import axios from "axios";
-import { IconButton, VStack } from "native-base";
+import { IconButton } from "native-base";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 
-import { GeofenceCard } from "@components/GeofenceCard";
+import { MarkerCard } from "@components/MarkerCard";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-interface IGeofences {
+import { Container } from "./styles";
+
+interface IGeofence {
   descricao: string;
   nomeGeocerca: string;
   codigoGeocerca: number;
 }
 
 export function Geofences() {
-  const { customer } = useCustomer();
-  const navigation = useNavigation();
   const { colors } = THEME;
 
+  const { customer } = useCustomer();
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
-  const [geofences, setGeofences] = useState<IGeofences[]>([]);
+  const [geofences, setGeofences] = useState<IGeofence[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -49,7 +52,7 @@ export function Geofences() {
             }
           }
         } catch (error) {
-          if (axios.isAxiosError(error)) console.log(error);
+          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
         } finally {
           setIsLoading(false);
         }
@@ -64,7 +67,7 @@ export function Geofences() {
   );
 
   return (
-    <VStack flex={1} w="full" bg={colors.shape}>
+    <Container>
       <HeaderDefault title="Geocerca">
         <IconButton
           icon={
@@ -83,8 +86,11 @@ export function Geofences() {
           style={{ width: "100%", padding: 16 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item: geofence }) => (
-            <GeofenceCard
+            <MarkerCard
               title={geofence.nomeGeocerca}
+              icon={
+                <Entypo name="location" size={28} color={colors.blue[700]} />
+              }
               description={geofence.descricao}
               onPress={() =>
                 navigation.navigate("UpdateGeofences", {
@@ -95,6 +101,6 @@ export function Geofences() {
           )}
         />
       )}
-    </VStack>
+    </Container>
   );
 }

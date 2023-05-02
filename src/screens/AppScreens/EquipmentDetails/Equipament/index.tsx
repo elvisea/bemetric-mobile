@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { Box, HStack, IconButton, ScrollView, Text, VStack } from "native-base";
@@ -27,8 +28,6 @@ export function Equipament() {
   const route = useRoute();
   const { params } = route.params as IParams;
 
-  console.log("Equipament Screen Params:", params);
-
   const { colors } = THEME;
 
   const [data, setData] = useState<IData | null>(null);
@@ -45,7 +44,7 @@ export function Equipament() {
 
       setData(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 
@@ -73,7 +72,7 @@ export function Equipament() {
 
           if (isActive) setEquipment(response.data[0]);
         } catch (error) {
-          if (axios.isAxiosError(error)) console.log("Error:", error);
+          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
         }
       }
 

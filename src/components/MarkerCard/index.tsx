@@ -1,20 +1,21 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { TouchableOpacityProps } from "react-native";
 
 import { Box } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
-import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { THEME } from "@theme/theme";
 import { Container, Description, Title } from "./styles";
 
-interface IGeofenceCardProps extends TouchableOpacityProps {
+interface IMarkerCardProps extends TouchableOpacityProps {
   title: string;
+  icon: ReactNode;
   description: string;
 }
 
-function GeofenceCard({ title, description, ...rest }: IGeofenceCardProps) {
+function MarkerCard({ title, icon, description, ...rest }: IMarkerCardProps) {
   const { colors } = THEME;
   return (
     <Container
@@ -29,11 +30,11 @@ function GeofenceCard({ title, description, ...rest }: IGeofenceCardProps) {
         alignItems="center"
         justifyContent="flex-start"
       >
-        <Entypo name="location" size={28} color={colors.blue[700]} />
+        {icon}
 
         <Box
           width="100%"
-          ml={`${RFValue(16)}px`}
+          ml={`${RFValue(8)}px`}
           alignItems="flex-start"
           justifyContent="center"
         >
@@ -58,4 +59,4 @@ function GeofenceCard({ title, description, ...rest }: IGeofenceCardProps) {
   );
 }
 
-export { GeofenceCard };
+export { MarkerCard };

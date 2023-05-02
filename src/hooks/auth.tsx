@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from "react";
 
+import axios from "axios";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -32,8 +33,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<IUser | null>(null);
 
   const fetchDataUser = async () => {
-    console.log("fetchDataUser:", user?.codigoUsuario);
-
     const response = await api.post("/Usuario/ListaUsuarios", {
       codigoUsuario: user?.codigoUsuario,
     });
@@ -59,8 +58,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setUser(response.data[0]);
     } catch (error) {
-      Alert.alert("Erro ao tentar fazer login!", `${error}`);
-      console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { FlatList } from "react-native";
+import { Alert, FlatList } from "react-native";
 
 import {
   useNavigation,
@@ -33,9 +33,11 @@ export function Equipments() {
   const { user } = useAuth();
   const { customer } = useCustomer();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [expanded, setExpanded] = useState("");
   const [count, setCount] = useState();
-  const [groupings, setGroupings] = useState<IGrouping[] | null>(null);
+  const [groupings, setGroupings] = useState<IGrouping[]>([]);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -46,6 +48,8 @@ export function Equipments() {
   };
 
   const fetchGroupings = async () => {
+    setIsLoading(true);
+
     try {
       if (user && customer) {
         const response = await api.post("Agrupamento/ObterLista", {
@@ -54,10 +58,14 @@ export function Equipments() {
           localDashboard: 3,
         });
 
-        setGroupings(response.data);
+        if (typeof response.data !== "string") {
+          setGroupings(response.data);
+        }
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,7 +90,7 @@ export function Equipments() {
 
       setCount(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -114,9 +122,9 @@ export function Equipments() {
           Grupos
         </Text>
 
-        {!groupings && <LoadingSpinner color={THEME.colors.blue[700]} />}
+        {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-        {groupings && (
+        {!isLoading && groupings.length > 0 && (
           <FlatList
             data={groupings}
             keyExtractor={(item) => item.codigoAgrupamento.toString()}

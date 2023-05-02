@@ -1,5 +1,5 @@
 import * as React from "react";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 import axios from "axios";
 import WebView from "react-native-webview";
@@ -49,16 +49,14 @@ export function MessageDetails() {
 
   async function indicarLeitura() {
     try {
-      const response = await api.put("/Mensagem/IndicarLeitura", {
+      await api.put("/Mensagem/IndicarLeitura", {
         tipoMensagem: params.tipoMensagem,
         codigoMensagem: params.codigoMensagem,
         codigoUsuario: user?.codigoUsuario,
         codigoCliente: customer?.codigoCliente,
       });
-
-      console.log("Response Indicar Leitura:", response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
     }
   }
@@ -72,7 +70,7 @@ export function MessageDetails() {
 
       setMessage(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
     }
   }

@@ -1,17 +1,19 @@
+import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
-import MapView, { Marker } from "react-native-maps";
+
+import axios from "axios";
+import { AntDesign } from "@expo/vector-icons";
 import { IconButton, VStack } from "native-base";
+import MapView, { Marker } from "react-native-maps";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { AntDesign } from "@expo/vector-icons";
+import api from "@services/api";
+import { THEME } from "@theme/theme";
+import { useCustomer } from "@hooks/customer";
 
 import { HeaderDefault } from "@components/HeaderDefault";
 
-import axios from "axios";
-import api from "@services/api";
-
 import { styles } from "./styles";
-import { THEME } from "@theme/theme";
 import { IParams } from "../interfaces/IEquipamentDetails";
 
 interface ILocation {
@@ -23,9 +25,10 @@ interface ILocation {
 
 export function Route() {
   const route = useRoute();
+  const { customer } = useCustomer();
+
   const { colors } = THEME;
   const { params } = route.params as IParams;
-  console.log("Route Screen Params:", params);
 
   const [location, setLocation] = useState<ILocation | null>(null);
 
@@ -33,11 +36,15 @@ export function Route() {
     try {
       const response = await api.post("/Equipamento/TrajetoApp", {
         codigoEquipamento: params.codigoEquipamento,
+        codigoCliente: customer?.codigoCliente,
       });
 
-      setLocation(response.data);
+      // Inicialmente retornava um Objeto. Agora volta uma Lista.
+      // Testar se está ok novo retorno.
+
+      setLocation(response.data[0]);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 

@@ -34,6 +34,7 @@ export declare global {
         identification?: string;
         type: number;
         tokenCliente?: string;
+        tipoCNPJCPF: number;
       };
 
       VerifyToken: {
@@ -44,6 +45,7 @@ export declare global {
         identification: string;
         type: number;
         tokenCliente?: string;
+        tipoCNPJCPF: number;
       };
 
       TemporaryPassword: {
@@ -90,7 +92,6 @@ export declare global {
 
       IncludeStackRoutes: {
         screen: string;
-        // params: { codigoEquipamento: number };
       };
 
       Equipamentos: undefined;
@@ -129,7 +130,6 @@ export declare global {
       Password: undefined;
       VincularCliente: undefined;
       AtivarCodigo: undefined;
-      // Equipamentos: undefined;
       EquipamentosScreen: undefined;
 
       HomePage: undefined;

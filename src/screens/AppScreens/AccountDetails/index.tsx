@@ -49,8 +49,6 @@ export function AccountDetails() {
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  console.log("USER CTX", user);
-
   const {
     control,
     handleSubmit,
@@ -76,17 +74,13 @@ export function AccountDetails() {
         celular: celular,
       };
 
-      console.log("Enviado:", data);
-
       const response = await api.post("Usuario/AlterarUsuarioApp", data);
 
       if (response.status === 200) fetchDataUser();
 
-      console.log("Response:", responses[response.data]);
       Alert.alert(responses[response.data], responses[response.data]);
     } catch (error) {
       Alert.alert(`${error}`, `${error}`);
-      console.log(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }

@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity } from "react-native";
+import { Alert, Platform, TouchableOpacity } from "react-native";
 import React, { useCallback, useState } from "react";
 import { HStack, IconButton, Text, VStack } from "native-base";
 
@@ -27,7 +27,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Item } from "@components/Item";
 import { Button } from "@components/Button/index";
 import { ButtonDate } from "@components/ButtonDate";
-import { ModalPeriod } from "@components/ModalPeriod";
+import { GenericModal } from "@components/GenericModal";
 import { PeriodOption } from "@components/PeriodOption";
 import { HeaderDefault } from "@components/HeaderDefault";
 
@@ -52,8 +52,6 @@ export function TelemetryData() {
   const route = useRoute();
   const navigation = useNavigation();
   const { params } = route.params as IParams;
-
-  console.log("TelemetryData Screen Params:", params);
 
   const [data, setData] = useState<ITelemetryData | null>(null);
 
@@ -150,17 +148,13 @@ export function TelemetryData() {
       codigoEquipamento: params.codigoEquipamento,
     };
 
-    console.log("Enviados", data);
-
     try {
       const response = await api.post("/Equipamento/DadosTelemetrias", data);
 
       setData(response.data);
       setIsOpenModal(false);
-
-      console.log("RESPONSE:", response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -216,7 +210,7 @@ export function TelemetryData() {
         </TouchableOpacity>
       ))}
 
-      <ModalPeriod
+      <GenericModal
         title="Período"
         isOpen={isOpenModal}
         closeModal={() => setIsOpenModal(!isOpenModal)}
@@ -258,7 +252,7 @@ export function TelemetryData() {
           width="100%"
           onPress={fetchData}
         />
-      </ModalPeriod>
+      </GenericModal>
 
       {selectStartDate && (
         <DateTimePicker

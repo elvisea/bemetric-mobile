@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import React, { ReactNode, useCallback, useState } from "react";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { Box, Center, HStack, ScrollView, Text, VStack } from "native-base";
@@ -35,8 +36,6 @@ export function TelemetryDevice() {
   const route = useRoute();
   const { colors } = THEME;
   const { params } = route.params as IParams;
-
-  console.log("TelemetryDevice Screen Params:", params);
 
   const status: IStatus = {
     0: {
@@ -110,11 +109,9 @@ export function TelemetryDevice() {
             }
           );
 
-          console.log(response.data);
-
           isActive && setTelemetry(response.data);
         } catch (error) {
-          if (axios.isAxiosError(error)) console.log("Error:", error);
+          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
         }
       }
 

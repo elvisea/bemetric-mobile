@@ -19,7 +19,7 @@ import {
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
-import { ModalPeriod } from "@components/ModalPeriod";
+import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
@@ -148,7 +148,7 @@ export function CreateGeofence() {
         setIsOpenModal(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -156,7 +156,6 @@ export function CreateGeofence() {
     const { status } = await requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
-      console.log("Location access permission denied. Set default location");
       setLocation({ latitude: -23.5505, longitude: -46.6333 });
     }
 
@@ -182,15 +181,13 @@ export function CreateGeofence() {
           latitude: response.coords.latitude,
           longitude: response.coords.longitude,
         });
-
-        console.log("New Location:", response.coords);
       }
     );
   }, []);
 
   return (
     <>
-      <ModalPeriod
+      <GenericModal
         title="Criar Geocerca"
         isOpen={isOpenModal}
         closeModal={hancleCloseModal}
@@ -338,7 +335,7 @@ export function CreateGeofence() {
           mt="24px"
           onPress={handleSaveGeofence}
         />
-      </ModalPeriod>
+      </GenericModal>
 
       <VStack flex={1} width="full" bg={colors.shape}>
         <HeaderDefault title="Geocerca">

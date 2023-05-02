@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -71,7 +72,7 @@ export function ClientCode() {
         });
       }
     } catch (error) {
-      console.log("ERROR =>", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }

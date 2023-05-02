@@ -10,6 +10,7 @@ import {
 import { Box, Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -33,7 +34,42 @@ interface Params {
   identification: string;
   type: number;
   tokenCliente: string;
+  tipoCNPJCPF: number;
 }
+
+interface IResponse {
+  [index: number]: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+const responses: IResponse = {
+  0: {
+    title: "Conta criada com sucesso!",
+    subtitle: "Conta criada com sucesso. Você já fazer login na sua conta!",
+  },
+  1: {
+    title: "Erro ao tentar criar conta.",
+    subtitle: "Erro no código de ativação. Tente novamente.",
+  },
+  2: {
+    title: "Erro ao tentar criar conta.",
+    subtitle: "Erro código de ativação expirado. Tente novamente.",
+  },
+  3: {
+    title: "Erro ao tentar criar conta.",
+    subtitle: "Email já cadastrado. Tente novamente.",
+  },
+  4: {
+    title: "Erro ao tentar criar conta.",
+    subtitle: "CNPJ ou CPF já existente. Tente novamente.",
+  },
+  5: {
+    title: "Erro ao tentar criar conta.",
+    subtitle: "Token do cliente não existe. Tente novamente.",
+  },
+};
 
 const schema = yup.object({
   "1": yup.string().required("Inválido"),
@@ -75,6 +111,7 @@ export function VerifyToken() {
       nomeCliente: params.client,
       tokenCliente: params.tokenCliente,
       codigoAtivacao: Number(token),
+      tipoCNPJCPF: params.tipoCNPJCPF,
     };
 
     try {
@@ -84,8 +121,8 @@ export function VerifyToken() {
 
       if (response.data === 0) {
         Alert.alert(
-          "Conta criada com sucesso!",
-          "Conta criada com sucesso. Você já fazer login na sua conta!",
+          responses[response.data].title,
+          responses[response.data].subtitle,
           [
             {
               text: "Login",
@@ -95,42 +132,14 @@ export function VerifyToken() {
         );
       }
 
-      if (response.data === 1) {
+      if (response.data !== 0) {
         Alert.alert(
-          "Erro ao tentar criar conta",
-          "Erro no código de ativação. Tente novamente."
-        );
-      }
-
-      if (response.data === 2) {
-        Alert.alert(
-          "Erro ao tentar criar conta",
-          "Erro código de ativação expirado. Tente novamente."
-        );
-      }
-
-      if (response.data === 3) {
-        Alert.alert(
-          "Erro ao tentar criar conta",
-          "Email já cadastrado. Tente novamente."
-        );
-      }
-
-      if (response.data === 4) {
-        Alert.alert(
-          "Erro ao tentar criar conta",
-          "CNPJ ou CPF já existente. Tente novamente."
-        );
-      }
-
-      if (response.data === 5) {
-        Alert.alert(
-          "Erro ao tentar criar conta",
-          "Token do cliente não existe. Tente novamente."
+          responses[response.data].title,
+          responses[response.data].subtitle
         );
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar criar conta", `${error}`);
+      Alert.alert("Erro ao tentar criar conta:", `${error}`);
     } finally {
       setIsSending(false);
     }
@@ -151,7 +160,7 @@ export function VerifyToken() {
         );
       }
     } catch (error) {
-      console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
       setIsResending(false);
     }

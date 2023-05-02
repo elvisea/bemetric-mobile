@@ -1,9 +1,11 @@
+import { Alert } from "react-native";
 import React, { useState } from "react";
-import { Box } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { useForm, Controller } from "react-hook-form";
+import axios from "axios";
 import * as yup from "yup";
+import { Box } from "native-base";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import api from "@services/api";
@@ -24,6 +26,7 @@ interface Params {
   identification: string;
   type: number;
   tokenCliente: string;
+  tipoCNPJCPF: number;
 }
 
 const schema = yup.object({
@@ -43,8 +46,15 @@ export function CreatePassword() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { name, email, client, identification, type, tokenCliente } =
-    route.params as Params;
+  const {
+    name,
+    email,
+    client,
+    identification,
+    type,
+    tokenCliente,
+    tipoCNPJCPF,
+  } = route.params as Params;
 
   const {
     control,
@@ -71,10 +81,11 @@ export function CreatePassword() {
           identification,
           type,
           tokenCliente,
+          tipoCNPJCPF,
         });
       }
     } catch (error) {
-      console.log("ERROR =>", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }

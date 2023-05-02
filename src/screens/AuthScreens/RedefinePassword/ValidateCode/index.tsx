@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { HStack, Text, VStack } from "native-base";
+import { Box, HStack, Text, VStack } from "native-base";
 
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -66,8 +66,6 @@ export function ValidateCode() {
         codigoAtivacao: Number(token),
       });
 
-      console.log("Response =>", response.data);
-
       if (response.data === 0) {
         navigation.navigate("EnterNewPassword", {
           codigoAtivacao: token,
@@ -124,8 +122,9 @@ export function ValidateCode() {
     <LayoutDefault
       bg="blue.700"
       firstIcon="chevron-left"
+      alignItems="flex-start"
+      justifyContent="flex-start"
       handleFirstIcon={() => navigation.goBack()}
-      justifyContent="space-between"
     >
       <KeyboardAvoidingView style={styles.keyboard} behavior={behavior}>
         <VStack flex={1} w="full" justifyContent="space-between" bg="blue.700">
@@ -148,27 +147,24 @@ export function ValidateCode() {
 
             <HStack mt={12} justifyContent="space-between" w="100%">
               {Array.of("1", "2", "3", "4", "5", "6").map((item) => (
-                <Controller
-                  key={item}
-                  control={control}
-                  name={item}
-                  render={({ field: { onChange, value } }) => (
-                    <InputToken
-                      value={value}
-                      placeholder="0"
-                      borderWidth={1}
-                      borderRadius={6}
-                      // keyboardType="numeric"
-                      returnKeyType="go"
-                      h="52px"
-                      // w="52px"
-                      onChangeText={onChange}
-                      errorMessage={errors[item]?.message}
-                    />
-                  )}
-                />
-                // <Box key={item} width="52px">
-                // </Box>
+                <Box key={item} width="52px">
+                  <Controller
+                    control={control}
+                    name={item}
+                    render={({ field: { onChange, value } }) => (
+                      <InputToken
+                        value={value}
+                        placeholder="0"
+                        borderWidth={1}
+                        borderRadius={6}
+                        keyboardType="numeric"
+                        h="52px"
+                        onChangeText={onChange}
+                        errorMessage={errors[item]?.message}
+                      />
+                    )}
+                  />
+                </Box>
               ))}
             </HStack>
           </VStack>

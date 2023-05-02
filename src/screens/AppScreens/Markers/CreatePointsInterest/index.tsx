@@ -20,7 +20,7 @@ import {
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
-import { ModalPeriod } from "@components/ModalPeriod";
+import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
@@ -61,8 +61,8 @@ const responses: IResponses = {
 
 export function CreatePointsInterest() {
   const { colors } = THEME;
-  const { customer } = useCustomer();
 
+  const { customer } = useCustomer();
   const navigation = useNavigation();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -149,7 +149,7 @@ export function CreatePointsInterest() {
         setIsOpenModal(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -157,8 +157,6 @@ export function CreatePointsInterest() {
     const { status } = await requestForegroundPermissionsAsync();
 
     if (status !== "granted") {
-      console.log("Location access permission denied. Set default location");
-
       setLocation({
         latitude: -23.5505,
         longitude: -46.6333,
@@ -191,15 +189,13 @@ export function CreatePointsInterest() {
           latitude: response.coords.latitude,
           longitude: response.coords.longitude,
         });
-
-        console.log("New Location:", response.coords);
       }
     );
   }, []);
 
   return (
     <>
-      <ModalPeriod
+      <GenericModal
         title="Criar Ponto de Interesse"
         isOpen={isOpenModal}
         closeModal={hancleCloseModal}
@@ -331,7 +327,7 @@ export function CreatePointsInterest() {
           mt="24px"
           onPress={handleSavePointInterest}
         />
-      </ModalPeriod>
+      </GenericModal>
 
       <VStack flex={1} width="full" bg={colors.shape}>
         <HeaderDefault title="Ponto de Interesse">

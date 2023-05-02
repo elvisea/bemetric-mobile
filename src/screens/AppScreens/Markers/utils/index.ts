@@ -1,3 +1,5 @@
+import { LatLng } from "react-native-maps";
+
 interface ICoordinate {
   latitude: number;
   longitude: number;
@@ -5,7 +7,6 @@ interface ICoordinate {
 
 const calculateDelta = (coordenadas: ICoordinate[]) => {
   const margemAjuste = 1;
-  // Encontrar os valores mínimos e máximos de latitude e longitude
   const minLatitude = Math.min(
     ...coordenadas.map((coordenada) => coordenada.latitude)
   );
@@ -19,15 +20,12 @@ const calculateDelta = (coordenadas: ICoordinate[]) => {
     ...coordenadas.map((coordenada) => coordenada.longitude)
   );
 
-  // Calcular a amplitude de latitudes e longitudes
   const amplitudeLatitude = maxLatitude - minLatitude;
   const amplitudeLongitude = maxLongitude - minLongitude;
 
-  // Adicionar a margem de ajuste (se fornecida)
   const margemLatitude = margemAjuste * amplitudeLatitude;
   const margemLongitude = margemAjuste * amplitudeLongitude;
 
-  // Calcular os valores de latitudeDelta e longitudeDelta
   const latitudeDelta = amplitudeLatitude + margemLatitude;
   const longitudeDelta = amplitudeLongitude + margemLongitude;
 
@@ -37,7 +35,6 @@ const calculateDelta = (coordenadas: ICoordinate[]) => {
 const calculateInitialRegion = (coordenadas: ICoordinate[]) => {
   const numCoordenadas = coordenadas.length;
 
-  // Calcular a soma das latitudes e longitudes
   let somaLatitudes = 0;
   let somaLongitudes = 0;
 
@@ -46,11 +43,9 @@ const calculateInitialRegion = (coordenadas: ICoordinate[]) => {
     somaLongitudes += coordenada.longitude;
   });
 
-  // Calcular as médias das latitudes e longitudes
   const mediaLatitude = somaLatitudes / numCoordenadas;
   const mediaLongitude = somaLongitudes / numCoordenadas;
 
-  // Criar uma nova coordenada com as médias calculadas
   const pontoCentral = {
     latitude: mediaLatitude,
     longitude: mediaLongitude,
@@ -59,4 +54,20 @@ const calculateInitialRegion = (coordenadas: ICoordinate[]) => {
   return pontoCentral;
 };
 
-export { calculateDelta, calculateInitialRegion };
+function getDeltaFromRadius(
+  center: LatLng,
+  radius: number
+): { latitude: number; longitude: number } {
+  const earthCircumference = 40075016.686;
+
+  const latDelta = (radius / earthCircumference) * 360;
+
+  const lonDelta =
+    (radius /
+      (Math.cos((center.latitude * Math.PI) / 180) * earthCircumference)) *
+    360;
+
+  return { latitude: latDelta * 5, longitude: lonDelta * 5 };
+}
+
+export { calculateDelta, calculateInitialRegion, getDeltaFromRadius };

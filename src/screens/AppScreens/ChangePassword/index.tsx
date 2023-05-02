@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { IconButton, Text, VStack } from "native-base";
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 
+import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -90,11 +91,8 @@ function ChangePassword() {
           onPress: () => (response.data === 0 ? navigation.goBack() : () => {}),
         },
       ]);
-
-      console.log(responses[response.data]);
     } catch (error) {
-      Alert.alert(`${error}`, `${error}`);
-      console.log(`${error}`, `${error}`);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }

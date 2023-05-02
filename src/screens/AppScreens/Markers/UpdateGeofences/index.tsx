@@ -12,7 +12,7 @@ import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
 
 import MapView, { MapPressEvent, Marker, Polygon } from "react-native-maps";
-import { HStack, IconButton, Text, VStack } from "native-base";
+import { HStack, IconButton, Text } from "native-base";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
@@ -20,12 +20,13 @@ import { THEME } from "@theme/theme";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
-import { ModalPeriod } from "@components/ModalPeriod";
+import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { ContainerCheckbox } from "../CreateGeofence/styles";
 
+import { Container } from "./styles";
 import { calculateDelta, calculateInitialRegion } from "../utils/";
 
 interface IPontoGeocerca {
@@ -78,9 +79,9 @@ export function UpdateGeofences() {
 
   const { codigoGeocerca } = route.params as IParams;
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isMapPressed, setIsMapPressed] = useState(false);
 
   const [geofence, setGeofence] = useState<IGeofence>({} as IGeofence);
 
@@ -88,34 +89,9 @@ export function UpdateGeofences() {
   const [newCoords, setNewCoords] = useState<ICoordinate[]>([]);
 
   const [delta, setDelta] = useState<IDelta>({} as IDelta);
-  const [initialRegion, setInitialRegion] = useState<ICoordinate>();
-
-  const fetchGeofence = async () => {
-    try {
-      const { data } = await api.post<IGeofence[]>("/Geocerca/ObterLista", {
-        codigoGeocerca,
-      });
-
-      setGeofence(data[0]);
-
-      let coordinates: ICoordinate[] = [];
-
-      for (let index = 0; index < data[0].listaPontosGeocerca.length; index++) {
-        const point = data[0].listaPontosGeocerca[index];
-
-        coordinates.push({
-          latitude: point.latitude,
-          longitude: point.longitude,
-        });
-      }
-
-      setCoords(coordinates);
-      setDelta(calculateDelta(coordinates));
-      setInitialRegion(calculateInitialRegion(coordinates));
-    } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
-    }
-  };
+  const [initialRegion, setInitialRegion] = useState<ICoordinate>(
+    {} as ICoordinate
+  );
 
   const handleDeleteGeofence = async () => {
     try {
@@ -123,8 +99,6 @@ export function UpdateGeofences() {
         const response = await api.delete("/Geocerca/Excluir", {
           data: { codigoGeocerca: codigoGeocerca },
         });
-
-        console.log("response", response.data);
 
         if (response.data === 0 || 1 || 2) {
           Alert.alert(responses[response.data], responses[response.data], [
@@ -136,14 +110,13 @@ export function UpdateGeofences() {
         }
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
   const setStateDefault = () => {
     setNewCoords([]);
     setIsEditMode(false);
-    setIsMapPressed(false);
   };
 
   const handleUpdateGeofence = async () => {
@@ -189,7 +162,7 @@ export function UpdateGeofences() {
         setIsOpenModal(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log(error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -201,8 +174,36 @@ export function UpdateGeofences() {
   const handleMapPress = (event: MapPressEvent) => {
     const { coordinate } = event.nativeEvent;
     setNewCoords((oldState) => [...oldState, coordinate]);
+  };
 
-    setIsMapPressed(true);
+  const fetchGeofence = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await api.post<IGeofence[]>("/Geocerca/ObterLista", {
+        codigoGeocerca,
+      });
+
+      setGeofence(data[0]);
+
+      let coordinates: ICoordinate[] = [];
+
+      for (let index = 0; index < data[0].listaPontosGeocerca.length; index++) {
+        const point = data[0].listaPontosGeocerca[index];
+
+        coordinates.push({
+          latitude: point.latitude,
+          longitude: point.longitude,
+        });
+      }
+
+      setCoords(coordinates);
+      setDelta(calculateDelta(coordinates));
+      setInitialRegion(calculateInitialRegion(coordinates));
+    } catch (error) {
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useFocusEffect(
@@ -219,7 +220,7 @@ export function UpdateGeofences() {
 
   return (
     <>
-      <ModalPeriod
+      <GenericModal
         title="Editar Geocerca"
         isOpen={isOpenModal}
         closeModal={hancleCloseModal}
@@ -367,9 +368,9 @@ export function UpdateGeofences() {
           mt="24px"
           onPress={handleUpdateGeofence}
         />
-      </ModalPeriod>
+      </GenericModal>
 
-      <VStack flex={1} width="full" bg={colors.shape}>
+      <Container>
         <HeaderDefault title="Geocerca">
           <HStack>
             {newCoords.length > 0 && (
@@ -382,22 +383,30 @@ export function UpdateGeofences() {
               />
             )}
 
-            <IconButton
-              style={{ marginRight: 8 }}
-              icon={<Feather name="edit" size={22} color={colors.blue[700]} />}
-              onPress={() => setIsEditMode(true)}
-            />
+            {!isEditMode && (
+              <>
+                <IconButton
+                  style={{ marginRight: 8 }}
+                  icon={
+                    <Feather name="edit" size={22} color={colors.blue[700]} />
+                  }
+                  onPress={() => setIsEditMode(true)}
+                />
 
-            <IconButton
-              icon={<Feather name="trash" size={22} color={colors.red[600]} />}
-              onPress={handleDeleteGeofence}
-            />
+                <IconButton
+                  icon={
+                    <Feather name="trash" size={22} color={colors.red[600]} />
+                  }
+                  onPress={handleDeleteGeofence}
+                />
+              </>
+            )}
           </HStack>
         </HeaderDefault>
 
-        {!geofence && <LoadingSpinner color={colors.blue[700]} />}
+        {isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-        {geofence && coords.length > 0 && initialRegion && (
+        {!isLoading && geofence && coords.length > 0 && initialRegion && (
           <MapView
             style={{ flex: 1 }}
             onPress={
@@ -413,9 +422,18 @@ export function UpdateGeofences() {
               longitudeDelta: delta.longitudeDelta,
             }}
           >
-            {geofence.listaPontosGeocerca.length > 0 && (
+            {!isEditMode && coords.length > 0 && (
               <Polygon
-                coordinates={!isMapPressed && !isEditMode ? coords : newCoords}
+                coordinates={coords}
+                fillColor="rgba(160, 198, 229, 0.3)"
+                strokeColor="rgba(0, 105, 192, 1)"
+                strokeWidth={2}
+              />
+            )}
+
+            {isEditMode && newCoords.length > 0 && (
+              <Polygon
+                coordinates={newCoords}
                 fillColor="rgba(160, 198, 229, 0.3)"
                 strokeColor="rgba(0, 105, 192, 1)"
                 strokeWidth={2}
@@ -437,12 +455,12 @@ export function UpdateGeofences() {
 
         {isEditMode && (
           <ButtonFull
-            disabled={isMapPressed && newCoords.length < 2}
+            disabled={isEditMode && newCoords.length < 2}
             title="Editar"
             onPress={() => setIsOpenModal(true)}
           />
         )}
-      </VStack>
+      </Container>
     </>
   );
 }

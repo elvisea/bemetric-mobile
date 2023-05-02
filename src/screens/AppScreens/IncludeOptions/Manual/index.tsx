@@ -69,9 +69,7 @@ export function Manual() {
         Alert.alert("Falha na verificação", "Falha na verificação");
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        Alert.alert("Falha na verificação", "Falha na verificação");
-      }
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 

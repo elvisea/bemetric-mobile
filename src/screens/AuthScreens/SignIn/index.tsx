@@ -91,7 +91,7 @@ export function SignIn() {
         navigation.navigate("TemporaryPassword", { email, password });
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar fazer login!", `${error}`);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -104,9 +104,7 @@ export function SignIn() {
       const response = await api.get("setup/DateTime");
       console.log(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error);
-      }
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 

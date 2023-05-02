@@ -103,7 +103,7 @@ export function MessageList() {
 
       setMessages(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -130,9 +130,8 @@ export function MessageList() {
           responses[response.data].subtitle,
           responses[response.data].subtitle
         );
-
-        console.log(responses[response.data].subtitle);
       } catch (error) {
+        if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       } finally {
       }
     },

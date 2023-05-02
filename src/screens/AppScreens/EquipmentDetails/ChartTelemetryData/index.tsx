@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
@@ -39,10 +40,8 @@ export function ChartTelemetryData() {
 
   const route = useRoute();
   const params = route.params as IParams;
-  console.log("PARAMS", params);
 
   const [chart, setChart] = useState<IChart[] | null>(null);
-  console.log("STATE", chart);
 
   const tipoDeGrafico = {
     GraficoKmRodados: {
@@ -115,17 +114,12 @@ export function ChartTelemetryData() {
           codigoEquipamento: params.codigoEquipamento,
         };
 
-        console.log("Enviados", data);
-
         try {
           const response = await api.post(`/Equipamento/${params.url}`, data);
 
-          console.log("Response:", response.data);
-
           isActive && setChart(formatDataForChart(response.data));
-          // isActive && setChart(dadosFake());
         } catch (error) {
-          if (axios.isAxiosError(error)) console.log("Error:", error);
+          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
         }
       };
 

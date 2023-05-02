@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 import React, { useCallback, useState } from "react";
 import { HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 
@@ -23,7 +23,7 @@ import api from "@services/api";
 
 import { Button } from "@components/Button";
 import { ButtonDate } from "@components/ButtonDate";
-import { ModalPeriod } from "@components/ModalPeriod";
+import { GenericModal } from "@components/GenericModal";
 import { PeriodOption } from "@components/PeriodOption";
 import { HeaderDefault } from "@components/HeaderDefault";
 
@@ -43,8 +43,6 @@ export function PeriodoPermanencia() {
 
   const route = useRoute();
   const { params } = route.params as IParams;
-
-  console.log("TelemetryData Screen Params:", params);
 
   const [data, setData] = useState<IPeriodStay | null>(null);
 
@@ -123,10 +121,8 @@ export function PeriodoPermanencia() {
 
       setData(response.data);
       setIsOpenModal(false);
-
-      console.log("RESPONSE:", response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) console.log("Error:", error);
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 
@@ -192,7 +188,7 @@ export function PeriodoPermanencia() {
         />
       </ScrollView>
 
-      <ModalPeriod
+      <GenericModal
         title="Período"
         isOpen={isOpenModal}
         closeModal={() => setIsOpenModal(!isOpenModal)}
@@ -234,7 +230,7 @@ export function PeriodoPermanencia() {
           width="100%"
           onPress={fetchData}
         />
-      </ModalPeriod>
+      </GenericModal>
 
       {selectStartDate && (
         <DateTimePicker
