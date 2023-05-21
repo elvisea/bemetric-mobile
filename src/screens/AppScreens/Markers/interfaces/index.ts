@@ -4,6 +4,7 @@ interface IPoint {
   descricao: string;
   latitude: number;
   longitude: number;
+  raio: number;
 }
 
 interface IListaPontosGeocerca {
@@ -22,10 +23,8 @@ interface IEquipment {
   nomeEquipamento: string;
   codigoEquipamento: number;
   codigoCliente: number;
-  status: number;
-  velocidade: number;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
 }
 
 interface IMarker {
@@ -39,4 +38,9 @@ interface ISelected {
   type: "points" | "geofences" | "equipments";
 }
 
-export { IPoint, IGeofence, IEquipment, IMarker, ISelected };
+interface IInicialRegion {
+  latitude: number;
+  longitude: number;
+}
+
+export { IPoint, IGeofence, IEquipment, IMarker, ISelected, IInicialRegion };

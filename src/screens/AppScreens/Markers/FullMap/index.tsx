@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Alert, FlatList } from "react-native";
 
 import axios from "axios";
-import MapView from "react-native-maps";
+import MapView, { Circle, Marker, Polygon } from "react-native-maps";
 
 import { HStack, IconButton, VStack } from "native-base";
 
@@ -12,6 +12,7 @@ import { Entypo, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
+import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
 import { Button } from "@components/Button";
@@ -23,6 +24,7 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import {
   IEquipment,
   IGeofence,
+  IInicialRegion,
   IMarker,
   IPoint,
   ISelected,
@@ -33,7 +35,11 @@ import {
 export function FullMap() {
   const { colors } = THEME;
 
+  const { user } = useAuth();
   const { customer } = useCustomer();
+
+  console.log("user:", user);
+  console.log("customer:", customer);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -50,7 +56,67 @@ export function FullMap() {
     equipments: [] as IEquipment[],
   });
 
+  const [itens, setItens] = useState({
+    points: [] as number[],
+    geofences: [] as number[],
+    equipments: [] as number[],
+  });
+
+  const handleSelecionarItens = (codigo: number) => {
+    const include = itens[selected.type].includes(codigo);
+
+    setItens((oldState) => {
+      const newState = { ...oldState };
+      newState[selected.type] = include
+        ? newState[selected.type].filter((item) => item !== codigo)
+        : [...newState[selected.type], codigo];
+      return newState;
+    });
+  };
+
+  const updateSelectedPoints = () => {
+    const selectedPoints = marker.points.filter((point) =>
+      itens.points.includes(point.codigoPontoInteresse)
+    );
+    setSelectedMarkers((prevMarkers) => ({
+      ...prevMarkers,
+      points: selectedPoints,
+    }));
+  };
+
+  const updateSelectedGeofences = () => {
+    const selectedGeofences = marker.geofences.filter((geofence) =>
+      itens.geofences.includes(geofence.codigoGeocerca)
+    );
+    setSelectedMarkers((prevMarkers) => ({
+      ...prevMarkers,
+      geofences: selectedGeofences,
+    }));
+  };
+
+  const updateSelectedEquipments = () => {
+    const selectedEquipments = marker.equipments.filter((equipment) =>
+      itens.equipments.includes(equipment.codigoEquipamento)
+    );
+    setSelectedMarkers((prevMarkers) => ({
+      ...prevMarkers,
+      equipments: selectedEquipments,
+    }));
+  };
+
+  const handleFilter = () => {
+    updateSelectedPoints();
+    updateSelectedGeofences();
+    updateSelectedEquipments();
+
+    setIsOpenModal(false);
+  };
+
   const [selected, setSelected] = useState<ISelected>({} as ISelected);
+
+  const [initialRegion, setInitialRegion] = useState<IInicialRegion>(
+    {} as IInicialRegion
+  );
 
   const handleSelectedItem = ({ title, type }: ISelected) => {
     setSelected({ title, type });
@@ -129,6 +195,40 @@ export function FullMap() {
     useCallback(() => {
       let isActive = true;
 
+      isActive &&
+        setItens({
+          points: [] as number[],
+          geofences: [] as number[],
+          equipments: [] as number[],
+        });
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      isActive &&
+        setSelectedMarkers({
+          points: [] as IPoint[],
+          geofences: [] as IGeofence[],
+          equipments: [] as IEquipment[],
+        });
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
       async function fetchData() {
         setIsLoading(true);
         try {
@@ -145,8 +245,10 @@ export function FullMap() {
                 codigoCliente: customer.codigoCliente,
               }),
 
-              api.post<IEquipment[]>("/Equipamento/TrajetoApp", {
+              api.post<IEquipment[]>("/Dashboard/ObterListaDadosEquipamento", {
                 codigoCliente: customer?.codigoCliente,
+                localDashboard: 3,
+                codigoUsuario: user?.codigoUsuario,
               }),
             ]);
 
@@ -189,8 +291,8 @@ export function FullMap() {
             renderItem={({ item }) => (
               <MarkerItem
                 title={item.nomePonto}
-                onPress={() => handleSelectedMarker(item)}
-                isChecked={selectedMarkers.points.includes(item)}
+                onPress={() => handleSelecionarItens(item.codigoPontoInteresse)}
+                isChecked={itens.points.includes(item.codigoPontoInteresse)}
               />
             )}
           />
@@ -205,8 +307,8 @@ export function FullMap() {
             renderItem={({ item }) => (
               <MarkerItem
                 title={item.nomeGeocerca}
-                onPress={() => handleSelectedMarker(item)}
-                isChecked={selectedMarkers.geofences.includes(item)}
+                onPress={() => handleSelecionarItens(item.codigoGeocerca)}
+                isChecked={itens.geofences.includes(item.codigoGeocerca)}
               />
             )}
           />
@@ -221,8 +323,8 @@ export function FullMap() {
             renderItem={({ item }) => (
               <MarkerItem
                 title={item.nomeEquipamento}
-                onPress={() => handleSelectedMarker(item)}
-                isChecked={selectedMarkers.equipments.includes(item)}
+                onPress={() => handleSelecionarItens(item.codigoEquipamento)}
+                isChecked={itens.equipments.includes(item.codigoEquipamento)}
               />
             )}
           />
@@ -233,7 +335,7 @@ export function FullMap() {
           mt={`${RFValue(20)}px`}
           title="Filtrar"
           width="100%"
-          onPress={() => { }}
+          onPress={handleFilter}
         />
       </GenericModal>
 
@@ -286,7 +388,52 @@ export function FullMap() {
 
         {isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-        {!isLoading && <MapView style={{ flex: 1 }} />}
+        {!isLoading && (
+          <MapView style={{ flex: 1 }} zoomControlEnabled>
+            {selectedMarkers.points.map((point) => (
+              <>
+                <Circle
+                  key={`${point.codigoPontoInteresse}${point.nomePonto}`}
+                  center={{
+                    latitude: point.latitude,
+                    longitude: point.longitude,
+                  }}
+                  radius={point.raio}
+                  fillColor="rgba(160, 198, 229, 0.3)"
+                  strokeColor="rgba(0, 105, 192, 1)"
+                  strokeWidth={2}
+                />
+
+                <Marker
+                  coordinate={{
+                    latitude: point.latitude,
+                    longitude: point.longitude,
+                  }}
+                />
+              </>
+            ))}
+
+            {selectedMarkers.geofences.map((geofence) => (
+              <Polygon
+                key={geofence.codigoGeocerca}
+                coordinates={geofence.listaPontosGeocerca}
+                fillColor="rgba(160, 198, 229, 0.3)"
+                strokeColor="rgba(0, 105, 192, 1)"
+                strokeWidth={2}
+              />
+            ))}
+
+            {selectedMarkers.equipments.map((equipment) => (
+              <Marker
+                key={equipment.codigoEquipamento}
+                coordinate={{
+                  latitude: equipment.latitude,
+                  longitude: equipment.longitude,
+                }}
+              />
+            ))}
+          </MapView>
+        )}
       </VStack>
     </>
   );

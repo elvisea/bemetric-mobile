@@ -204,7 +204,7 @@ export function TelemetryData() {
             >
               {typeof data === "object"
                 ? `${list[item].value} ${list[item].label}`
-                : "has no values"}
+                : "Vazio"}
             </Text>
           </Item>
         </TouchableOpacity>

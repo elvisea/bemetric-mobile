@@ -105,7 +105,7 @@ function ChangePassword() {
       handleFirstIcon={handleMenu}
     >
       <VStack w="full" flex={1}>
-        <HeaderDefault title="Trocar Senha" />
+        <HeaderDefault title="Alterar Senha" />
 
         <VStack w="full" p="16px" flex={1}>
           <Text color="blue.700" fontSize="12px" fontFamily="Roboto_400Regular">
