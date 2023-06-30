@@ -1,3 +1,4 @@
+import { HeaderDefault } from "@components/HeaderDefault";
 import { ConnectionOption } from "@components/Include/ConnectionOption";
 import { LayoutDefault } from "@components/LayoutDefault";
 
@@ -15,6 +16,8 @@ export function Include() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
+      <HeaderDefault title="Configure a conexão bluetooth" />
+
       <ConnectionOption
         mt={16}
         title="Identificar Bluetooth"

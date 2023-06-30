@@ -19,6 +19,7 @@ import {
 } from "@expo-google-fonts/montserrat";
 
 import { AuthProvider } from "./src/hooks/auth";
+import { BluetoothProvider } from "./src/hooks/bluetooth";
 import { CustomerProvider } from "./src/hooks/customer";
 
 import { THEME } from "./src/theme/theme";
@@ -40,9 +41,11 @@ export default function App() {
     <NativeBaseProvider theme={THEME}>
       <SafeAreaView style={{ flex: 1 }}>
         <AuthProvider>
-          <CustomerProvider>
-            {fontsLoaded ? <Routes /> : <Loading />}
-          </CustomerProvider>
+          <BluetoothProvider>
+            <CustomerProvider>
+              {fontsLoaded ? <Routes /> : <Loading />}
+            </CustomerProvider>
+          </BluetoothProvider>
         </AuthProvider>
       </SafeAreaView>
     </NativeBaseProvider>

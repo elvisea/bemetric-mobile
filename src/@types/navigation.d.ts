@@ -105,7 +105,10 @@ export declare global {
         codigoMensagem: number;
       };
 
-      Manual: undefined;
+      Manual: {
+        id: string;
+        serial: string;
+      };
       ChangePassword: undefined;
 
       UpdateGeofences: {

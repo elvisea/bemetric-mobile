@@ -6,7 +6,8 @@ import { THEME } from "@theme/theme";
 
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
-import { IncludeHeader } from "@components/Include/IncludeHeader";
+import { HeaderDefault } from "@components/HeaderDefault";
+
 import { ConnectionOption } from "@components/Include/ConnectionOption";
 
 export function ConfigureConnection() {
@@ -20,7 +21,7 @@ export function ConfigureConnection() {
       handleFirstIcon={handleMenu}
     >
       <VStack flex={1} w="full">
-        <IncludeHeader title="Configure a conexão de dados" />
+        <HeaderDefault title="Configure a conexão de dados" />
 
         <ConnectionOption
           mt={16}
@@ -51,7 +52,7 @@ export function ConfigureConnection() {
         />
       </VStack>
 
-      <ButtonFull title="AVANÇAR SEM CONEXÃO" onPress={() => {}} />
+      <ButtonFull title="Avançar sem conexão" onPress={() => {}} />
     </LayoutDefault>
   );
 }

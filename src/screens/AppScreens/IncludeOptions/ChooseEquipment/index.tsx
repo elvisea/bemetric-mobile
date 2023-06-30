@@ -36,7 +36,7 @@ export function ChooseEquipment() {
         </Text>
       </VStack>
 
-      <ButtonFull title="SALVAR" onPress={() => {}} />
+      <ButtonFull title="Salvar" onPress={() => {}} />
     </LayoutDefault>
   );
 }

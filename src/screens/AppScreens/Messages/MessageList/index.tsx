@@ -15,6 +15,7 @@ import MensagemNaoLido from "@assets/mensagem-aviso-nao-lido.svg";
 
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
+import { IResponse } from "@interfaces/IResponse";
 
 import { Message } from "@components/Message";
 import { MessageHeader } from "@components/MessageHeader";
@@ -33,14 +34,7 @@ interface IMessageType {
   };
 }
 
-interface IResponses {
-  [index: number]: {
-    title: string;
-    subtitle: string;
-  };
-}
-
-const responses: IResponses = {
+const responses: IResponse = {
   0: {
     title: "OK - Excluído com sucesso",
     subtitle: "Mensagem excluída com sucesso",
