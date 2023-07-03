@@ -14,6 +14,8 @@ import { MobileNetwork } from "@screens/AppScreens/IncludeOptions/MobileNetwork"
 import { ManualConnection } from "@screens/AppScreens/IncludeOptions/ManualConnection";
 import { ChooseEquipment } from "@screens/AppScreens/IncludeOptions/ChooseEquipment";
 import { AddEquipment } from "@screens/AppScreens/IncludeOptions/AddEquipment";
+import { ChooseGrouping } from "@screens/AppScreens/IncludeOptions/ChooseGrouping";
+import { AddGrouping } from "@screens/AppScreens/IncludeOptions/AddGrouping";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -42,8 +44,10 @@ export default function IncludeStackRoutes() {
         <Screen name="ManualConnection" component={ManualConnection} />
 
         <Screen name="ChooseEquipment" component={ChooseEquipment} />
+        <Screen name="ChooseGrouping" component={ChooseGrouping} />
 
         <Screen name="AddEquipment" component={AddEquipment} />
+        <Screen name="AddGrouping" component={AddGrouping} />
       </Navigator>
     </>
   );

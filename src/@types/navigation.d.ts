@@ -109,6 +109,14 @@ export declare global {
         id: string;
         serial: string;
       };
+
+      ConfigureConnection: undefined;
+
+      ChooseEquipment: undefined;
+      ChooseGrouping: undefined;
+      AddEquipment: undefined;
+      AddGrouping: undefined;
+
       ChangePassword: undefined;
 
       UpdateGeofences: {

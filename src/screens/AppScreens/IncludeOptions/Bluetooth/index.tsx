@@ -17,20 +17,10 @@ import { Content, TitleHeader, Warning, Status } from "./styles";
 export function Bluetooth() {
   const navigation = useNavigation();
 
-  const {
-    devices,
-    bluetoothEnabled,
-    bluetoothStateChanged,
-    scanForDevices,
-    requestPermissions,
-  } = useBluetooth();
+  const { devices, bluetoothEnabled, scanForDevices, requestPermissions } =
+    useBluetooth();
 
   const [isAllowed, setIsAllowed] = useState(false);
-
-  console.log("Lista de Dispositivos:", devices);
-  console.log("Permissões habilitadas?", isAllowed);
-  console.log("Bluetooth habilitado?", bluetoothEnabled);
-  console.log("Bluetooth State Changed:", bluetoothStateChanged);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 

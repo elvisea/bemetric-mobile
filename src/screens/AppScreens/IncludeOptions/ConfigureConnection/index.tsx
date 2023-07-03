@@ -52,7 +52,10 @@ export function ConfigureConnection() {
         />
       </VStack>
 
-      <ButtonFull title="Avançar sem conexão" onPress={() => {}} />
+      <ButtonFull
+        title="Avançar sem conexão"
+        onPress={() => navigation.navigate("ChooseEquipment")}
+      />
     </LayoutDefault>
   );
 }

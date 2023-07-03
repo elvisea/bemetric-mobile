@@ -82,8 +82,6 @@ type BluetoothContextData = {
   // ) => Subscription;
 };
 
-
-
 export const BluetoothContext = createContext<BluetoothContextData>(
   {} as BluetoothContextData
 );
@@ -210,7 +208,6 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   //   };
   // };
 
-
   // const monitorCharacteristicForDevice = async (
   //   id: string,
   //   serviceUUID: string,
@@ -290,8 +287,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         }
       });
 
-      return subscription
-
+      return subscription;
     } catch (error) {
       onError(error);
     }
@@ -476,10 +472,8 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
 
   const disconnectDevice = async (id: string) => {
     const device = await manager.cancelDeviceConnection(id);
-    console.log("Device desconectado:", device.id);
-
+    console.log("Device Desconectado:", device.id);
     setConnectedDevice(null);
-    console.log();
   };
 
   useEffect(() => {

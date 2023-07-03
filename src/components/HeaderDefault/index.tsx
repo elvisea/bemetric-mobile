@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 import { HStack, Text, IStackProps } from "native-base";
 
 import { THEME } from "@theme/theme";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type Props = IStackProps & {
   title: string;
@@ -12,7 +13,7 @@ export function HeaderDefault({ title, children, ...rest }: Props) {
   return (
     <HStack
       w="full"
-      h={58}
+      h={RFValue(58)}
       bg={THEME.colors.white}
       paddingX="16px"
       alignItems="center"

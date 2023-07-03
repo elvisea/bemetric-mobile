@@ -1,7 +1,9 @@
 import { Alert } from "react-native";
 import { useCallback, useState } from "react";
-import { Select, VStack } from "native-base";
 import { Feather } from "@expo/vector-icons";
+
+import { Select, VStack } from "native-base";
+
 import {
   useNavigation,
   DrawerActions,

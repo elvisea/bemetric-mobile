@@ -13,6 +13,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
+import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
 import { ButtonFull } from "@components/ButtonFull";
@@ -22,51 +23,53 @@ import { EquipmentCard } from "@components/EquipmentCard";
 
 import { ListTitle } from "./styles";
 
-type IEquipment = {
-  placa: string;
-  identificador: string;
-  tipoEquipamento: string;
-  nomeEquipamento: string;
-  codigoEquipamento: number;
+type IGrouping = {
+  codigoAgrupamento: number;
+  nomeAgrupamento: string;
+  nomeCliente: string;
+  nomeParceiro: string;
+  criadoEmFormatado: string;
 };
 
-export function ChooseEquipment() {
+export function ChooseGrouping() {
   const navigation = useNavigation();
 
+  const { user } = useAuth();
   const { customer } = useCustomer();
 
-  console.log("Código Cliente:", customer?.codigoCliente);
-
-  const [equipment, setEquipment] = useState<IEquipment[]>([]);
-  const [selectedEquipment, setSelectedEquipment] = useState<IEquipment | null>(
+  const [grouping, setGrouping] = useState<IGrouping[]>([]);
+  const [selectedGrouping, setSelectedGrouping] = useState<IGrouping | null>(
     null
   );
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const handleSelectedEquipment = (item: IEquipment) => {
-    if (item.codigoEquipamento === selectedEquipment?.codigoEquipamento) {
-      setSelectedEquipment(null);
+  const handleSelectedGrouping = (item: IGrouping) => {
+    if (item.codigoAgrupamento === selectedGrouping?.codigoAgrupamento) {
+      setSelectedGrouping(null);
     } else {
-      setSelectedEquipment(item);
+      setSelectedGrouping(item);
     }
   };
 
   const handleAdvance = () => {
-    if (selectedEquipment) {
-      navigation.navigate("ChooseGrouping");
+    if (selectedGrouping) {
+      console.log("Salvar");
     } else {
-      navigation.navigate("AddEquipment");
+      navigation.navigate("AddGrouping");
     }
   };
 
-  const fetchEquipment = async () => {
+  const fetchGrouping = async () => {
     try {
-      const response = await api.post("/Equipamento/ObterLista", {
+      const response = await api.post("/Agrupamento/ObterLista", {
+        codigoUsuario: user?.codigoUsuario,
         codigoCliente: customer?.codigoCliente,
       });
 
-      setEquipment(response.data);
+      console.log("Response Fetch Grouping:", response.data);
+
+      setGrouping(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
@@ -76,7 +79,7 @@ export function ChooseEquipment() {
     useCallback(() => {
       let isActive = true;
 
-      if (isActive) fetchEquipment();
+      if (isActive) fetchGrouping();
 
       return () => {
         isActive = false;
@@ -90,29 +93,29 @@ export function ChooseEquipment() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <HeaderDefault title="Equipamentos disponíveis" />
+      <HeaderDefault title="Agrupamentos disponíveis" />
 
       <FlatList
-        data={equipment}
-        ListHeaderComponent={<ListTitle>Selecione um Equipamento</ListTitle>}
-        keyExtractor={(item) => item.codigoEquipamento.toString()}
+        data={grouping}
+        ListHeaderComponent={<ListTitle>Selecione um Agrupamento</ListTitle>}
+        keyExtractor={(item) => item.codigoAgrupamento.toString()}
         style={styles.container}
         renderItem={({ item }) => (
           <EquipmentCard
             isSelected={
-              item.codigoEquipamento === selectedEquipment?.codigoEquipamento
+              item.codigoAgrupamento === selectedGrouping?.codigoAgrupamento
             }
-            placa={item.placa}
-            identificador={item.identificador}
-            nomeEquipamento={item.nomeEquipamento}
-            tipoEquipamento={item.tipoEquipamento}
-            onPress={() => handleSelectedEquipment(item)}
+            placa={item.nomeCliente}
+            identificador={item.nomeCliente}
+            nomeEquipamento={item.nomeAgrupamento}
+            tipoEquipamento={item.nomeParceiro}
+            onPress={() => handleSelectedGrouping(item)}
           />
         )}
       />
 
       <ButtonFull
-        title={selectedEquipment ? "Avançar" : "Adicionar equipamento"}
+        title={selectedGrouping ? "Avançar" : "Adicionar Agrupamento"}
         onPress={handleAdvance}
       />
     </LayoutDefault>
