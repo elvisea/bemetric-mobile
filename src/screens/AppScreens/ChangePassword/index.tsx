@@ -16,7 +16,8 @@ import { LayoutDefault } from "@components/LayoutDefault";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-import { useAuth } from "@hooks/auth";
+
+import { useAuth } from "@hooks/authentication";
 
 import { FormProps } from "./interfaces";
 import { schema } from "./constants/schema";
@@ -56,7 +57,7 @@ function ChangePassword() {
       Alert.alert(responses[response.data], responses[response.data], [
         {
           text: response.data === 0 ? "Voltar" : "Tentar novamente",
-          onPress: () => (response.data === 0 ? navigation.goBack() : () => {}),
+          onPress: () => (response.data === 0 ? navigation.goBack() : () => { }),
         },
       ]);
     } catch (error) {

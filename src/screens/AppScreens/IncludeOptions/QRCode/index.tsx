@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { Text, StyleSheet, Button } from "react-native";
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 
-import {
-  BarCodeScanner,
-  BarCodeScannerResult,
-} from "expo-barcode-scanner";
+import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
 
 import { THEME } from "@theme/theme";
 import { LayoutDefault } from "@components/LayoutDefault";

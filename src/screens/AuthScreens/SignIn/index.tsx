@@ -11,7 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Logo from "@assets/logo.svg";
 
 import api from "@services/api";
-import { useAuth } from "@hooks/auth";
+import { useAuth } from "@hooks/authentication";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";

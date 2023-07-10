@@ -16,7 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Linking from "expo-linking";
 
 import api from "@services/api";
-import { useAuth } from "@hooks/auth";
+import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 import { THEME } from "@theme/theme";
@@ -26,7 +26,7 @@ import { CUSTOMER, TOKEN, USER } from "@constants/storage";
 import { IconMenuDrawer } from "@components/IconMenuDrawer";
 
 const CustomDrawer = (props: any) => {
-  const { resetUserState } = useAuth();
+  const { signOut } = useAuth();
   const { resetCustomerState, customer } = useCustomer();
 
   const [whatsApp, setWhatsApp] = useState<string | null>(null);
@@ -37,7 +37,7 @@ const CustomDrawer = (props: any) => {
     await AsyncStorage.removeItem(TOKEN);
 
     setWhatsApp(null);
-    resetUserState();
+    signOut();
     resetCustomerState();
   };
 

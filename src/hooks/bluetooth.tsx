@@ -102,7 +102,6 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   console.log("connectedDevice =>", connectedDevice);
   console.log("devices =>", devices);
 
-
   const isDeviceConnected = async (id: string) => {
     return await manager.isDeviceConnected(id);
   };

@@ -17,7 +17,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-import { useAuth } from "@hooks/auth";
+import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 import { ICustomer } from "@interfaces/ICustomer";
