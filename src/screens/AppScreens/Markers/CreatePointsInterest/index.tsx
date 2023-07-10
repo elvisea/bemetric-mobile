@@ -29,35 +29,8 @@ import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 
 import { ContainerCheckbox } from "./styles";
-
-interface ILocation {
-  latitude: number;
-  longitude: number;
-}
-
-interface IPointsInterest {
-  incluir: true;
-  codigoCliente: number;
-  nomePonto: string;
-  descricao: string;
-  raio: number;
-  latitude: number | null;
-  longitude: number | null;
-  alertaEntradaSaida: boolean;
-  alertaPermanencia: boolean;
-  alertaPermanenciaTempo?: number;
-}
-
-interface IResponses {
-  [index: number]: string;
-}
-
-const responses: IResponses = {
-  0: "Ponto de Interesse criado com sucesso",
-  1: "Cliente não localizado",
-  2: "Nome do Ponto de Interesse já cadastrado",
-  3: "Falha ao tentar criar Ponto de Interesse",
-};
+import { responses } from "./constants/responses";
+import { ILocation, IPointsInterest } from "./interfaces";
 
 export function CreatePointsInterest() {
   const { colors } = THEME;

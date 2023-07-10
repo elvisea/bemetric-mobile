@@ -64,6 +64,8 @@ export declare global {
         codigoAtivacao: string;
       };
 
+      Equipments: undefined;
+
       DetalhesEquipamento: undefined;
 
       EquipmentDetails: {
@@ -105,7 +107,18 @@ export declare global {
         codigoMensagem: number;
       };
 
-      Manual: undefined;
+      Manual: {
+        id: string;
+        serial: string;
+      };
+
+      ConfigureConnection: undefined;
+
+      ChooseEquipment: undefined;
+      ChooseGrouping: undefined;
+      AddEquipment: undefined;
+      AddGrouping: undefined;
+
       ChangePassword: undefined;
 
       UpdateGeofences: {

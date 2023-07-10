@@ -77,7 +77,7 @@ const CustomDrawer = (props: any) => {
             pressColor="transparent"
             style={{
               ...styles.item,
-              backgroundColor: "#0FD3BC",
+              backgroundColor: THEME.colors.cyan[200],
               marginBottom: 16,
             }}
             label="WhatsApp"
@@ -86,7 +86,7 @@ const CustomDrawer = (props: any) => {
               <MaterialCommunityIcons
                 name="whatsapp"
                 size={RFValue(34)}
-                color="#FFF"
+                color={THEME.colors.white}
               />
             )}
           />

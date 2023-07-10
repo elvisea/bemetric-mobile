@@ -8,7 +8,7 @@ interface IStyle {
 
 export const Container = styled.TouchableOpacity<IStyle>`
   width: 100%;
-  height: ${RFValue(72)}px;
+  height: ${RFValue(68)}px;
   padding: 0 ${RFValue(16)}px;
   margin-top: ${({ mt }) => RFValue(mt)}px;
   flex-direction: row;

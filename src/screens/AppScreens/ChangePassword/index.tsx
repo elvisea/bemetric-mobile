@@ -6,7 +6,7 @@ import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "@components/Input";
@@ -18,41 +18,9 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/auth";
 
-interface FormProps {
-  current: string;
-  newPassword: string;
-  confirmNewPassword: string;
-}
-
-const schema = yup.object({
-  newPassword: yup
-    .string()
-    .required("Informe sua senha")
-    .min(4, "A senha deve ter pelo menos 4 dígitos."),
-  current: yup
-    .string()
-    .required("Informe sua senha")
-    .min(4, "A senha deve ter pelo menos 4 dígitos."),
-  confirmNewPassword: yup
-    .string()
-    .required("Confirme sua senha.")
-    .oneOf(
-      [yup.ref("newPassword"), null],
-      "A confirmação da senha não confere"
-    ),
-});
-
-interface IResponses {
-  [index: number]: string;
-}
-
-const responses: IResponses = {
-  0: "Senha Alterada com sucesso",
-  1: "Senha ou Nova Senha não informados",
-  2: "Senha e Nova senha são iguais",
-  3: "Senha Atual informada é inválida",
-  4: "Erro na alteração da senha atual",
-};
+import { FormProps } from "./interfaces";
+import { schema } from "./constants/schema";
+import { responses } from "./constants/responses";
 
 function ChangePassword() {
   const { colors } = THEME;

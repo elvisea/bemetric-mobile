@@ -1,77 +1,192 @@
 import { Alert } from "react-native";
-import { Text, VStack } from "native-base";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+
+import {
+  useNavigation,
+  DrawerActions,
+  useRoute,
+} from "@react-navigation/native";
 
 import axios from "axios";
+import { Text, VStack } from "native-base";
+import { RFValue } from "react-native-responsive-fontsize";
 
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
-
-import { RFValue } from "react-native-responsive-fontsize";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
-import { IncludeHeader } from "@components/Include/IncludeHeader";
+import { HeaderDefault } from "@components/HeaderDefault";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-interface IFormProps {
-  serial: string;
-  key: string;
-}
+import { useBluetooth } from "@hooks/bluetooth";
+import { processResponses } from "@hooks/processResponse";
 
-const schema = yup.object({
-  serial: yup.string().required("Informe o serial"),
-  key: yup.string().required("Informe a chave"),
-});
+import {
+  CHARACTERISTIC_UUID,
+  SERVICE_UUID,
+  MONITORED_FEATURE_UUID,
+} from "@hooks/uuid";
+
+import { IFormProps, IParams } from "./interfaces";
+
+import { schema } from "./constants/schema";
+import { response } from "./constants/response";
 
 export function Manual() {
+  const route = useRoute();
+  const navigation = useNavigation();
+
+  const {
+    connectToDevice,
+    disconnectDevice,
+    isDeviceConnected,
+    monitorCharacteristicForDevice,
+    writeCharacteristicWithResponseForDevice,
+  } = useBluetooth();
+
+  const params = route.params as IParams;
+
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<IFormProps>({
+    defaultValues: { serial: params.serial },
     resolver: yupResolver(schema),
   });
 
-  const navigation = useNavigation();
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  async function handleAdvance({ key, serial }: IFormProps) {
+  const [conectado, setConectado] = useState(false);
+  const [deviceValue, setDeviceValue] = useState<object | undefined>(undefined);
+
+  console.log(getValues());
+
+
+  const onValueChange = (value: string | null | undefined) => {
+    const respostaProcessada = processResponses(value);
+    setDeviceValue(respostaProcessada);
+  };
+
+  const onError = (error: unknown) => console.error("Monitor error:", error);
+
+  async function checkAvailability() {
     try {
-      const response = await api.post("AppMobile/ValidarSerialChave", {
-        serial: serial,
-        chave: key,
+      const chave = getValues("chave");
+      const serial = getValues("serial");
+
+      const { data } = await api.post("AppMobile/ValidarSerialChave", {
+        chave,
+        serial,
       });
 
-      if (response.data === 0) {
+      if (data === 0) {
         Alert.alert(
-          "Dispositivo liberado para ser associado",
-          "Dispositivo liberado para ser associado"
+          "Equipamento conectado.",
+          "Dispositivo liberado para ser associado. Continue seu cadastro.",
+          [
+            {
+              text: "Continuar",
+              onPress: () => navigation.navigate("ConfigureConnection"),
+            },
+          ]
         );
       }
 
-      if (response.data === 1) {
-        Alert.alert("Dispositivo não localizado", "Dispositivo não localizado");
-      }
-
-      if (response.data === 2) {
-        Alert.alert(
-          "Dispositivo não liberado para ser associado",
-          "Dispositivo não liberado para ser associado"
-        );
-      }
-
-      if (response.data === 3) {
-        Alert.alert("Falha na verificação", "Falha na verificação");
+      if (data !== 0) {
+        Alert.alert(response[data].title, response[data].subtitle);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
+
+  async function writeCharacteristic(chave: string) {
+    const PAYLOAD = { BT_PASSWORD: chave, GET_SERIAL_KEY: "" };
+
+    await writeCharacteristicWithResponseForDevice(
+      params.id,
+      SERVICE_UUID,
+      CHARACTERISTIC_UUID,
+      PAYLOAD
+    );
+  }
+
+  const conectar = async () => {
+    await connectToDevice(params.id);
+    const isConnected = await isDeviceConnected(params.id);
+    setConectado(isConnected);
+  };
+
+  async function handleAdvance({ chave }: IFormProps) {
+    await conectar();
+    await writeCharacteristic(chave);
+  }
+
+  const tryAgain = async () => {
+    await disconnectDevice(params.id);
+    setDeviceValue(undefined);
+    setConectado(false);
+  };
+
+  const disconnect = async () => {
+    const isConnected = await isDeviceConnected(params.id);
+
+    if (isConnected) await disconnectDevice(params.id);
+
+    setDeviceValue(undefined);
+    setConectado(false);
+  };
+
+  useEffect(() => {
+    const handleDeviceValueChange = () => {
+      if (deviceValue) {
+        if ("BTPASSWORD" in deviceValue) {
+          Alert.alert(
+            "Credenciais inválidas.",
+            "Verifique se as credenciais de acesso estão corretas.",
+            [
+              {
+                text: "Tentar Novamente",
+                onPress: () => tryAgain(),
+              },
+            ]
+          );
+        } else {
+          checkAvailability();
+        }
+      }
+    };
+
+    handleDeviceValueChange();
+  }, [deviceValue]);
+
+  useEffect(() => {
+    const monitorDevice = async (): Promise<unknown> => {
+      try {
+        const subscription = await monitorCharacteristicForDevice(
+          params.id,
+          SERVICE_UUID,
+          MONITORED_FEATURE_UUID,
+          onValueChange,
+          onError
+        );
+
+        return () => subscription?.remove();
+      } catch (error) {
+        console.error("Monitor error:", error);
+      }
+    };
+
+    return () => {
+      monitorDevice();
+    };
+  }, [conectado]);
 
   return (
     <LayoutDefault
@@ -79,13 +194,14 @@ export function Manual() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <IncludeHeader title="Vincular ao dispositivo" />
+      <HeaderDefault title="Vincular ao dispositivo" />
 
-      <VStack flex={1} w="full" p="16px">
+      <VStack flex={1} w="full" paddingX="16px">
         <Text
           color="blue.700"
-          fontFamily="Montserrat_400Regular"
+          fontFamily="Roboto_400Regular"
           fontSize="13px"
+          mt={`${RFValue(16)}px`}
         >
           Serial
         </Text>
@@ -98,8 +214,8 @@ export function Manual() {
               borderBottomColor="blue.700"
               _input={{
                 color: "#333333",
-                fontSize: "13px",
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: "14px",
+                fontFamily: "Roboto_500Medium",
               }}
               onChangeText={onChange}
               value={value}
@@ -110,32 +226,33 @@ export function Manual() {
 
         <Text
           color="blue.700"
-          fontFamily="Montserrat_400Regular"
+          fontFamily="Roboto_400Regular"
           fontSize="13px"
-          mt={`${RFValue(32)}px`}
+          mt={`${RFValue(16)}px`}
         >
           Chave
         </Text>
 
         <Controller
           control={control}
-          name="key"
+          name="chave"
           render={({ field: { onChange, value } }) => (
             <Input
               borderBottomColor="blue.700"
               _input={{
                 color: "#333333",
-                fontSize: "13px",
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: "14px",
+                fontFamily: "Roboto_500Medium",
               }}
               onChangeText={onChange}
               value={value}
-              errorMessage={errors.key?.message}
+              errorMessage={errors.chave?.message}
             />
           )}
         />
       </VStack>
 
+      <ButtonFull title="Desconectar" onPress={disconnect} />
       <ButtonFull title="AVANÇAR" onPress={handleSubmit(handleAdvance)} />
     </LayoutDefault>
   );

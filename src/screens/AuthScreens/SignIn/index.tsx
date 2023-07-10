@@ -27,7 +27,7 @@ const schema = yup.object({
   password: yup
     .string()
     .required("Informe sua senha")
-    .min(4, "A senha deve ter pelo menos 4 dígitos."),
+    .min(6, "A senha deve ter pelo menos 6 dígitos."),
 });
 
 export function SignIn() {
