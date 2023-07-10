@@ -67,7 +67,6 @@ export function Manual() {
 
   console.log(getValues());
 
-
   const onValueChange = (value: string | null | undefined) => {
     const respostaProcessada = processResponses(value);
     setDeviceValue(respostaProcessada);

@@ -8,11 +8,11 @@ import { Box, VStack, Select, FormControl, Heading } from "native-base";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-import { useAuth } from "@hooks/auth";
+import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 import { ICustomer } from "@interfaces/ICustomer";
-import { CUSTOMER, TOKEN, USER } from "@constants/storage";
+import { CUSTOMER } from "@constants/storage";
 
 import { Header } from "@components/Header";
 import { ButtonFull } from "@components/ButtonFull";
@@ -20,7 +20,7 @@ import { HeaderWelcome } from "@components/HeaderWelcome";
 
 export function Clients() {
   const { user } = useAuth();
-  const { resetUserState } = useAuth();
+  const { signOut } = useAuth();
   const { addCustomer, resetCustomerState } = useCustomer();
 
   const [customer, setCustomer] = useState<ICustomer | null>(null);
@@ -48,11 +48,9 @@ export function Clients() {
   };
 
   const clearStorage = async () => {
-    await AsyncStorage.removeItem(USER);
     await AsyncStorage.removeItem(CUSTOMER);
-    await AsyncStorage.removeItem(TOKEN);
 
-    resetUserState();
+    signOut();
     resetCustomerState();
   };
 

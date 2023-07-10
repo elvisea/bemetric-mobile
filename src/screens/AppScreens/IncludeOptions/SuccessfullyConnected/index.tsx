@@ -32,7 +32,7 @@ export function SuccessfullyConnected() {
         </Text>
       </VStack>
 
-      <ButtonFull title="AVANÇAR" onPress={() => { }} />
+      <ButtonFull title="AVANÇAR" onPress={() => {}} />
     </LayoutDefault>
   );
 }

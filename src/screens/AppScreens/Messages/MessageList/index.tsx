@@ -13,7 +13,7 @@ import SistemaLido from "@assets/sistema-lido.svg";
 import SistemaNaoLido from "@assets/sistema-nao-lido.svg";
 import MensagemNaoLido from "@assets/mensagem-aviso-nao-lido.svg";
 
-import { useAuth } from "@hooks/auth";
+import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 import { Message } from "@components/Message";

@@ -18,7 +18,7 @@ import {
   Montserrat_300Light,
 } from "@expo-google-fonts/montserrat";
 
-import { AuthProvider } from "./src/hooks/auth";
+import { AuthProvider } from "./src/hooks/authentication";
 import { BluetoothProvider } from "./src/hooks/bluetooth";
 import { CustomerProvider } from "./src/hooks/customer";
 

@@ -5,23 +5,23 @@ import AuthStackRoutes from "./auth.stack.routes";
 import AppDrawerRoutes from "./app.drawer.routes";
 import ClientsStackRoutes from "./clients.stack.routes";
 
-import { useAuth } from "@hooks/auth";
+import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 const Routes = () => {
-  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { customer } = useCustomer();
 
   const switchNavigation = () => {
-    if (!user) {
+    if (!isAuthenticated) {
       return <AuthStackRoutes />;
     }
 
-    if (user && !customer) {
+    if (isAuthenticated && !customer) {
       return <ClientsStackRoutes />;
     }
 
-    if (user && customer) {
+    if (isAuthenticated && customer) {
       return <AppDrawerRoutes />;
     }
   };
