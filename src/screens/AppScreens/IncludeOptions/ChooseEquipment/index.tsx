@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Alert, FlatList, StyleSheet } from "react-native";
+import { Alert, FlatList } from "react-native";
 
 import {
   useNavigation,
@@ -8,63 +8,100 @@ import {
 } from "@react-navigation/native";
 
 import axios from "axios";
-import { RFValue } from "react-native-responsive-fontsize";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { useCustomer } from "@hooks/customer";
 
+import { IEquipment } from "./types";
+import { ListTitle } from "./styles";
+import { response } from "./constants";
+
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { EquipmentCard } from "@components/EquipmentCard";
 
-import { ListTitle } from "./styles";
-
-type IEquipment = {
-  placa: string;
-  identificador: string;
-  tipoEquipamento: string;
-  nomeEquipamento: string;
-  codigoEquipamento: number;
-};
-
 export function ChooseEquipment() {
-  const navigation = useNavigation();
-
   const { customer } = useCustomer();
-
-  console.log("Código Cliente:", customer?.codigoCliente);
+  const { navigate, dispatch } = useNavigation();
 
   const [equipment, setEquipment] = useState<IEquipment[]>([]);
-  const [selectedEquipment, setSelectedEquipment] = useState<IEquipment | null>(
-    null
-  );
+  const [selected, setSelected] = useState<IEquipment | null>(null);
 
-  const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+  const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
   const handleSelectedEquipment = (item: IEquipment) => {
-    if (item.codigoEquipamento === selectedEquipment?.codigoEquipamento) {
-      setSelectedEquipment(null);
+    if (item.codigoEquipamento === selected?.codigoEquipamento) {
+      setSelected(null);
     } else {
-      setSelectedEquipment(item);
+      setSelected(item);
     }
   };
 
   const handleAdvance = () => {
-    if (selectedEquipment) {
-      navigation.navigate("ChooseGrouping");
+    if (selected) {
+      navigate("ChooseGrouping");
     } else {
-      navigation.navigate("AddEquipment");
+      navigate("AddEquipment");
     }
   };
 
+  async function handleSaveEquipment() {
+    try {
+      const { data } = await api.post("/AppMobile/Gravar", {
+        codigoCliente: customer?.codigoCliente,
+        incluirAgrupamento: false,
+
+        incluirEquipamento: false,
+        codigoEquipamento: selected?.codigoEquipamento,
+        tipoEquipamento: selected?.tipoEquipamento,
+        nomeEquipamento: selected?.nomeEquipamento,
+        identificadorEquipamento: selected?.identificador,
+        modeloEquipamento: selected?.modelo,
+        placaEquipamento: selected?.placa,
+        anoEquipamento: selected?.ano,
+        serialDispositivo: "B2K-CD-B2CC30",
+        chaveDispositivo: "332428",
+        horimetroIncialEquipamento: selected.horimetroIncial,
+        hodometroIncialEquipamento: selected.hodometroIncial,
+        dataAquisicaoEquipamento: selected.dataAquisicao,
+
+        codigoAgrupamento: 0, // APENAS se estiver SELECIONANDO o Agrupamento. Se nao 0
+        nomeAgrupamento: "", // APENAS na INCLUSÃO de Agrupamento.
+      });
+
+      if (data.erro === 0) {
+        Alert.alert(
+          `${response[data.erro].title}`,
+          `${response[data.erro].subtitle}`,
+          [
+            {
+              text: "Mostrar Agrupamentos",
+              onPress: () => navigate("Equipments"),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          `${response[data.erro].title}`,
+          `${response[data.erro].subtitle}`
+        );
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    }
+  }
+
   const fetchEquipment = async () => {
     try {
-      const response = await api.post("/Equipamento/ObterLista", {
-        codigoCliente: customer?.codigoCliente,
-      });
+      const response = await api.post(
+        "/AppMobile/ObterListaEquipamentosNaoAssociados",
+        {
+          codigoCliente: customer?.codigoCliente,
+        }
+      );
 
       setEquipment(response.data);
     } catch (error) {
@@ -94,14 +131,14 @@ export function ChooseEquipment() {
 
       <FlatList
         data={equipment}
+        contentContainerStyle={{ padding: 16, width: "100%" }}
         ListHeaderComponent={<ListTitle>Selecione um Equipamento</ListTitle>}
+        showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.codigoEquipamento.toString()}
-        style={styles.container}
+        style={{ width: "100%" }}
         renderItem={({ item }) => (
           <EquipmentCard
-            isSelected={
-              item.codigoEquipamento === selectedEquipment?.codigoEquipamento
-            }
+            isSelected={item.codigoEquipamento === selected?.codigoEquipamento}
             placa={item.placa}
             identificador={item.identificador}
             nomeEquipamento={item.nomeEquipamento}
@@ -112,16 +149,9 @@ export function ChooseEquipment() {
       />
 
       <ButtonFull
-        title={selectedEquipment ? "Avançar" : "Adicionar equipamento"}
-        onPress={handleAdvance}
+        title={selected ? "Avançar" : "Adicionar equipamento"}
+        onPress={selected ? handleSaveEquipment : handleAdvance}
       />
     </LayoutDefault>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    padding: RFValue(16),
-  },
-});

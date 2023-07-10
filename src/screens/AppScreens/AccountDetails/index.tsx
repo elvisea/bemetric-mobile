@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { Alert } from "react-native";
 import { Text, VStack, Button as ButtonNativeBase } from "native-base";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "@components/Input";
@@ -10,35 +11,13 @@ import { Button } from "@components/Button";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-import { useNavigation, DrawerActions } from "@react-navigation/native";
-
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-import { Alert } from "react-native";
 import { useAuth } from "@hooks/auth";
 
-interface FormProps {
-  name: string;
-  email?: string;
-  celular?: string;
-  telefone?: string;
-}
-
-const schema = yup.object({
-  name: yup.string().required("Informe seu email."),
-  celular: yup.string().optional(),
-  telefone: yup.string().optional(),
-});
-
-interface IResponses {
-  [index: number]: string;
-}
-
-const responses: IResponses = {
-  0: "Usuário alterado com sucesso",
-  1: "Usuário não existe",
-  2: "Usuário não pode ser alterado",
-};
+import { FormProps } from "./interfaces";
+import { schema } from "./constants/schema";
+import { responses } from "./constants/responses";
 
 export function AccountDetails() {
   const { user, fetchDataUser } = useAuth();

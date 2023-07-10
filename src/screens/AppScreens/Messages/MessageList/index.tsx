@@ -15,35 +15,13 @@ import MensagemNaoLido from "@assets/mensagem-aviso-nao-lido.svg";
 
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
-import { IResponse } from "@interfaces/IResponse";
 
 import { Message } from "@components/Message";
 import { MessageHeader } from "@components/MessageHeader";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-interface IMessageType {
-  [index: number]: {
-    read: {
-      color: string;
-      icon: ReactNode;
-    };
-    unread: {
-      color: string;
-      icon: ReactNode;
-    };
-  };
-}
-
-const responses: IResponse = {
-  0: {
-    title: "OK - Excluído com sucesso",
-    subtitle: "Mensagem excluída com sucesso",
-  },
-  1: {
-    title: "Erro - Falha na exclusão",
-    subtitle: "Erro ao tentar excluir a mensagem",
-  },
-};
+import { IMessageType } from "./interfaces";
+import { responses } from "./constants/responses";
 
 export function MessageList() {
   const navigation = useNavigation();

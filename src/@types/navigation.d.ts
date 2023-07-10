@@ -64,6 +64,8 @@ export declare global {
         codigoAtivacao: string;
       };
 
+      Equipments: undefined;
+
       DetalhesEquipamento: undefined;
 
       EquipmentDetails: {

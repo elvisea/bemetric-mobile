@@ -29,47 +29,8 @@ import { ContainerCheckbox } from "../CreateGeofence/styles";
 import { Container } from "./styles";
 import { calculateDelta, calculateInitialRegion } from "../utils/";
 
-interface IPontoGeocerca {
-  latitude: number;
-  longitude: number;
-}
-
-interface IGeofence {
-  incluir: boolean;
-  codigoCliente: number;
-  nomeGeocerca: string;
-  descricao: string;
-  alertaPermanencia: boolean;
-  alertaEntradaSaida: boolean;
-  alertaPermanenciaTempo?: number;
-  alertaVelocidade: boolean;
-  alertaVelocidadeQuilometro?: number;
-  listaPontosGeocerca: IPontoGeocerca[] | [];
-}
-
-interface ICoordinate {
-  latitude: number;
-  longitude: number;
-}
-
-interface IParams {
-  codigoGeocerca: number;
-}
-
-interface IDelta {
-  latitudeDelta: number;
-  longitudeDelta: number;
-}
-
-interface IResponses {
-  [index: number]: string;
-}
-
-const responses: IResponses = {
-  0: "Geocerca atualizada com sucesso",
-  1: "Geocerca não localizada",
-  2: "Falha ao tentar excluir Geocerca",
-};
+import { responses } from "./constants/responses";
+import { ICoordinate, IDelta, IGeofence, IParams } from "./interfaces";
 
 export function UpdateGeofences() {
   const { colors } = THEME;

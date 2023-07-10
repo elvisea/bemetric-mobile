@@ -1,6 +1,7 @@
 {
-  "name": "b2kbemetrics",
+  "name": "bemetrics",
   "version": "1.0.0",
+  "main": "index.js",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -25,6 +26,7 @@
     "axios": "^1.2.1",
     "date-fns": "^2.29.3",
     "expo": "~47.0.14",
+    "expo-barcode-scanner": "~12.1.0",
     "expo-checkbox": "~2.2.2",
     "expo-dev-client": "~2.0.1",
     "expo-device": "~5.0.0",
@@ -56,9 +58,10 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@types/styled-components-react-native": "^5.2.0",
-    "babel-plugin-module-resolver": "^4.1.0",
+    "@babel/core": "^7.20.0",
+    "@types/styled-components": "^5.1.26",
+    "@types/styled-components-react-native": "^5.2.1",
+    "babel-plugin-module-resolver": "^5.0.0",
     "react-native-svg-transformer": "^1.0.0"
   },
   "private": true

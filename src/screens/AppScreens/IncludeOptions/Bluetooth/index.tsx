@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 import { Device } from "react-native-ble-plx";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -37,10 +42,15 @@ export function Bluetooth() {
 
   const canDisplay = () => bluetoothEnabled && devices.length > 0;
 
-  useEffect(() => {
-    requestUsagePermissions();
-    if (isAllowed && bluetoothEnabled) scanForDevices();
-  }, [isAllowed]);
+  useFocusEffect(
+    useCallback(() => {
+      requestUsagePermissions();
+
+      if (isAllowed && bluetoothEnabled) {
+        scanForDevices();
+      }
+    }, [isAllowed, bluetoothEnabled])
+  );
 
   return (
     <LayoutDefault
@@ -48,7 +58,7 @@ export function Bluetooth() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <IncludeHeader title="Bluetooh" />
+      <IncludeHeader title="Bluetooth" />
 
       {!bluetoothEnabled && (
         <Content>

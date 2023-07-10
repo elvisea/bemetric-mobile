@@ -17,23 +17,10 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/auth";
 import { useCustomer } from "@hooks/customer";
 
+import { IParams, IMessage } from "./interfaces";
+
 import { MessageHeader } from "@components/MessageHeader";
 import { LoadingSpinner } from "@components/LoadingSpinner";
-
-interface IMessage {
-  codigoParceiro: number;
-  dataEnvio: string;
-  descricao: string;
-  listaClientes: null;
-  nomeParceiro: string;
-  titulo: string;
-  todosClientes: number;
-}
-
-interface IParams {
-  tipoMensagem: number;
-  codigoMensagem: number;
-}
 
 export function MessageDetails() {
   const { user } = useAuth();

@@ -38,9 +38,6 @@ export function FullMap() {
   const { user } = useAuth();
   const { customer } = useCustomer();
 
-  console.log("user:", user);
-  console.log("customer:", customer);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
 

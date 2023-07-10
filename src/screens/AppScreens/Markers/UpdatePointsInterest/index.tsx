@@ -27,42 +27,12 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { ContainerCheckbox } from "./styles";
 import { getDeltaFromRadius } from "../utils";
 
-interface IPointsInterest {
-  incluir: boolean;
-  codigoCliente: number;
-  nomePonto: string;
-  descricao: string;
-  raio: number;
-  latitude: number;
-  longitude: number;
-  alertaEntradaSaida: boolean;
-  alertaPermanencia: boolean;
-  alertaPermanenciaTempo?: number;
-}
+import { IPointsInterest } from "./types";
+import { deleteResponse, updateResponse } from "./responses";
 
 interface IParams {
   codigoPontoInteresse: number;
 }
-
-interface IUpdateResponse {
-  [index: number]: string;
-}
-
-const updateResponse: IUpdateResponse = {
-  0: "Ponto de Interesse atualizado com sucesso.",
-  1: "Cliente não localizado.",
-  2: "Nome do Ponto de Interesse já cadastrado.",
-  3: "Falha ao tentar atualizar Ponto de Interesse.",
-};
-
-interface IDeleteResponse {
-  [index: number]: string;
-}
-
-const deleteResponse: IDeleteResponse = {
-  0: "Ponto de Interesse excluído com sucesso!",
-  1: "Falha ao tentar excluir Ponto de Interesse!",
-};
 
 export function UpdatePointsInterest() {
   const { colors } = THEME;

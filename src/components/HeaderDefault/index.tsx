@@ -13,7 +13,7 @@ export function HeaderDefault({ title, children, ...rest }: Props) {
   return (
     <HStack
       w="full"
-      h={RFValue(58)}
+      h={`${RFValue(58)}px`}
       bg={THEME.colors.white}
       paddingX="16px"
       alignItems="center"

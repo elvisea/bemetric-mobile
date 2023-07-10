@@ -80,7 +80,7 @@ export function Change() {
       >
         <HeaderDefault title="Selecione o equipamento" />
 
-        <VStack paddingY="16px" paddingX="16px" width="full">
+        <VStack py="16px" px="16px" width="full">
           <FlatList
             data={equipments}
             style={{ width: "100%" }}

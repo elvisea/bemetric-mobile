@@ -11,7 +11,6 @@ import axios from "axios";
 import { Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 
@@ -22,50 +21,20 @@ import { HeaderDefault } from "@components/HeaderDefault";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-import { IResponse } from "@interfaces/IResponse";
 
 import { useBluetooth } from "@hooks/bluetooth";
 import { processResponses } from "@hooks/processResponse";
 
 import {
   CHARACTERISTIC_UUID,
-  MONITORED_FEATURE_UUID,
   SERVICE_UUID,
+  MONITORED_FEATURE_UUID,
 } from "@hooks/uuid";
 
-interface IFormProps {
-  chave: string;
-  serial: string;
-}
+import { IFormProps, IParams } from "./interfaces";
 
-interface IParams {
-  id: string;
-  serial: string;
-}
-
-const schema = yup.object({
-  serial: yup.string().required("Informe o serial"),
-  chave: yup.string().required("Informe a chave"),
-});
-
-const response: IResponse = {
-  0: {
-    title: "Dispositivo liberado para ser associado.",
-    subtitle: "Continue o processo de cadastro.",
-  },
-  1: {
-    title: "Dispositivo não localizado",
-    subtitle: "Dispositivo não localizado",
-  },
-  2: {
-    title: "Dispositivo não liberado para ser associado",
-    subtitle: "Dispositivo não liberado para ser associado",
-  },
-  3: {
-    title: "Falha na verificação",
-    subtitle: "Falha na verificação",
-  },
-};
+import { schema } from "./constants/schema";
+import { response } from "./constants/response";
 
 export function Manual() {
   const route = useRoute();
@@ -95,6 +64,9 @@ export function Manual() {
 
   const [conectado, setConectado] = useState(false);
   const [deviceValue, setDeviceValue] = useState<object | undefined>(undefined);
+
+  console.log(getValues());
+
 
   const onValueChange = (value: string | null | undefined) => {
     const respostaProcessada = processResponses(value);
@@ -163,7 +135,10 @@ export function Manual() {
   };
 
   const disconnect = async () => {
-    await disconnectDevice(params.id);
+    const isConnected = await isDeviceConnected(params.id);
+
+    if (isConnected) await disconnectDevice(params.id);
+
     setDeviceValue(undefined);
     setConectado(false);
   };

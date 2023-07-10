@@ -29,34 +29,8 @@ import { useCustomer } from "@hooks/customer";
 
 import { ContainerCheckbox } from "./styles";
 
-interface IPontoGeocerca {
-  latitude: number;
-  longitude: number;
-}
-
-interface IGeofence {
-  incluir: boolean;
-  codigoCliente: number;
-  nomeGeocerca: string;
-  descricao: string;
-  alertaPermanencia: boolean;
-  alertaEntradaSaida: boolean;
-  alertaPermanenciaTempo?: number;
-  alertaVelocidade: boolean;
-  alertaVelocidadeQuilometro?: number;
-  listaPontosGeocerca: IPontoGeocerca[] | [];
-}
-
-interface IResponses {
-  [index: number]: string;
-}
-
-const responses: IResponses = {
-  0: "Geocerca criada com sucesso",
-  1: "Cliente não localizado",
-  2: "Nome da geocerca já cadastrado",
-  3: "Falha ao tentar criar geocerca",
-};
+import { responses } from "./constants/responses";
+import { IGeofence, IPontoGeocerca } from "./interfaces";
 
 export function CreateGeofence() {
   const { colors } = THEME;

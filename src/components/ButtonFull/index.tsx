@@ -11,7 +11,7 @@ export function ButtonFull({ title, ...rest }: Props) {
   return (
     <NativeBaseButton
       w="full"
-      h={RFValue(77)}
+      h={`${RFValue(77)}px`}
       bg="blue.600"
       borderWidth={0}
       borderRadius={0}

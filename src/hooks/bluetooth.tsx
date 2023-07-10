@@ -99,6 +99,10 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   const [devices, setDevices] = useState<Device[] | []>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
 
+  console.log("connectedDevice =>", connectedDevice);
+  console.log("devices =>", devices);
+
+
   const isDeviceConnected = async (id: string) => {
     return await manager.isDeviceConnected(id);
   };
@@ -449,6 +453,11 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
 
   const scanForDevices = () => {
     try {
+      if (!bluetoothEnabled) {
+        console.log("Bluetooth is turned off. Stopping device scan.");
+        return;
+      }
+
       manager.startDeviceScan(null, null, (error, device) => {
         if (error) {
           console.error("Error when trying to scan for devices", error);

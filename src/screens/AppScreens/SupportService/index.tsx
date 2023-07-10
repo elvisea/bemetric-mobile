@@ -18,16 +18,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-interface IContact {
-  codigoContato: number;
-  codigoParceiro: number;
-  descritivo: string;
-  emailSuporte: string;
-  incluir: false;
-  nomeParceiro: string;
-  telefone: string;
-  whatsapp: string;
-}
+import { IContact } from "./interfaces";
 
 export function SupportService() {
   const navigation = useNavigation();
