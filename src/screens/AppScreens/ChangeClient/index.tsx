@@ -68,8 +68,6 @@ export function ChangeClient() {
   useFocusEffect(
     useCallback(() => {
       const fetch = async () => {
-        console.log("user?.codigoUsuario", user?.codigoUsuario);
-
         try {
           const response = await api.post("/Usuario/ListaClientesUsuario", {
             codigoUsuario: user?.codigoUsuario,

@@ -77,8 +77,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     await storageUserSave(data);
     await storageTokenSave(data.jwtToken);
 
-    // await fetchDataUser(); // Verificar Chamada
-
     dispatch({ type: "LOADING" });
   };
 
