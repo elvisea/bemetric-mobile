@@ -65,38 +65,32 @@ export function ChangeClient() {
     }
   };
 
-  const getListClients = async () => {
-    try {
-      const response = await api.post("/Usuario/ListaClientesUsuario", {
-        codigoUsuario: user?.codigoUsuario,
-      });
-
-      if (response.status === 204) {
-        Alert.alert(
-          "Usuário não possui Clientes!",
-          "Usuário não possui Clientes cadastrados."
-        );
-      }
-
-      if (response.status === 200) {
-        setCustomers(response.data);
-      }
-    } catch (error) {
-      Alert.alert("Erro ao tentar listar Clientes!", `${error}`);
-    }
-  };
-
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
+      const fetch = async () => {
+        console.log("user?.codigoUsuario", user?.codigoUsuario);
 
-      if (isActive) {
-        if (user) getListClients();
-      }
+        try {
+          const response = await api.post("/Usuario/ListaClientesUsuario", {
+            codigoUsuario: user?.codigoUsuario,
+          });
 
-      return () => {
-        isActive = false;
+          if (response.status === 204) {
+            Alert.alert(
+              "Usuário não possui Clientes!",
+              "Usuário não possui Clientes cadastrados."
+            );
+          }
+
+          if (response.status === 200) {
+            setCustomers(response.data);
+          }
+        } catch (error) {
+          Alert.alert("Erro ao tentar listar Clientes!", `${error}`);
+        }
       };
+
+      user && fetch();
     }, [])
   );
 

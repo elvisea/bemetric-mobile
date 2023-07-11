@@ -1,6 +1,5 @@
 import { Alert } from "react-native";
 import React, { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Feather } from "@expo/vector-icons";
 import { Box, VStack, Select, FormControl, Heading } from "native-base";
@@ -12,7 +11,6 @@ import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 import { ICustomer } from "@interfaces/ICustomer";
-import { CUSTOMER } from "@constants/storage";
 
 import { Header } from "@components/Header";
 import { ButtonFull } from "@components/ButtonFull";
@@ -21,7 +19,7 @@ import { HeaderWelcome } from "@components/HeaderWelcome";
 export function Clients() {
   const { user } = useAuth();
   const { signOut } = useAuth();
-  const { addCustomer, resetCustomerState } = useCustomer();
+  const { addCustomer, resetCustomer } = useCustomer();
 
   const [customer, setCustomer] = useState<ICustomer | null>(null);
   const [customers, setCustomers] = useState<ICustomer[]>([] as ICustomer[]);
@@ -48,14 +46,13 @@ export function Clients() {
   };
 
   const clearStorage = async () => {
-    await AsyncStorage.removeItem(CUSTOMER);
-
     signOut();
-    resetCustomerState();
+    resetCustomer();
   };
 
   useEffect(() => {
     const fetch = async () => {
+      console.log("user?.codigoUsuario", user?.codigoUsuario);
       try {
         const response = await api.post("/Usuario/ListaClientesUsuario", {
           codigoUsuario: user?.codigoUsuario,

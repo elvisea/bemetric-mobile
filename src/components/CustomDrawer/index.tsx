@@ -11,7 +11,6 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import * as Linking from "expo-linking";
 
@@ -22,23 +21,19 @@ import { useCustomer } from "@hooks/customer";
 import { THEME } from "@theme/theme";
 import { Container, Content } from "./styles";
 
-import { CUSTOMER, TOKEN, USER } from "@constants/storage";
 import { IconMenuDrawer } from "@components/IconMenuDrawer";
 
 const CustomDrawer = (props: any) => {
   const { signOut } = useAuth();
-  const { resetCustomerState, customer } = useCustomer();
+  const { resetCustomer, customer } = useCustomer();
 
   const [whatsApp, setWhatsApp] = useState<string | null>(null);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem(USER);
-    await AsyncStorage.removeItem(CUSTOMER);
-    await AsyncStorage.removeItem(TOKEN);
-
     setWhatsApp(null);
+
     signOut();
-    resetCustomerState();
+    resetCustomer();
   };
 
   const getWhatsApp = async () => {

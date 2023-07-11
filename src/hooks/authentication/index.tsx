@@ -37,7 +37,7 @@ export const AuthContext = createContext<AuthContextData>({
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log(state);
+  console.log("User:", state);
 
   const loadUserFromStorage = async () => {
     const userFromStorage = await storageUserGet();
@@ -77,7 +77,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     await storageUserSave(data);
     await storageTokenSave(data.jwtToken);
 
-    await fetchDataUser();
+    // await fetchDataUser(); // Verificar Chamada
 
     dispatch({ type: "LOADING" });
   };
@@ -85,10 +85,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const signOut = async () => {
     dispatch({ type: "LOADING" });
 
+    dispatch({ type: "SIGN_OUT" });
+
     await storageUserRemove();
     await storageTokenRemove();
-
-    dispatch({ type: "SIGN_OUT" });
 
     api.defaults.headers.common.Authorization = undefined;
 

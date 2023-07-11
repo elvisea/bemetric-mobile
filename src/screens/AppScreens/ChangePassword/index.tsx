@@ -57,7 +57,7 @@ function ChangePassword() {
       Alert.alert(responses[response.data], responses[response.data], [
         {
           text: response.data === 0 ? "Voltar" : "Tentar novamente",
-          onPress: () => (response.data === 0 ? navigation.goBack() : () => { }),
+          onPress: () => (response.data === 0 ? navigation.goBack() : () => {}),
         },
       ]);
     } catch (error) {
