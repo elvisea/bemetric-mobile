@@ -10,7 +10,7 @@ const response: IResponse = {
     subtitle: "Dispositivo não localizado",
   },
   2: {
-    title: "Dispositivo não liberado para ser associado",
+    title: "Dispositivo não disponível",
     subtitle: "Dispositivo não liberado para ser associado",
   },
   3: {

@@ -351,7 +351,9 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
 
   const connectToDevice = async (id: string) => {
     try {
-      const dispositivoConectado = await manager.connectToDevice(id);
+      const dispositivoConectado = await manager.connectToDevice(id, {
+        requestMTU: 500,
+      });
       await manager.requestMTUForDevice(id, 500);
       setConnectedDevice(dispositivoConectado);
 

@@ -109,6 +109,7 @@ export declare global {
 
       Manual: {
         id: string;
+        chave?: string;
         serial: string;
       };
 
