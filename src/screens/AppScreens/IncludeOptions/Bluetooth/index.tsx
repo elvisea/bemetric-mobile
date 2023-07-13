@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
 import {
@@ -22,16 +22,22 @@ import { Content, TitleHeader, Warning, Status } from "./styles";
 export function Bluetooth() {
   const navigation = useNavigation();
 
-  const { devices, bluetoothEnabled, scanForDevices, requestPermissions } =
-    useBluetooth();
+  const {
+    devices,
+    bluetoothEnabled,
+    permissionsGranted,
+    scanForDevices,
+    requestPermissions,
+    changeGrantedPermissions,
+  } = useBluetooth();
 
-  const [isAllowed, setIsAllowed] = useState(false);
+  const canDisplay = () => bluetoothEnabled && devices.length > 0;
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const requestUsagePermissions = async () => {
-    const response = await requestPermissions();
-    setIsAllowed(response);
+    const isGranted = await requestPermissions();
+    changeGrantedPermissions(isGranted);
   };
 
   const handleChooseDevice = (device: Device) => {
@@ -40,16 +46,14 @@ export function Bluetooth() {
     }
   };
 
-  const canDisplay = () => bluetoothEnabled && devices.length > 0;
-
   useFocusEffect(
     useCallback(() => {
       requestUsagePermissions();
 
-      if (isAllowed && bluetoothEnabled) {
+      if (permissionsGranted && bluetoothEnabled) {
         scanForDevices();
       }
-    }, [isAllowed, bluetoothEnabled])
+    }, [permissionsGranted, bluetoothEnabled])
   );
 
   return (

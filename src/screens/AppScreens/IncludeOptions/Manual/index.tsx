@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { Alert, FlatList } from "react-native";
 import { useEffect, useState } from "react";
 
 import {
@@ -35,16 +35,15 @@ import { IFormProps, IParams } from "./interfaces";
 
 import { schema } from "./constants/schema";
 import { response } from "./constants/response";
+import { inputs } from "./constants/inputs";
 
 export function Manual() {
   const route = useRoute();
   const navigation = useNavigation();
 
   const {
-    connectToDevice,
     disconnectDevice,
-    isDeviceConnected,
-    monitorCharacteristicForDevice,
+    connectAndMonitorCharacteristicForDevice,
     writeCharacteristicWithResponseForDevice,
   } = useBluetooth();
 
@@ -56,16 +55,18 @@ export function Manual() {
     getValues,
     formState: { errors },
   } = useForm<IFormProps>({
-    defaultValues: { serial: params.serial },
+    defaultValues: {
+      serial: params.serial,
+      chave: params.chave ? params.chave : undefined,
+    },
     resolver: yupResolver(schema),
   });
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const [conectado, setConectado] = useState(false);
   const [deviceValue, setDeviceValue] = useState<object | undefined>(undefined);
 
-  console.log(getValues());
+  console.log("deviceValue:", deviceValue);
 
   const onValueChange = (value: string | null | undefined) => {
     const respostaProcessada = processResponses(value);
@@ -73,6 +74,12 @@ export function Manual() {
   };
 
   const onError = (error: unknown) => console.error("Monitor error:", error);
+
+  const chooseAnotherDevice = async () => {
+    await disconnectDevice(params.id);
+    setDeviceValue(undefined);
+    navigation.goBack();
+  };
 
   async function checkAvailability() {
     try {
@@ -98,48 +105,31 @@ export function Manual() {
       }
 
       if (data !== 0) {
-        Alert.alert(response[data].title, response[data].subtitle);
+        Alert.alert(response[data].title, response[data].subtitle, [
+          {
+            text: "Tente outro dispositivo",
+            onPress: () => chooseAnotherDevice(),
+          },
+        ]);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 
-  async function writeCharacteristic(chave: string) {
+  async function handleAdvance({ chave }: IFormProps) {
     const PAYLOAD = { BT_PASSWORD: chave, GET_SERIAL_KEY: "" };
 
     await writeCharacteristicWithResponseForDevice(
-      params.id,
       SERVICE_UUID,
       CHARACTERISTIC_UUID,
       PAYLOAD
     );
   }
 
-  const conectar = async () => {
-    await connectToDevice(params.id);
-    const isConnected = await isDeviceConnected(params.id);
-    setConectado(isConnected);
-  };
-
-  async function handleAdvance({ chave }: IFormProps) {
-    await conectar();
-    await writeCharacteristic(chave);
-  }
-
-  const tryAgain = async () => {
+  const disconnect = async () => {
     await disconnectDevice(params.id);
     setDeviceValue(undefined);
-    setConectado(false);
-  };
-
-  const disconnect = async () => {
-    const isConnected = await isDeviceConnected(params.id);
-
-    if (isConnected) await disconnectDevice(params.id);
-
-    setDeviceValue(undefined);
-    setConectado(false);
   };
 
   useEffect(() => {
@@ -152,7 +142,7 @@ export function Manual() {
             [
               {
                 text: "Tentar Novamente",
-                onPress: () => tryAgain(),
+                // onPress: () => chooseAnotherDevice(),
               },
             ]
           );
@@ -168,7 +158,7 @@ export function Manual() {
   useEffect(() => {
     const monitorDevice = async (): Promise<unknown> => {
       try {
-        const subscription = await monitorCharacteristicForDevice(
+        const subscription = await connectAndMonitorCharacteristicForDevice(
           params.id,
           SERVICE_UUID,
           MONITORED_FEATURE_UUID,
@@ -178,14 +168,15 @@ export function Manual() {
 
         return () => subscription?.remove();
       } catch (error) {
-        console.error("Monitor error:", error);
+        console.error(
+          "Error when trying to connect and monitor feature",
+          error
+        );
       }
     };
 
-    return () => {
-      monitorDevice();
-    };
-  }, [conectado]);
+    monitorDevice();
+  }, []);
 
   return (
     <LayoutDefault
@@ -196,57 +187,41 @@ export function Manual() {
       <HeaderDefault title="Vincular ao dispositivo" />
 
       <VStack flex={1} w="full" paddingX="16px">
-        <Text
-          color="blue.700"
-          fontFamily="Roboto_400Regular"
-          fontSize="13px"
-          mt={`${RFValue(16)}px`}
-        >
-          Serial
-        </Text>
+        <FlatList
+          data={inputs}
+          style={{ width: "100%" }}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item: input }) => (
+            <>
+              <Text
+                color="blue.700"
+                fontFamily="Roboto_400Regular"
+                fontSize="13px"
+                mt={`${RFValue(16)}px`}
+              >
+                {input.title}
+              </Text>
 
-        <Controller
-          control={control}
-          name="serial"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              borderBottomColor="blue.700"
-              _input={{
-                color: "#333333",
-                fontSize: "14px",
-                fontFamily: "Roboto_500Medium",
-              }}
-              onChangeText={onChange}
-              value={value}
-              errorMessage={errors.serial?.message}
-            />
-          )}
-        />
-
-        <Text
-          color="blue.700"
-          fontFamily="Roboto_400Regular"
-          fontSize="13px"
-          mt={`${RFValue(16)}px`}
-        >
-          Chave
-        </Text>
-
-        <Controller
-          control={control}
-          name="chave"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              borderBottomColor="blue.700"
-              _input={{
-                color: "#333333",
-                fontSize: "14px",
-                fontFamily: "Roboto_500Medium",
-              }}
-              onChangeText={onChange}
-              value={value}
-              errorMessage={errors.chave?.message}
-            />
+              <Controller
+                control={control}
+                name={input.name}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    borderBottomColor="blue.700"
+                    _input={{
+                      color: "#333333",
+                      fontSize: "14px",
+                      fontFamily: "Roboto_500Medium",
+                    }}
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType={input.keyboardType}
+                    errorMessage={errors[input.name]?.message}
+                  />
+                )}
+              />
+            </>
           )}
         />
       </VStack>

@@ -5,6 +5,7 @@ interface IFormProps {
 
 interface IParams {
   id: string;
+  chave?: string;
   serial: string;
 }
 

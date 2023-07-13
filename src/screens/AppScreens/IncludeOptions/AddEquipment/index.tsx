@@ -1,4 +1,4 @@
-import { Alert, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, TouchableOpacity, View } from "react-native";
 
 import { useCallback, useState } from "react";
 
@@ -338,40 +338,45 @@ export function AddEquipment() {
                 ))}
             </Select>
 
-            {inputs.map((input) => (
-              <>
-                <Text
-                  key={input.id}
-                  mt={`${RFValue(24)}px`}
-                  color="blue.700"
-                  fontSize="13px"
-                  marginBottom="12px"
-                  fontFamily="Roboto_400Regular"
-                >
-                  {input.title}
-                </Text>
+            <FlatList
+              data={inputs}
+              style={{ width: "100%" }}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item: input }) => (
+                <>
+                  <Text
+                    mt={`${RFValue(24)}px`}
+                    color="blue.700"
+                    fontSize="13px"
+                    marginBottom="12px"
+                    fontFamily="Roboto_400Regular"
+                  >
+                    {input.title}
+                  </Text>
 
-                <Controller
-                  control={control}
-                  name={input.name}
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      py={0}
-                      keyboardType={input.keyboardType}
-                      borderBottomColor="blue.700"
-                      _input={{
-                        color: "#333333",
-                        fontSize: "16px",
-                        fontFamily: "Roboto_400Regular",
-                      }}
-                      value={value}
-                      onChangeText={onChange}
-                      errorMessage={errors[input.name]?.message}
-                    />
-                  )}
-                />
-              </>
-            ))}
+                  <Controller
+                    control={control}
+                    name={input.name}
+                    render={({ field: { onChange, value } }) => (
+                      <Input
+                        py={0}
+                        keyboardType={input.keyboardType}
+                        borderBottomColor="blue.700"
+                        _input={{
+                          color: "#333333",
+                          fontSize: "16px",
+                          fontFamily: "Roboto_400Regular",
+                        }}
+                        value={value}
+                        onChangeText={onChange}
+                        errorMessage={errors[input.name]?.message}
+                      />
+                    )}
+                  />
+                </>
+              )}
+            />
           </VStack>
         </ScrollView>
 
