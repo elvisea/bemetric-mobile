@@ -17,6 +17,8 @@ import { reducer } from "./reducer";
 import { initialState } from "./initial-state";
 import { BluetoothContextData, BluetoothProviderProps } from "./types";
 
+import { processResponses } from "@hooks/processResponse";
+
 export const BluetoothContext = createContext<BluetoothContextData>(
   {} as BluetoothContextData
 );
@@ -28,7 +30,7 @@ const HEADER = [0x4d, 0x00, 0x00, 0x2c];
 const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("Bluetooth:", state);
+  console.log("state bluetooth 👹", state);
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -130,36 +132,21 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     }
   };
 
-  const connectToDevice = async (id: string) => {
-    if (state.deviceIsConnected) {
-      return console.error("Device is already connected");
-    }
-
-    try {
-      const dispositivoConectado = await manager.connectToDevice(id, {
-        requestMTU: 500,
-      });
-
-      dispatch({ type: "CONNECT_DEVICE" });
-      dispatch({ type: "SET_DEVICE", payload: dispositivoConectado });
-    } catch (error) {
-      console.error("Failed when trying to connect:", error);
-    }
-  };
-
   const disconnectDevice = async (id: string) => {
     await manager.cancelDeviceConnection(id);
 
     dispatch({ type: "REMOVE_DEVICE" });
-    dispatch({ type: "CONNECT_DEVICE" });
+    dispatch({ type: "CONNECT_DEVICE", payload: false });
   };
 
   const writeCharacteristicWithResponseForDevice = async (
     serviceUUID: string,
     characteristicUUID: string,
-    payload: object
+    command: object
   ) => {
     if (state.connectedDevice) {
+      console.log("Device is connected and can write to a feature");
+
       try {
         const discovered =
           await state.connectedDevice.discoverAllServicesAndCharacteristics();
@@ -184,17 +171,17 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
           return;
         }
 
-        let payloadString = JSON.stringify(payload);
+        let commandString = JSON.stringify(command);
 
-        const payloadBuffer = Buffer.from(payloadString);
+        const commandBuffer = Buffer.from(commandString);
 
-        const size = payloadString.length;
+        const size = commandString.length;
 
         HEADER[3] = size;
 
         const concatenatedBuffer = Buffer.concat([
           Buffer.from(HEADER),
-          payloadBuffer,
+          commandBuffer,
         ]);
 
         const valueBase64 = concatenatedBuffer.toString("base64");
@@ -204,6 +191,8 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         console.error("Failed when trying to write", error);
       }
     }
+
+    console.log("Device is not connected and cannot write to a feature");
   };
 
   const monitorCharacteristicForDevice = async (
@@ -213,6 +202,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     onError: (error: BleError | null | unknown) => void
   ): Promise<Subscription | undefined> => {
     if (state.connectedDevice) {
+      console.log("Device is connected and can monitor features");
       try {
         const discovered =
           await state.connectedDevice.discoverAllServicesAndCharacteristics();
@@ -250,14 +240,33 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         onError(error);
       }
     }
+
+    console.log("Device is not connected and cannot monitor features");
   };
 
-  const conectar = async (id: string): Promise<Device> => {
+  const connectToDevice = async (id: string) => {
+    if (state.deviceIsConnected) {
+      return console.error("Device is already connected");
+    }
+
+    try {
+      const dispositivoConectado = await manager.connectToDevice(id, {
+        requestMTU: 500,
+      });
+
+      dispatch({ type: "CONNECT_DEVICE", payload: true });
+      dispatch({ type: "SET_DEVICE", payload: dispositivoConectado });
+    } catch (error) {
+      console.error("Failed when trying to connect:", error);
+    }
+  };
+
+  const connectDevice = async (id: string): Promise<Device> => {
     const dispositivoConectado = await manager.connectToDevice(id, {
       requestMTU: 500,
     });
 
-    dispatch({ type: "CONNECT_DEVICE" });
+    dispatch({ type: "CONNECT_DEVICE", payload: true });
     dispatch({ type: "SET_DEVICE", payload: dispositivoConectado });
 
     return dispositivoConectado;
@@ -271,7 +280,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     onError: (error: BleError | null | unknown) => void
   ): Promise<Subscription | undefined> => {
     try {
-      const dispositivo = await conectar(id);
+      const dispositivo = await connectDevice(id);
 
       const discovered =
         await dispositivo.discoverAllServicesAndCharacteristics();
@@ -308,6 +317,43 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     }
   };
 
+  const setServiceUUID = (serviceUUID: string) => {
+    dispatch({ type: "SET_SERVICE_UUID", payload: serviceUUID });
+  };
+
+  const resetServiceUUID = () => {
+    dispatch({ type: "RESET_SERVICE_UUID" });
+  };
+
+  const setCharacteristicUUID = (characteristicUUID: string) => {
+    dispatch({ type: "SET_CHARACTERISTIC_UUID", payload: characteristicUUID });
+  };
+
+  const resetCharacteristicUUID = () => {
+    dispatch({ type: "RESET_CHARACTERISTIC_UUID" });
+  };
+
+  const setCommand = (command: object) => {
+    dispatch({ type: "SET_COMMAND", payload: command });
+  };
+
+  const onValueChange = (value: string | null | undefined) => {
+    const response = processResponses(value);
+    dispatch({ type: "SET_DEVICE_RESPONSE", payload: response });
+  };
+
+  const onError = (error: BleError | null | unknown) => {
+    console.error("Error when trying to monitor feature.", error);
+  };
+
+  const resetBluetooth = async () => {
+    if (state.connectedDevice) {
+      await disconnectDevice(state.connectedDevice.id);
+    }
+
+    dispatch({ type: "RESET_BLUETOOTH" });
+  };
+
   useEffect(() => {
     const stateChangeListener = manager.onStateChange(
       handleBluetoothStateChange,
@@ -322,11 +368,79 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    let subscription: Subscription | undefined;
+
+    const monitorDevice = async () => {
+      if (subscription) {
+        subscription.remove();
+      }
+
+      subscription = await monitorCharacteristicForDevice(
+        state.serviceUUID,
+        state.characteristicUUID,
+        onValueChange,
+        onError
+      );
+    };
+
+    monitorDevice();
+
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
+  }, [state.connectedDevice]);
+
+  useEffect(() => {
+    const writeCharacteristic = async () => {
+      await writeCharacteristicWithResponseForDevice(
+        state.serviceUUID,
+        state.characteristicUUID,
+        state.command
+      );
+    };
+
+    writeCharacteristic();
+  }, [state.serviceUUID, state.characteristicUUID, state.command]);
+
+  // useEffect(() => {
+  //   const checkConnectedDevices = async () => {
+  //     try {
+  //       const connectedDevices = await manager.connectedDevices([]);
+
+  //       if (connectedDevices.length > 0) {
+  //         // Existem dispositivos conectados
+  //         console.log("Existem dispositivos conectados:", connectedDevices);
+  //       } else {
+  //         // Não existem dispositivos conectados
+  //         dispatch({ type: "CONNECT_DEVICE", payload: false })
+  //         dispatch({ type: "REMOVE_DEVICE" })
+  //         console.log("Não existem dispositivos conectados.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Erro ao obter dispositivos conectados:", error);
+  //     }
+  //   };
+
+  //   checkConnectedDevices();
+
+  //   // // Defina um intervalo para verificar periodicamente se há dispositivos conectados
+  //   // const interval = setInterval(checkConnectedDevices, 5000); // A cada 5 segundos
+
+  //   // return () => {
+  //   //   clearInterval(interval);
+  //   // };
+  // }, []);
+
   return (
     <BluetoothContext.Provider
       value={{
         devices: state.devices,
         connectedDevice: state.connectedDevice,
+
+        deviceResponse: state.deviceResponse,
 
         bluetoothState: state.bluetoothState,
         bluetoothEnabled: state.bluetoothEnabled,
@@ -334,11 +448,16 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         deviceIsConnected: state.deviceIsConnected,
         permissionsGranted: state.permissionsGranted,
 
-        scanForDevices,
+        setCommand,
+        resetBluetooth,
+        setServiceUUID,
+        setCharacteristicUUID,
 
-        writeCharacteristicWithResponseForDevice,
+        scanForDevices,
         connectToDevice,
         disconnectDevice,
+
+        writeCharacteristicWithResponseForDevice,
 
         requestPermissions,
         changeGrantedPermissions,

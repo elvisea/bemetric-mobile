@@ -36,7 +36,7 @@ export function ConfigureConnection() {
           title="Conexão Redes Móveis"
           onPress={() =>
             navigation.navigate("IncludeStackRoutes", {
-              screen: "MobileNetwork",
+              screen: "ConexaoRedesMoveis",
             })
           }
         />

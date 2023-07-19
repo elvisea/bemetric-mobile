@@ -3,7 +3,7 @@ import { useNavigation, DrawerActions } from "@react-navigation/native";
 import { THEME } from "@theme/theme";
 
 import { LayoutDefault } from "@components/LayoutDefault";
-import { IncludeHeader } from "@components/Include/IncludeHeader";
+import { HeaderDefault } from "@components/HeaderDefault";
 
 export function WiFi() {
   const navigation = useNavigation();
@@ -15,7 +15,7 @@ export function WiFi() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <IncludeHeader title="Conexão WIFI" />
+      <HeaderDefault title="Conexão WIFI" />
     </LayoutDefault>
   );
 }

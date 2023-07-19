@@ -20,7 +20,7 @@ import { IncludeHeader } from "@components/Include/IncludeHeader";
 import { Content, TitleHeader, Warning, Status } from "./styles";
 
 export function Bluetooth() {
-  const navigation = useNavigation();
+  const { navigate, dispatch } = useNavigation();
 
   const {
     devices,
@@ -33,7 +33,7 @@ export function Bluetooth() {
 
   const canDisplay = () => bluetoothEnabled && devices.length > 0;
 
-  const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+  const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
@@ -42,7 +42,7 @@ export function Bluetooth() {
 
   const handleChooseDevice = (device: Device) => {
     if (device.name) {
-      navigation.navigate("Manual", { id: device.id, serial: device.name });
+      navigate("VincularDispositivo", { serial: device.name });
     }
   };
 

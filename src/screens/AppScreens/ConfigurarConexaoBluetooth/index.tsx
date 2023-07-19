@@ -6,7 +6,7 @@ import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import { THEME } from "@theme/theme";
 
-export function Include() {
+export function ConfigurarConexaoBluetooth() {
   const navigation = useNavigation();
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -28,7 +28,7 @@ export function Include() {
 
       <ConnectionOption
         mt={8}
-        title="Identificar por QRcode"
+        title="Identificar QRcode"
         onPress={() =>
           navigation.navigate("IncludeStackRoutes", { screen: "QRCode" })
         }
@@ -36,10 +36,10 @@ export function Include() {
 
       <ConnectionOption
         mt={8}
-        title="Idendificação manual"
+        title="Identificar Manualmente"
         onPress={() =>
           navigation.navigate("IncludeStackRoutes", {
-            screen: "Manual",
+            screen: "VincularDispositivo",
           })
         }
       />

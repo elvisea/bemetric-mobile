@@ -11,7 +11,7 @@ import { THEME } from "@theme/theme";
 import { Equipments } from "@screens/AppScreens/Equipments";
 import { Change } from "@screens/AppScreens/Change";
 
-import { Include } from "@screens/AppScreens/Include";
+import { ConfigurarConexaoBluetooth } from "@screens/AppScreens/ConfigurarConexaoBluetooth";
 import MarkersStackRoutes from "./markers.stack.routes";
 
 const Tab = createBottomTabNavigator();
@@ -42,8 +42,8 @@ export default function HomeTabRoutes() {
         />
 
         <Tab.Screen
-          name="Include"
-          component={Include}
+          name="ConfigurarConexaoBluetooth"
+          component={ConfigurarConexaoBluetooth}
           options={{
             tabBarLabel: "Incluir",
             tabBarIcon: ({ color, size }) => (

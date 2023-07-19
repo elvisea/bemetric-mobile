@@ -46,12 +46,18 @@ export const THEME = extendTheme({
     shape: "#F3F3F3",
   },
   fonts: {
-    Roboto_700Bold: "Roboto_700Bold",
     Roboto_400Regular: "Roboto_400Regular",
     Roboto_500Medium: "Roboto_500Medium",
+    Roboto_700Bold: "Roboto_700Bold",
+
     Montserrat_300Light: "Montserrat_300Light",
     Montserrat_400Regular: "Montserrat_400Regular",
     Montserrat_600SemiBold: "Montserrat_600SemiBold",
+
+    RobotoSlab_400Regular: "RobotoSlab_400Regular",
+    RobotoSlab_500Medium: "RobotoSlab_500Medium",
+    RobotoSlab_600SemiBold: "RobotoSlab_600SemiBold",
+    RobotoSlab_700Bold: "RobotoSlab_700Bold",
   },
   fontSizes: {
     xs: 12,

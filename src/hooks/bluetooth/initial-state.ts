@@ -11,6 +11,13 @@ const initialState: AuthState = {
   bluetoothEnabled: false,
   deviceIsConnected: false,
 
+  serviceUUID: "",
+  characteristicUUID: "",
+
+  command: {},
+
+  deviceResponse: undefined,
+
   permissionsGranted: false,
 };
 
