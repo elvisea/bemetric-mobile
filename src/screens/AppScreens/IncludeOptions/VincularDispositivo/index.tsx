@@ -1,9 +1,10 @@
+import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList } from "react-native";
-import { useEffect, useState } from "react";
 
 import {
   useNavigation,
   DrawerActions,
+  useFocusEffect,
   useRoute,
 } from "@react-navigation/native";
 
@@ -15,15 +16,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 
 import { Input } from "@components/Input";
+import { schema } from "./constants/schema";
+import { inputs } from "./constants/inputs";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-
 import { useBluetooth } from "@hooks/bluetooth";
-import { processResponses } from "@hooks/processResponse";
 
 import {
   CHARACTERISTIC_UUID,
@@ -32,22 +33,30 @@ import {
 } from "@hooks/uuid";
 
 import { IFormProps, IParams } from "./interfaces";
-
-import { schema } from "./constants/schema";
 import { response } from "./constants/response";
-import { inputs } from "./constants/inputs";
 
-export function Manual() {
-  const route = useRoute();
+export function VincularDispositivo() {
   const navigation = useNavigation();
 
-  const {
-    disconnectDevice,
-    connectAndMonitorCharacteristicForDevice,
-    writeCharacteristicWithResponseForDevice,
-  } = useBluetooth();
-
+  const route = useRoute();
   const params = route.params as IParams;
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    devices,
+    deviceResponse,
+    bluetoothEnabled,
+    permissionsGranted,
+    scanForDevices,
+    resetBluetooth,
+    connectToDevice,
+    setCommand,
+    setServiceUUID,
+    setCharacteristicUUID,
+    requestPermissions,
+    changeGrantedPermissions,
+  } = useBluetooth();
 
   const {
     control,
@@ -56,30 +65,15 @@ export function Manual() {
     formState: { errors },
   } = useForm<IFormProps>({
     defaultValues: {
-      serial: params.serial,
-      chave: params.chave ? params.chave : undefined,
+      chave: params?.chave ? params.chave : undefined,
+      serial: params?.serial ? params.serial : undefined,
     },
     resolver: yupResolver(schema),
   });
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const [deviceValue, setDeviceValue] = useState<object | undefined>(undefined);
-
-  console.log("deviceValue:", deviceValue);
-
-  const onValueChange = (value: string | null | undefined) => {
-    const respostaProcessada = processResponses(value);
-    setDeviceValue(respostaProcessada);
-  };
-
-  const onError = (error: unknown) => console.error("Monitor error:", error);
-
-  const chooseAnotherDevice = async () => {
-    await disconnectDevice(params.id);
-    setDeviceValue(undefined);
-    navigation.goBack();
-  };
+  const chooseAnotherDevice = async () => resetBluetooth();
 
   async function checkAvailability() {
     try {
@@ -88,12 +82,12 @@ export function Manual() {
 
       const { data } = await api.post("AppMobile/ValidarSerialChave", {
         chave,
-        serial,
+        serial: serial.trim().toUpperCase(),
       });
 
       if (data === 0) {
         Alert.alert(
-          "Equipamento conectado.",
+          "Dispositivo liberado.",
           "Dispositivo liberado para ser associado. Continue seu cadastro.",
           [
             {
@@ -114,37 +108,49 @@ export function Manual() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  async function handleAdvance({ chave }: IFormProps) {
-    const PAYLOAD = { BT_PASSWORD: chave, GET_SERIAL_KEY: "" };
+  async function handleAdvance({ chave, serial }: IFormProps) {
+    setIsLoading(false);
 
-    await writeCharacteristicWithResponseForDevice(
-      SERVICE_UUID,
-      CHARACTERISTIC_UUID,
-      PAYLOAD
-    );
+    const name = serial.trim().toUpperCase();
+    const found = devices.find((device) => device.name === name);
+
+    if (found) {
+      const COMMAND = { BT_PASSWORD: chave.trim(), GET_SERIAL_KEY: "" };
+
+      setServiceUUID(SERVICE_UUID);
+      setCharacteristicUUID(MONITORED_FEATURE_UUID);
+
+      setTimeout(() => {
+        connectToDevice(found.id);
+      }, 1000);
+
+      setCommand(COMMAND);
+
+      setTimeout(() => {
+        setCharacteristicUUID(CHARACTERISTIC_UUID);
+      }, 3000);
+    } else {
+      setIsLoading(false);
+
+      Alert.alert(
+        "Dispositivo não encontrado.",
+        "Verifique se o Dispositivo está ligado ou se o Serial está correto e tente novamente."
+      );
+    }
   }
-
-  const disconnect = async () => {
-    await disconnectDevice(params.id);
-    setDeviceValue(undefined);
-  };
 
   useEffect(() => {
     const handleDeviceValueChange = () => {
-      if (deviceValue) {
-        if ("BTPASSWORD" in deviceValue) {
+      if (deviceResponse) {
+        if ("BTPASSWORD" in deviceResponse) {
           Alert.alert(
             "Credenciais inválidas.",
-            "Verifique se as credenciais de acesso estão corretas.",
-            [
-              {
-                text: "Tentar Novamente",
-                // onPress: () => chooseAnotherDevice(),
-              },
-            ]
+            "Verifique se as credenciais de acesso estão corretas."
           );
         } else {
           checkAvailability();
@@ -153,30 +159,22 @@ export function Manual() {
     };
 
     handleDeviceValueChange();
-  }, [deviceValue]);
+  }, [deviceResponse]);
 
-  useEffect(() => {
-    const monitorDevice = async (): Promise<unknown> => {
-      try {
-        const subscription = await connectAndMonitorCharacteristicForDevice(
-          params.id,
-          SERVICE_UUID,
-          MONITORED_FEATURE_UUID,
-          onValueChange,
-          onError
-        );
+  const requestUsagePermissions = async () => {
+    const isGranted = await requestPermissions();
+    changeGrantedPermissions(isGranted);
+  };
 
-        return () => subscription?.remove();
-      } catch (error) {
-        console.error(
-          "Error when trying to connect and monitor feature",
-          error
-        );
+  useFocusEffect(
+    useCallback(() => {
+      requestUsagePermissions();
+
+      if (permissionsGranted && bluetoothEnabled) {
+        scanForDevices();
       }
-    };
-
-    monitorDevice();
-  }, []);
+    }, [permissionsGranted, bluetoothEnabled])
+  );
 
   return (
     <LayoutDefault
@@ -195,10 +193,11 @@ export function Manual() {
           renderItem={({ item: input }) => (
             <>
               <Text
-                color="blue.700"
-                fontFamily="Roboto_400Regular"
-                fontSize="13px"
                 mt={`${RFValue(16)}px`}
+                color="blue.700"
+                fontSize={`${RFValue(13)}px`}
+                fontFamily="Roboto_400Regular"
+                marginBottom={`${RFValue(8)}px`}
               >
                 {input.title}
               </Text>
@@ -208,11 +207,12 @@ export function Manual() {
                 name={input.name}
                 render={({ field: { onChange, value } }) => (
                   <Input
+                    py={0}
                     borderBottomColor="blue.700"
                     _input={{
                       color: "#333333",
-                      fontSize: "14px",
-                      fontFamily: "Roboto_500Medium",
+                      fontSize: "16px",
+                      fontFamily: "Roboto_400Regular",
                     }}
                     value={value}
                     onChangeText={onChange}
@@ -226,8 +226,11 @@ export function Manual() {
         />
       </VStack>
 
-      <ButtonFull title="Desconectar" onPress={disconnect} />
-      <ButtonFull title="AVANÇAR" onPress={handleSubmit(handleAdvance)} />
+      <ButtonFull
+        title="Avançar"
+        isLoading={isLoading}
+        onPress={handleSubmit(handleAdvance)}
+      />
     </LayoutDefault>
   );
 }

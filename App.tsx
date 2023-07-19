@@ -13,6 +13,13 @@ import {
 } from "@expo-google-fonts/roboto";
 
 import {
+  RobotoSlab_400Regular,
+  RobotoSlab_500Medium,
+  RobotoSlab_600SemiBold,
+  RobotoSlab_700Bold,
+} from "@expo-google-fonts/roboto-slab";
+
+import {
   Montserrat_400Regular,
   Montserrat_600SemiBold,
   Montserrat_300Light,
@@ -35,6 +42,10 @@ export default function App() {
     Roboto_500Medium,
     Roboto_700Bold,
     Roboto_400Regular,
+    RobotoSlab_400Regular,
+    RobotoSlab_500Medium,
+    RobotoSlab_600SemiBold,
+    RobotoSlab_700Bold,
   });
 
   return (

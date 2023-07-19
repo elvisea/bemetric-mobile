@@ -21,8 +21,6 @@ export const CustomerContext = createContext<CustomerContextData>({
 const CustomerProvider = ({ children }: CustomerProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("Customer:", state);
-
   const addCustomer = async (customer: ICustomer) => {
     dispatch({ type: "SET_CUSTOMER", payload: customer });
     await storageCustomerSave(customer);

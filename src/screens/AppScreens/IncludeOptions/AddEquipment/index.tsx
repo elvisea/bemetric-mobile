@@ -346,11 +346,11 @@ export function AddEquipment() {
               renderItem={({ item: input }) => (
                 <>
                   <Text
-                    mt={`${RFValue(24)}px`}
+                    mt={`${RFValue(16)}px`}
                     color="blue.700"
-                    fontSize="13px"
-                    marginBottom="12px"
+                    fontSize={`${RFValue(13)}px`}
                     fontFamily="Roboto_400Regular"
+                    marginBottom={`${RFValue(8)}px`}
                   >
                     {input.title}
                   </Text>
@@ -361,7 +361,6 @@ export function AddEquipment() {
                     render={({ field: { onChange, value } }) => (
                       <Input
                         py={0}
-                        keyboardType={input.keyboardType}
                         borderBottomColor="blue.700"
                         _input={{
                           color: "#333333",
@@ -370,6 +369,7 @@ export function AddEquipment() {
                         }}
                         value={value}
                         onChangeText={onChange}
+                        keyboardType={input.keyboardType}
                         errorMessage={errors[input.name]?.message}
                       />
                     )}

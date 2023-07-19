@@ -92,8 +92,18 @@ export declare global {
         params: { codigoEquipamento: number };
       };
 
+      VincularDispositivo: {
+        id?: string;
+        chave?: string;
+        serial: string;
+      };
+
       IncludeStackRoutes: {
         screen: string;
+        params?: {
+          chave?: string;
+          serial?: string;
+        };
       };
 
       Equipamentos: undefined;
@@ -105,12 +115,6 @@ export declare global {
       MessageDetails: {
         tipoMensagem: number;
         codigoMensagem: number;
-      };
-
-      Manual: {
-        id: string;
-        chave?: string;
-        serial: string;
       };
 
       ConfigureConnection: undefined;

@@ -4,9 +4,9 @@ interface IFormProps {
 }
 
 interface IParams {
-  id: string;
+  id?: string;
   chave?: string;
-  serial: string;
+  serial?: string;
 }
 
 export { IFormProps, IParams };

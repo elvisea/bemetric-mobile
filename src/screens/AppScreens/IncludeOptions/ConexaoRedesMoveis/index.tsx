@@ -18,17 +18,14 @@ import { inputs } from "./constants/inputs";
 import { schema } from "./constants/schema";
 
 interface IForm {
-  nome: string;
+  ponto: string;
+  usuario: string;
   senha: string;
 }
 
-export function ManualConnection() {
+export function ConexaoRedesMoveis() {
   const navigation = useNavigation();
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
-
-  const handleNextPage = async (data: IForm) => {
-    console.log(data);
-  };
 
   const {
     control,
@@ -38,15 +35,19 @@ export function ManualConnection() {
     resolver: yupResolver(schema),
   });
 
+  const handleNextPage = async (data: IForm) => {
+    console.log(data);
+  };
+
   return (
     <LayoutDefault
       bg={THEME.colors.shape}
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <HeaderDefault title="Conexão WIFI" />
+      <HeaderDefault title="Conexão Redes Móveis" />
 
-      <VStack flex={1} w="full" p="16px">
+      <VStack flex={1} w="full" paddingX="16px">
         <FlatList
           data={inputs}
           style={{ width: "100%" }}
@@ -88,7 +89,7 @@ export function ManualConnection() {
         />
       </VStack>
 
-      <ButtonFull title="AVANÇAR" onPress={handleSubmit(handleNextPage)} />
+      <ButtonFull title="Salvar" onPress={handleSubmit(handleNextPage)} />
     </LayoutDefault>
   );
 }

@@ -12,15 +12,12 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 export function QRCode() {
-  const navigation = useNavigation();
-  const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+  const { navigate, dispatch } = useNavigation();
+  const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
   const {
-    devices,
-    bluetoothEnabled,
     permissionsGranted,
 
-    scanForDevices,
     requestPermissions,
     changeGrantedPermissions,
   } = useBluetooth();
@@ -38,20 +35,10 @@ export function QRCode() {
     setHasPermission(status === "granted");
   };
 
-  const checkAvailability = (data: string) => {
-    const chave = data.split(":")[1];
-    const serial = data.split(":")[0];
-
-    const scannedDevice = devices.find((device) => device.name === serial);
-
-    if (scannedDevice) {
-      setScanned(false);
-      navigation.navigate("Manual", { id: scannedDevice.id, chave, serial });
-    }
-  };
-
   const handleBarCodeScanned = ({ data }: BarCodeScannerResult) => {
     setScanned(true);
+
+    const [serial, chave] = data.split(":");
 
     Alert.alert(
       "Leitura realizada com sucesso.",
@@ -59,7 +46,7 @@ export function QRCode() {
       [
         {
           text: "Verificar",
-          onPress: () => checkAvailability(data),
+          onPress: () => navigate("VincularDispositivo", { serial, chave }),
         },
       ]
     );
@@ -69,10 +56,6 @@ export function QRCode() {
     !permissionsGranted && requestUsagePermissions();
     permissionsGranted && getBarCodeScannerPermissions();
   }, [permissionsGranted]);
-
-  useEffect(() => {
-    if (permissionsGranted && bluetoothEnabled) scanForDevices();
-  }, [permissionsGranted, bluetoothEnabled]);
 
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
