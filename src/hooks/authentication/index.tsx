@@ -37,8 +37,6 @@ export const AuthContext = createContext<AuthContextData>({
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("state user 😀", state);
-
   const loadUserFromStorage = async () => {
     const userFromStorage = await storageUserGet();
     if (userFromStorage) {

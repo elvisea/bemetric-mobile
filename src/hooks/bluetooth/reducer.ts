@@ -1,3 +1,4 @@
+import { initialState } from "./initial-state";
 import { AuthAction, AuthState } from "./types";
 
 const reducer = (state: AuthState, action: AuthAction): AuthState => {
@@ -50,46 +51,16 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
         permissionsGranted: action.payload,
       };
 
-    case "SET_DEVICE_RESPONSE":
+    case "INCLUDE_RETURN_Value":
       return {
         ...state,
-        deviceResponse: action.payload,
+        returnedValues: [...state.returnedValues, action.payload],
       };
 
-    case "RESET_DEVICE_RESPONSE":
+    case "RESET_RETURN_VALUES":
       return {
         ...state,
-        deviceResponse: undefined,
-      };
-
-    case "SET_SERVICE_UUID":
-      return {
-        ...state,
-        serviceUUID: action.payload,
-      };
-
-    case "RESET_SERVICE_UUID":
-      return {
-        ...state,
-        serviceUUID: "",
-      };
-
-    case "SET_CHARACTERISTIC_UUID":
-      return {
-        ...state,
-        characteristicUUID: action.payload,
-      };
-
-    case "RESET_CHARACTERISTIC_UUID":
-      return {
-        ...state,
-        characteristicUUID: "",
-      };
-
-    case "SET_COMMAND":
-      return {
-        ...state,
-        command: action.payload,
+        returnedValues: [],
       };
 
     case "RESET_BLUETOOTH":
@@ -97,9 +68,10 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         connectedDevice: null,
         deviceIsConnected: false,
-        deviceResponse: undefined,
-        command: {},
       };
+
+    case "RESET_TOTAL":
+      return (state = initialState);
 
     default:
       return state;

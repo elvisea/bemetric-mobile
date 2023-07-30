@@ -7,11 +7,11 @@ import { THEME } from "@theme/theme";
 import { Bluetooth } from "@screens/AppScreens/IncludeOptions/Bluetooth";
 import { QRCode } from "@screens/AppScreens/IncludeOptions/QRCode";
 import { SuccessfullyConnected } from "@screens/AppScreens/IncludeOptions/SuccessfullyConnected";
-import { ConfigureConnection } from "@screens/AppScreens/IncludeOptions/ConfigureConnection";
-import { WiFi } from "@screens/AppScreens/IncludeOptions/WiFi";
+import { ConfigurarConexaoDados } from "@screens/AppScreens/IncludeOptions/ConfigurarConexaoDados";
+import { ListaRedes } from "@screens/AppScreens/IncludeOptions/ListaRedes";
 import { ConexaoRedesMoveis } from "@screens/AppScreens/IncludeOptions/ConexaoRedesMoveis";
-import { ManualConnection } from "@screens/AppScreens/IncludeOptions/ManualConnection";
-import { ChooseEquipment } from "@screens/AppScreens/IncludeOptions/ChooseEquipment";
+import { ConexaoManual } from "@screens/AppScreens/IncludeOptions/ConexaoManual";
+import { EquipamentosDisponiveis } from "@screens/AppScreens/IncludeOptions/EquipamentosDisponiveis";
 import { AddEquipment } from "@screens/AppScreens/IncludeOptions/AddEquipment";
 import { VincularDispositivo } from "@screens/AppScreens/IncludeOptions/VincularDispositivo";
 
@@ -33,15 +33,21 @@ export default function IncludeStackRoutes() {
           component={SuccessfullyConnected}
         />
 
-        <Screen name="ConfigureConnection" component={ConfigureConnection} />
+        <Screen
+          name="ConfigurarConexaoDados"
+          component={ConfigurarConexaoDados}
+        />
 
-        <Screen name="WiFi" component={WiFi} />
+        <Screen name="ListaRedes" component={ListaRedes} />
 
         <Screen name="ConexaoRedesMoveis" component={ConexaoRedesMoveis} />
 
-        <Screen name="ManualConnection" component={ManualConnection} />
+        <Screen name="ConexaoManual" component={ConexaoManual} />
 
-        <Screen name="ChooseEquipment" component={ChooseEquipment} />
+        <Screen
+          name="EquipamentosDisponiveis"
+          component={EquipamentosDisponiveis}
+        />
 
         <Screen name="AddEquipment" component={AddEquipment} />
       </Navigator>

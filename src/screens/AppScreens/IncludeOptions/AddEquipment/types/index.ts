@@ -1,4 +1,4 @@
-type ITypeForm = {
+type TypeForm = {
   equipmentName: string;
   equipmentIdentifier: string;
   equipmentModel: string;
@@ -11,7 +11,7 @@ type ITypeForm = {
   initialOdometer: string;
 };
 
-type IGrouping = {
+type TypeGrouping = {
   codigoAgrupamento?: number;
   nomeAgrupamento: string;
   nomeCliente?: string;
@@ -19,8 +19,10 @@ type IGrouping = {
   criadoEmFormatado?: string;
 };
 
-type ITypesEquipment = {
+type TypeEquipment = {
   tipoEquipamento: string;
 };
 
-export { ITypeForm, IGrouping, ITypesEquipment };
+type Typeparams = { chave: string; serial: string };
+
+export { TypeForm, TypeGrouping, TypeEquipment, Typeparams };

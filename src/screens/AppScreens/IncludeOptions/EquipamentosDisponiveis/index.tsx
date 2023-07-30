@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Alert, FlatList } from "react-native";
 
 import {
+  useRoute,
   useNavigation,
   DrawerActions,
   useFocusEffect,
@@ -13,6 +14,7 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { useCustomer } from "@hooks/customer";
+import { useBluetooth } from "@hooks/bluetooth";
 
 import { IEquipment } from "./types";
 import { ListTitle } from "./styles";
@@ -23,9 +25,14 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { EquipmentCard } from "@components/EquipmentCard";
 
-export function ChooseEquipment() {
+export function EquipamentosDisponiveis() {
   const { customer } = useCustomer();
   const { navigate, dispatch } = useNavigation();
+
+  const { connectedDevice } = useBluetooth();
+
+  const route = useRoute();
+  const params = route.params as { chave: string };
 
   const [equipment, setEquipment] = useState<IEquipment[]>([]);
   const [selected, setSelected] = useState<IEquipment | null>(null);
@@ -44,7 +51,10 @@ export function ChooseEquipment() {
     if (selected) {
       navigate("ChooseGrouping");
     } else {
-      navigate("AddEquipment");
+      navigate("AddEquipment", {
+        chave: params.chave,
+        serial: connectedDevice?.name || "",
+      });
     }
   };
 
@@ -62,11 +72,11 @@ export function ChooseEquipment() {
         modeloEquipamento: selected?.modelo,
         placaEquipamento: selected?.placa,
         anoEquipamento: selected?.ano,
-        serialDispositivo: "B2K-CD-B2CC30",
-        chaveDispositivo: "332428",
-        horimetroIncialEquipamento: selected.horimetroIncial,
-        hodometroIncialEquipamento: selected.hodometroIncial,
-        dataAquisicaoEquipamento: selected.dataAquisicao,
+        serialDispositivo: connectedDevice && connectedDevice.name,
+        chaveDispositivo: params.chave,
+        horimetroIncialEquipamento: selected?.horimetroIncial,
+        hodometroIncialEquipamento: selected?.hodometroIncial,
+        dataAquisicaoEquipamento: selected?.dataAquisicao,
 
         codigoAgrupamento: 0, // APENAS se estiver SELECIONANDO o Agrupamento. Se nao 0
         nomeAgrupamento: "", // APENAS na INCLUSÃO de Agrupamento.

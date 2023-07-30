@@ -13,9 +13,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
 
+import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { DeviceBluetooth } from "@components/DeviceBluetooth";
-import { IncludeHeader } from "@components/Include/IncludeHeader";
 
 import { Content, TitleHeader, Warning, Status } from "./styles";
 
@@ -62,7 +62,7 @@ export function Bluetooth() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <IncludeHeader title="Bluetooth" />
+      <HeaderDefault title="Bluetooth" />
 
       {!bluetoothEnabled && (
         <Content>

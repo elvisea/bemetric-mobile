@@ -103,6 +103,7 @@ export declare global {
         params?: {
           chave?: string;
           serial?: string;
+          network?: string | undefined;
         };
       };
 
@@ -117,11 +118,34 @@ export declare global {
         codigoMensagem: number;
       };
 
-      ConfigureConnection: undefined;
+      EquipamentosDisponiveis: {
+        chave: string;
+      };
 
-      ChooseEquipment: undefined;
+      ConfigurarConexaoDados: {
+        chave: string;
+      };
+
+      ListaRedes: {
+        chave: string;
+      };
+
+      ConexaoRedesMoveis: {
+        chave: string;
+      };
+
+      ConexaoManual: {
+        chave: string;
+        nomeRede?: string;
+      };
+
       ChooseGrouping: undefined;
-      AddEquipment: undefined;
+
+      AddEquipment: {
+        chave: string;
+        serial: string;
+      };
+
       AddGrouping: undefined;
 
       ChangePassword: undefined;
