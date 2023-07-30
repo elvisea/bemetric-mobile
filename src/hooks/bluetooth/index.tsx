@@ -17,7 +17,13 @@ import { reducer } from "./reducer";
 import { initialState } from "./initial-state";
 import { BluetoothContextData, BluetoothProviderProps } from "./types";
 
-import { processResponses } from "@hooks/processResponse";
+import {
+  SERVICE_UUID,
+  CHARACTERISTIC_UUID,
+  MONITORED_FEATURE_UUID,
+} from "@hooks/uuid";
+
+import { removeBytes } from "@utils/removebytes";
 
 export const BluetoothContext = createContext<BluetoothContextData>(
   {} as BluetoothContextData
@@ -30,7 +36,7 @@ const HEADER = [0x4d, 0x00, 0x00, 0x2c];
 const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("state bluetooth 👹", state);
+  console.log("State Bluetooth =>", state);
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -145,7 +151,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     command: object
   ) => {
     if (state.connectedDevice) {
-      console.log("Device is connected and can write to a feature");
+      console.log("Device is connected and can write to a feature 👍");
 
       try {
         const discovered =
@@ -187,103 +193,27 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         const valueBase64 = concatenatedBuffer.toString("base64");
 
         await characteristic.writeWithResponse(valueBase64);
+
+        console.log("Successfully written ✅");
       } catch (error) {
-        console.error("Failed when trying to write", error);
+        console.error("Failed when trying to write ❌", error);
       }
     }
 
-    console.log("Device is not connected and cannot write to a feature");
+    console.log("Device is not connected and cannot write to a feature ❌");
   };
 
   const monitorCharacteristicForDevice = async (
-    serviceUUID: string,
-    characteristicUUID: string,
-    onValueChange: (value: string | null | undefined) => void,
-    onError: (error: BleError | null | unknown) => void
-  ): Promise<Subscription | undefined> => {
-    if (state.connectedDevice) {
-      console.log("Device is connected and can monitor features");
-      try {
-        const discovered =
-          await state.connectedDevice.discoverAllServicesAndCharacteristics();
-
-        const services = await discovered.services();
-
-        const service = services.find(
-          (service) => service.uuid === serviceUUID
-        );
-
-        if (!service) {
-          return;
-        }
-
-        const characteristics = await service.characteristics();
-
-        const characteristic = characteristics.find(
-          (item) => item.uuid === characteristicUUID
-        );
-
-        if (!characteristic) {
-          return;
-        }
-
-        const subscription = characteristic.monitor((error, characteristic) => {
-          if (error) {
-            onError(error);
-          } else if (characteristic?.value) {
-            onValueChange(characteristic.value);
-          }
-        });
-
-        return subscription;
-      } catch (error) {
-        onError(error);
-      }
-    }
-
-    console.log("Device is not connected and cannot monitor features");
-  };
-
-  const connectToDevice = async (id: string) => {
-    if (state.deviceIsConnected) {
-      return console.error("Device is already connected");
-    }
-
-    try {
-      const dispositivoConectado = await manager.connectToDevice(id, {
-        requestMTU: 500,
-      });
-
-      dispatch({ type: "CONNECT_DEVICE", payload: true });
-      dispatch({ type: "SET_DEVICE", payload: dispositivoConectado });
-    } catch (error) {
-      console.error("Failed when trying to connect:", error);
-    }
-  };
-
-  const connectDevice = async (id: string): Promise<Device> => {
-    const dispositivoConectado = await manager.connectToDevice(id, {
-      requestMTU: 500,
-    });
-
-    dispatch({ type: "CONNECT_DEVICE", payload: true });
-    dispatch({ type: "SET_DEVICE", payload: dispositivoConectado });
-
-    return dispositivoConectado;
-  };
-
-  const connectAndMonitorCharacteristicForDevice = async (
-    id: string,
+    device: Device,
     serviceUUID: string,
     characteristicUUID: string,
     onValueChange: (value: string | null | undefined) => void,
     onError: (error: BleError | null | unknown) => void
   ): Promise<Subscription | undefined> => {
     try {
-      const dispositivo = await connectDevice(id);
+      console.log("Discover all services and features 🔎...");
 
-      const discovered =
-        await dispositivo.discoverAllServicesAndCharacteristics();
+      const discovered = await device.discoverAllServicesAndCharacteristics();
 
       const services = await discovered.services();
 
@@ -292,6 +222,8 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
       if (!service) {
         return;
       }
+
+      console.log("Service found 👷");
 
       const characteristics = await service.characteristics();
 
@@ -303,6 +235,8 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         return;
       }
 
+      console.log("Characteristic found 👷");
+
       const subscription = characteristic.monitor((error, characteristic) => {
         if (error) {
           onError(error);
@@ -311,39 +245,102 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         }
       });
 
+      console.log("Subscription ✅");
+
       return subscription;
     } catch (error) {
       onError(error);
     }
   };
 
-  const setServiceUUID = (serviceUUID: string) => {
-    dispatch({ type: "SET_SERVICE_UUID", payload: serviceUUID });
-  };
+  const writeCharacteristicWithResponseForService = async (
+    device: Device,
+    command: object
+  ) => {
+    console.log("Write Characteristic With Response For Service 🖊...");
 
-  const resetServiceUUID = () => {
-    dispatch({ type: "RESET_SERVICE_UUID" });
-  };
+    dispatch({ type: "RESET_RETURN_VALUES" });
 
-  const setCharacteristicUUID = (characteristicUUID: string) => {
-    dispatch({ type: "SET_CHARACTERISTIC_UUID", payload: characteristicUUID });
-  };
+    let commandString = JSON.stringify(command);
 
-  const resetCharacteristicUUID = () => {
-    dispatch({ type: "RESET_CHARACTERISTIC_UUID" });
-  };
+    const commandBuffer = Buffer.from(commandString);
 
-  const setCommand = (command: object) => {
-    dispatch({ type: "SET_COMMAND", payload: command });
+    const size = commandString.length;
+
+    HEADER[3] = size;
+
+    const concatenatedBuffer = Buffer.concat([
+      Buffer.from(HEADER),
+      commandBuffer,
+    ]);
+
+    const valueBase64 = concatenatedBuffer.toString("base64");
+
+    const characteristic =
+      await device.writeCharacteristicWithResponseForService(
+        SERVICE_UUID,
+        CHARACTERISTIC_UUID,
+        valueBase64
+      );
+
+    return characteristic;
   };
 
   const onValueChange = (value: string | null | undefined) => {
-    const response = processResponses(value);
-    dispatch({ type: "SET_DEVICE_RESPONSE", payload: response });
+    if (value) {
+      const bytesRemovidos = removeBytes(value);
+      const valueAlreadyExists = state.returnedValues.includes(bytesRemovidos);
+
+      if (!valueAlreadyExists) {
+        dispatch({ type: "INCLUDE_RETURN_Value", payload: bytesRemovidos });
+      }
+    }
   };
 
   const onError = (error: BleError | null | unknown) => {
     console.error("Error when trying to monitor feature.", error);
+  };
+
+  const connectToDevice = async (id: string) => {
+    try {
+      dispatch({ type: "RESET_RETURN_VALUES" });
+
+      const connected = await manager.connectToDevice(id, {
+        requestMTU: 500,
+      });
+
+      monitorCharacteristicForDevice(
+        connected,
+        SERVICE_UUID,
+        MONITORED_FEATURE_UUID,
+        onValueChange,
+        onError
+      );
+
+      dispatch({ type: "CONNECT_DEVICE", payload: true });
+      dispatch({ type: "SET_DEVICE", payload: connected });
+    } catch (error) {
+      console.error("Failed when trying to connect:", error);
+    }
+  };
+
+  const resetReturnValues = () => {
+    dispatch({ type: "RESET_RETURN_VALUES" });
+  };
+
+  const isDeviceConnected = async (id: string) => {
+    return await manager.isDeviceConnected(id);
+  };
+
+  const checkConnectedDevices = async () => {
+    const connectedDevices = await manager.connectedDevices([]);
+    if (connectedDevices.length > 0) {
+      console.log("There are connected devices");
+      return true;
+    } else {
+      console.log("No devices connected");
+      return false;
+    }
   };
 
   const resetBluetooth = async () => {
@@ -352,6 +349,14 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     }
 
     dispatch({ type: "RESET_BLUETOOTH" });
+  };
+
+  const resetTotal = async () => {
+    if (state.connectedDevice) {
+      await disconnectDevice(state.connectedDevice.id);
+      dispatch({ type: "RESET_TOTAL" });
+    }
+    dispatch({ type: "RESET_TOTAL" });
   };
 
   useEffect(() => {
@@ -368,79 +373,11 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     };
   }, []);
 
-  useEffect(() => {
-    let subscription: Subscription | undefined;
-
-    const monitorDevice = async () => {
-      if (subscription) {
-        subscription.remove();
-      }
-
-      subscription = await monitorCharacteristicForDevice(
-        state.serviceUUID,
-        state.characteristicUUID,
-        onValueChange,
-        onError
-      );
-    };
-
-    monitorDevice();
-
-    return () => {
-      if (subscription) {
-        subscription.remove();
-      }
-    };
-  }, [state.connectedDevice]);
-
-  useEffect(() => {
-    const writeCharacteristic = async () => {
-      await writeCharacteristicWithResponseForDevice(
-        state.serviceUUID,
-        state.characteristicUUID,
-        state.command
-      );
-    };
-
-    writeCharacteristic();
-  }, [state.serviceUUID, state.characteristicUUID, state.command]);
-
-  // useEffect(() => {
-  //   const checkConnectedDevices = async () => {
-  //     try {
-  //       const connectedDevices = await manager.connectedDevices([]);
-
-  //       if (connectedDevices.length > 0) {
-  //         // Existem dispositivos conectados
-  //         console.log("Existem dispositivos conectados:", connectedDevices);
-  //       } else {
-  //         // Não existem dispositivos conectados
-  //         dispatch({ type: "CONNECT_DEVICE", payload: false })
-  //         dispatch({ type: "REMOVE_DEVICE" })
-  //         console.log("Não existem dispositivos conectados.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Erro ao obter dispositivos conectados:", error);
-  //     }
-  //   };
-
-  //   checkConnectedDevices();
-
-  //   // // Defina um intervalo para verificar periodicamente se há dispositivos conectados
-  //   // const interval = setInterval(checkConnectedDevices, 5000); // A cada 5 segundos
-
-  //   // return () => {
-  //   //   clearInterval(interval);
-  //   // };
-  // }, []);
-
   return (
     <BluetoothContext.Provider
       value={{
         devices: state.devices,
         connectedDevice: state.connectedDevice,
-
-        deviceResponse: state.deviceResponse,
 
         bluetoothState: state.bluetoothState,
         bluetoothEnabled: state.bluetoothEnabled,
@@ -448,10 +385,16 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         deviceIsConnected: state.deviceIsConnected,
         permissionsGranted: state.permissionsGranted,
 
-        setCommand,
+        returnedValues: state.returnedValues,
+
+        writeCharacteristicWithResponseForService,
+        resetReturnValues,
+
+        resetTotal,
         resetBluetooth,
-        setServiceUUID,
-        setCharacteristicUUID,
+
+        isDeviceConnected,
+        checkConnectedDevices,
 
         scanForDevices,
         connectToDevice,
@@ -463,7 +406,6 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         changeGrantedPermissions,
 
         monitorCharacteristicForDevice,
-        connectAndMonitorCharacteristicForDevice,
       }}
     >
       {children}

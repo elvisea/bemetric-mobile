@@ -1,3 +1,4 @@
+import { THEME } from "@theme/theme";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -18,6 +19,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 16,
+  },
+
+  buttonDate: {
+    width: "100%",
+    borderBottomColor: THEME.colors.blue[700],
+    borderBottomWidth: 1,
   },
 });
 

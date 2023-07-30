@@ -1,11 +1,17 @@
 import { ReactNode } from "react";
-import { BleError, Device, State, Subscription } from "react-native-ble-plx";
+import {
+  BleError,
+  Characteristic,
+  Device,
+  State,
+  Subscription,
+} from "react-native-ble-plx";
 
 type BluetoothContextData = {
   devices: Device[];
   connectedDevice: Device | null;
 
-  deviceResponse: object | null | undefined;
+  returnedValues: string[];
 
   bluetoothState: State;
 
@@ -14,13 +20,18 @@ type BluetoothContextData = {
 
   permissionsGranted: boolean;
 
-  setServiceUUID(serviceUUID: string): void;
+  resetReturnValues(): void;
 
-  setCharacteristicUUID(characteristicUUID: string): void;
+  writeCharacteristicWithResponseForService(
+    device: Device,
+    command: object
+  ): Promise<Characteristic | undefined>;
 
-  setCommand(command: object): void;
+  resetTotal(): Promise<void>;
+  resetBluetooth(): Promise<void>;
 
-  resetBluetooth(): void;
+  isDeviceConnected(id: string): Promise<boolean>;
+  checkConnectedDevices(): Promise<boolean>;
 
   scanForDevices(): void;
 
@@ -39,14 +50,7 @@ type BluetoothContextData = {
   ): Promise<void>;
 
   monitorCharacteristicForDevice(
-    serviceUUID: string,
-    characteristicUUID: string,
-    onValueChange: (value: string | null | undefined) => void,
-    onError: (error: BleError | null | unknown) => void
-  ): Promise<Subscription | undefined>;
-
-  connectAndMonitorCharacteristicForDevice(
-    id: string,
+    device: Device,
     serviceUUID: string,
     characteristicUUID: string,
     onValueChange: (value: string | null | undefined) => void,
@@ -62,18 +66,13 @@ type AuthState = {
   devices: Device[];
   connectedDevice: Device | null;
 
-  serviceUUID: string;
-  characteristicUUID: string;
-
-  command: object;
-
-  deviceResponse: object | null | undefined;
-
   bluetoothState: State;
 
   bluetoothEnabled: boolean;
   deviceIsConnected: boolean;
   permissionsGranted: boolean;
+
+  returnedValues: string[];
 };
 
 type AuthAction =
@@ -84,14 +83,10 @@ type AuthAction =
   | { type: "CONNECT_DEVICE"; payload: boolean }
   | { type: "BLUETOOTH_STATE"; payload: State }
   | { type: "ENABLE_BLUETOOTH"; payload: boolean }
-  | { type: "SET_DEVICE_RESPONSE"; payload: object | undefined }
-  | { type: "RESET_DEVICE_RESPONSE" }
-  | { type: "SET_SERVICE_UUID"; payload: string }
-  | { type: "RESET_SERVICE_UUID" }
-  | { type: "SET_CHARACTERISTIC_UUID"; payload: string }
-  | { type: "RESET_CHARACTERISTIC_UUID" }
-  | { type: "SET_COMMAND"; payload: object }
   | { type: "RESET_BLUETOOTH" }
+  | { type: "RESET_TOTAL" }
+  | { type: "INCLUDE_RETURN_Value"; payload: string }
+  | { type: "RESET_RETURN_VALUES" }
   | { type: "PERMISSIONS_GRANTED"; payload: boolean };
 
 export { BluetoothContextData, BluetoothProviderProps, AuthState, AuthAction };

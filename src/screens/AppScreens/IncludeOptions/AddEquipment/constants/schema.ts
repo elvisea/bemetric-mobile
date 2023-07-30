@@ -10,7 +10,6 @@ const schema = yup.object({
   devicekey: yup.string().required("Informe o seguinte campo"),
   initialHourMeter: yup.number().required("Informe o seguinte campo"),
   initialOdometer: yup.number().required("Informe o seguinte campo"),
-  acquisitionDate: yup.string().required("Informe o seguinte campo"),
 });
 
 export { schema };

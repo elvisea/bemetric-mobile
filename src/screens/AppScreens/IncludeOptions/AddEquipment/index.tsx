@@ -1,8 +1,9 @@
-import { Alert, FlatList, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, TouchableOpacity, View } from "react-native";
 
 import { useCallback, useState } from "react";
 
 import {
+  useRoute,
   useNavigation,
   DrawerActions,
   useFocusEffect,
@@ -12,6 +13,8 @@ import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ScrollView, Select, Text, VStack } from "native-base";
+
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
@@ -35,35 +38,52 @@ import { inputs } from "./constants/inputs";
 import { schema } from "./constants/schema";
 import { response } from "./constants/response";
 
-import { IGrouping, ITypeForm, ITypesEquipment } from "./types";
+import { TypeGrouping, TypeForm, TypeEquipment, Typeparams } from "./types";
+import { formatDate } from "@utils/formatDate";
 
 export function AddEquipment() {
+  const { user } = useAuth();
+  const { customer } = useCustomer();
+
+  const navigation = useNavigation();
+
+  const route = useRoute();
+  const params = route.params as Typeparams;
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ITypeForm>({
+  } = useForm<TypeForm>({
+    defaultValues: { deviceSerial: params.serial, devicekey: params.chave },
     resolver: yupResolver(schema),
   });
 
-  const navigation = useNavigation();
-
-  const { user } = useAuth();
-  const { customer } = useCustomer();
-
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [selectDate, setSelectDate] = useState(false);
 
-  const [groupings, setGroupings] = useState<IGrouping[]>([]);
-  const [typesEquipment, setTypesEquipment] = useState<ITypesEquipment[]>([]);
+  const [acquisitionDate, setAcquisitionDate] = useState<Date>(new Date());
+
+  const [groupings, setGroupings] = useState<TypeGrouping[]>([]);
+  const [typesEquipment, setTypesEquipment] = useState<TypeEquipment[]>([]);
 
   const [newGrouping, setNewGrouping] = useState("");
   const [typeSelected, setTypeSelected] = useState("");
 
-  const [selectedGrouping, setSelectedGrouping] = useState<IGrouping>(
-    {} as IGrouping
+  const [selectedGrouping, setSelectedGrouping] = useState<TypeGrouping>(
+    {} as TypeGrouping
   );
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+
+  const handleSelectAcquisitionDate = useCallback(
+    (_event: unknown, date: Date | undefined) => {
+      if (Platform.OS === "android") setSelectDate(false);
+
+      if (date) setAcquisitionDate(date);
+    },
+    [selectDate]
+  );
 
   const fetchGrouping = async () => {
     try {
@@ -108,7 +128,7 @@ export function AddEquipment() {
 
     setSelectedGrouping({
       nomeAgrupamento: newGrouping,
-      codigoAgrupamento: 200,
+      codigoAgrupamento: Math.floor(Math.random() * 1000),
     });
   };
 
@@ -124,7 +144,7 @@ export function AddEquipment() {
     if (selectedType) setTypeSelected(selectedType.tipoEquipamento);
   };
 
-  async function handleSaveEquipment(form: ITypeForm) {
+  async function handleSaveEquipment(form: TypeForm) {
     try {
       const { data } = await api.post("/AppMobile/Gravar", {
         codigoCliente: customer?.codigoCliente,
@@ -141,7 +161,7 @@ export function AddEquipment() {
         chaveDispositivo: form.devicekey,
         horimetroIncialEquipamento: Number(form.initialHourMeter),
         hodometroIncialEquipamento: Number(form.initialOdometer),
-        dataAquisicaoEquipamento: "2023-06-28T14:00",
+        dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
 
         codigoAgrupamento:
           newGrouping === "" ? 0 : selectedGrouping.codigoAgrupamento, // APENAS se estiver SELECIONANDO o Agrupamento. Se nao 0
@@ -200,7 +220,7 @@ export function AddEquipment() {
           _focus={{ borderColor: "blue.700", bg: "white" }}
           variant="outline"
           placeholder="Nome"
-          fontSize="14px"
+          fontSize={`${RFValue(14)}px`}
           borderBottomColor="blue.700"
           placeholderTextColor={"blue.700"}
         />
@@ -233,7 +253,7 @@ export function AddEquipment() {
       >
         <HeaderDefault title="Adicionar Equipamento" />
 
-        <ScrollView w="full">
+        <ScrollView w="full" showsVerticalScrollIndicator={false}>
           <VStack
             flex={1}
             w="full"
@@ -243,7 +263,7 @@ export function AddEquipment() {
             <Text
               color="blue.700"
               fontFamily="Roboto_400Regular"
-              fontSize={`${RFValue(13)}px`}
+              fontSize={`${RFValue(14)}px`}
               marginBottom={`${RFValue(12)}px`}
             >
               Escolher Agrupamento
@@ -255,7 +275,7 @@ export function AddEquipment() {
                 h={`${RFValue(30)}px`}
                 minWidth="84%"
                 accessibilityLabel="Escolher agrupamento"
-                fontSize={`${RFValue(16)}px`}
+                fontSize={`${RFValue(14)}px`}
                 fontFamily={THEME.fonts.Roboto_400Regular}
                 color={"#333333"}
                 dropdownIcon={
@@ -273,9 +293,9 @@ export function AddEquipment() {
                 onValueChange={(selected) => handleSelectGrouping(selected)}
               >
                 {typesEquipment.length > 0 &&
-                  groupings.map((grouping) => (
+                  groupings.map((grouping, index) => (
                     <Select.Item
-                      key={grouping.codigoAgrupamento}
+                      key={`${index}-${grouping.codigoAgrupamento}-${grouping.nomeAgrupamento}`}
                       alignItems="center"
                       value={grouping.nomeAgrupamento.toString()}
                       label={grouping.nomeAgrupamento}
@@ -296,9 +316,9 @@ export function AddEquipment() {
             </View>
 
             <Text
-              mt={`${RFValue(24)}px`}
+              mt={`${RFValue(16)}px`}
               color="blue.700"
-              fontSize={`${RFValue(13)}px`}
+              fontSize={`${RFValue(14)}px`}
               fontFamily="Roboto_400Regular"
               marginBottom={`${RFValue(12)}px`}
             >
@@ -310,7 +330,7 @@ export function AddEquipment() {
               h="30px"
               minWidth="100%"
               accessibilityLabel="Escolher tipo equipamento"
-              fontSize="16px"
+              fontSize={`${RFValue(14)}px`}
               fontFamily={THEME.fonts.Roboto_400Regular}
               color={"#333333"}
               dropdownIcon={
@@ -328,9 +348,9 @@ export function AddEquipment() {
               onValueChange={(selected) => handleSelectTypeEquipment(selected)}
             >
               {typesEquipment.length > 0 &&
-                typesEquipment.map((customer) => (
+                typesEquipment.map((customer, index) => (
                   <Select.Item
-                    key={customer.tipoEquipamento}
+                    key={`Index: ${index} Tipo: ${customer.tipoEquipamento}`}
                     alignItems="center"
                     value={customer.tipoEquipamento.toString()}
                     label={customer.tipoEquipamento}
@@ -338,45 +358,75 @@ export function AddEquipment() {
                 ))}
             </Select>
 
-            <FlatList
-              data={inputs}
-              style={{ width: "100%" }}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item: input }) => (
-                <>
-                  <Text
-                    mt={`${RFValue(16)}px`}
-                    color="blue.700"
-                    fontSize={`${RFValue(13)}px`}
-                    fontFamily="Roboto_400Regular"
-                    marginBottom={`${RFValue(8)}px`}
-                  >
-                    {input.title}
-                  </Text>
+            {inputs.map((input) => (
+              <>
+                <Text
+                  key={input.id}
+                  mt={`${RFValue(16)}px`}
+                  color="blue.700"
+                  fontSize={`${RFValue(14)}px`}
+                  fontFamily="Roboto_400Regular"
+                  marginBottom={`${RFValue(8)}px`}
+                >
+                  {input.title}
+                </Text>
 
-                  <Controller
-                    control={control}
-                    name={input.name}
-                    render={({ field: { onChange, value } }) => (
-                      <Input
-                        py={0}
-                        borderBottomColor="blue.700"
-                        _input={{
-                          color: "#333333",
-                          fontSize: "16px",
-                          fontFamily: "Roboto_400Regular",
-                        }}
-                        value={value}
-                        onChangeText={onChange}
-                        keyboardType={input.keyboardType}
-                        errorMessage={errors[input.name]?.message}
-                      />
-                    )}
-                  />
-                </>
-              )}
-            />
+                <Controller
+                  control={control}
+                  name={input.name}
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      py={0}
+                      borderBottomColor="blue.700"
+                      _input={{
+                        color: "#333333",
+                        fontSize: `${RFValue(14)}px`,
+                        fontFamily: "Roboto_400Regular",
+                      }}
+                      value={value}
+                      onChangeText={onChange}
+                      keyboardType={input.keyboardType}
+                      errorMessage={errors[input.name]?.message}
+                    />
+                  )}
+                />
+              </>
+            ))}
+
+            <Text
+              mt={`${RFValue(16)}px`}
+              color="blue.700"
+              fontSize={`${RFValue(14)}px`}
+              fontFamily="Roboto_400Regular"
+              marginBottom={`${RFValue(8)}px`}
+            >
+              Data Aquisição
+            </Text>
+
+            <TouchableOpacity
+              activeOpacity={0.75}
+              style={styles.buttonDate}
+              onPress={() => setSelectDate(true)}
+            >
+              <Text
+                color="#363636"
+                fontSize={`${RFValue(14)}px`}
+                fontFamily="Roboto_400Regular"
+              >
+                {formatDate(acquisitionDate).show}
+              </Text>
+            </TouchableOpacity>
+
+            {selectDate && (
+              <DateTimePicker
+                mode="date"
+                value={acquisitionDate}
+                maximumDate={new Date()}
+                testID="dateTimePicker"
+                display="default"
+                onChange={handleSelectAcquisitionDate}
+              />
+            )}
           </VStack>
         </ScrollView>
 
