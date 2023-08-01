@@ -14,6 +14,7 @@ import MessagesStackRoutes from "./messages.stack.routes";
 import IncludeStackRoutes from "./include.stack.routes";
 
 import { ChartTelemetryData } from "@screens/AppScreens/EquipmentDetails/ChartTelemetryData";
+import SyncDataStackRoutes from "./sync.data.stack.routes";
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +68,15 @@ export default function HomeStackRoutes() {
         <Stack.Screen
           name="IncludeStackRoutes"
           component={IncludeStackRoutes}
+          options={{
+            animation: "none",
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="SyncDataStackRoutes"
+          component={SyncDataStackRoutes}
           options={{
             animation: "none",
             headerShown: false,

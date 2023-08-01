@@ -146,6 +146,10 @@ export declare global {
         serial: string;
       };
 
+      SyncDataStackRoutes: {
+        screen: "ExportarDados" | "ColetarDados" | "SincronizarDados";
+      };
+
       AddGrouping: undefined;
 
       ChangePassword: undefined;
