@@ -1,17 +1,21 @@
 import { Alert } from "react-native";
-import React, { ReactNode, useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import axios from "axios";
 import { FlatList, Text, VStack } from "native-base";
 
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import api from "@services/api";
 
 import { THEME } from "@theme/theme";
 
-import SistemaLido from "@assets/sistema-lido.svg";
-import SistemaNaoLido from "@assets/sistema-nao-lido.svg";
-import MensagemNaoLido from "@assets/mensagem-aviso-nao-lido.svg";
+import SystemRead from "@assets/system-read.svg";
+import SystemUnread from "@assets/system-unread.svg";
+
+import AdminRead from "@assets/admin-read.svg";
+import AdminUnread from "@assets/admin-unread.svg";
 
 import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
@@ -34,32 +38,44 @@ export function MessageList() {
   const messageType: IMessageType = {
     0: {
       read: {
-        color: colors.blue[700],
-        icon: <MensagemNaoLido />,
+        color: colors.gray[350],
+        icon: <AdminRead />,
       },
       unread: {
         color: colors.blue[700],
-        icon: <MensagemNaoLido />,
+        icon: <AdminUnread />,
       },
     },
     1: {
       read: {
-        color: colors.cyan[100],
-        icon: <SistemaLido />,
+        color: colors.gray[350],
+        icon: (
+          <MaterialCommunityIcons
+            name="email-open-multiple-outline"
+            size={29}
+            color={colors.white}
+          />
+        ),
       },
       unread: {
-        color: colors.cyan[100],
-        icon: <SistemaLido />,
+        color: colors.orange[100],
+        icon: (
+          <MaterialCommunityIcons
+            name="email-multiple-outline"
+            size={29}
+            color={colors.white}
+          />
+        ),
       },
     },
     2: {
       read: {
-        color: colors.orange[100],
-        icon: <SistemaNaoLido />,
+        icon: <SystemRead />,
+        color: colors.gray[350],
       },
       unread: {
-        color: colors.orange[100],
-        icon: <SistemaNaoLido />,
+        icon: <SystemUnread />,
+        color: colors.cyan[100],
       },
     },
   };
