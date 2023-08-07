@@ -1,6 +1,8 @@
 import React, { ReactNode } from "react";
 import { HStack, Text, IStackProps } from "native-base";
 
+import { RFValue } from "react-native-responsive-fontsize";
+
 import { THEME } from "@theme/theme";
 
 type Props = IStackProps & {
@@ -20,9 +22,9 @@ export function Item({
   return (
     <HStack
       w="full"
-      h={58}
+      h={`${RFValue(58)}px`}
       bg={THEME.colors.white}
-      paddingX="16px"
+      paddingX={`${RFValue(16)}px`}
       alignItems="center"
       justifyContent="space-between"
       {...rest}
@@ -32,9 +34,9 @@ export function Item({
 
         <Text
           color={color}
-          fontSize="16px"
+          fontSize={`${RFValue(14)}px`}
           fontFamily="Roboto_400Regular"
-          marginLeft={icon ? "16px" : "0"}
+          marginLeft={icon ? `${RFValue(16)}px` : "0"}
           isTruncated
         >
           {title}

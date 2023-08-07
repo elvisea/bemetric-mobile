@@ -15,14 +15,14 @@ export function HeaderDefault({ title, children, ...rest }: Props) {
       w="full"
       h={`${RFValue(58)}px`}
       bg={THEME.colors.white}
-      paddingX="16px"
+      paddingX={`${RFValue(16)}px`}
       alignItems="center"
       justifyContent={children ? "space-between" : "flex-start"}
       {...rest}
     >
       <Text
         color="blue.700"
-        fontSize="16px"
+        fontSize={`${RFValue(16)}px`}
         fontFamily="Roboto_500Medium"
         isTruncated
       >

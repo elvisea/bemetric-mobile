@@ -55,6 +55,7 @@ export function ConexaoManual() {
 
   const [statusCommandResponse, setStatusCommandResponse] =
     useState<IResponseObject>(null);
+
   const [configureCommandResponse, setConfigureCommandResponse] =
     useState<IResponseObject>(null);
 

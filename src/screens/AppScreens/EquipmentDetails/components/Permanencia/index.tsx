@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { Box, HStack, IBoxProps, Text } from "native-base";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface IProps extends IBoxProps {
   icon: ReactNode;
@@ -13,113 +14,118 @@ interface IProps extends IBoxProps {
 function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
   return (
     <Box
-      mb="16px"
+      mb={`${RFValue(16)}px`}
       bg="white"
-      p="16px"
-      borderRadius="8px"
+      p={`${RFValue(16)}px`}
+      borderRadius={`${RFValue(8)}px`}
       borderColor="#00000029"
       borderWidth={1}
       {...rest}
     >
-      <HStack mb="8px" alignItems="center">
+      <HStack mb={`${RFValue(8)}px`} alignItems="center">
         <Box
-          h="30px"
-          w="30px"
+          h={`${RFValue(30)}px`}
+          w={`${RFValue(30)}px`}
           bg="#17C3C4"
-          borderRadius="4px"
+          borderRadius={`${RFValue(4)}px`}
           alignItems="center"
           justifyContent="center"
         >
           {icon}
         </Box>
-        <Text fontFamily="Montserrat_400Regular" ml="16px">
+        <Text
+          fontFamily="Roboto_400Regular"
+          color="#373435"
+          fontSize={`${RFValue(14)}px`}
+          ml={`${RFValue(16)}px`}
+        >
           {title}
         </Text>
       </HStack>
 
       <HStack
-        h="36px"
+        h={`${RFValue(30)}px`}
         alignItems="center"
         w="full"
         justifyContent="space-between"
       >
         <Text
-          fontFamily="Montserrat_400Regular"
-          fontSize="13px"
-          color="#878787"
+          fontFamily="Roboto_400Regular"
+          fontSize={`${RFValue(14)}px`}
+          color="#717171"
         >
           Total de horas
         </Text>
         <Text
-          fontFamily="Montserrat_400Regular"
+          fontFamily="Roboto_400Regular"
           color="blue.700"
-          fontSize="18px"
+          fontSize={`${RFValue(16)}px`}
         >
           {total}
         </Text>
       </HStack>
 
       <HStack
-        h="36px"
+        h={`${RFValue(30)}px`}
         alignItems="center"
         w="full"
         justifyContent="space-between"
       >
         <Text
-          fontFamily="Montserrat_400Regular"
-          fontSize="13px"
-          color="#878787"
+          fontFamily="Roboto_400Regular"
+          fontSize={`${RFValue(14)}px`}
+          color="#717171"
         >
           Horas trabalhadas
         </Text>
         <Text
-          fontFamily="Montserrat_400Regular"
+          fontFamily="Roboto_400Regular"
           color="blue.700"
-          fontSize="18px"
+          fontSize={`${RFValue(16)}px`}
         >
           {hours}
         </Text>
       </HStack>
 
       <HStack
-        h="36px"
+        h={`${RFValue(30)}px`}
         alignItems="center"
         w="full"
         justifyContent="space-between"
       >
         <Text
-          fontFamily="Montserrat_400Regular"
-          fontSize="13px"
-          color="#878787"
+          fontFamily="Roboto_400Regular"
+          fontSize={`${RFValue(14)}px`}
+          color="#717171"
         >
           Parado ignição ligada
         </Text>
         <Text
-          fontFamily="Montserrat_400Regular"
+          fontFamily="Roboto_400Regular"
           color="blue.700"
-          fontSize="18px"
+          fontSize={`${RFValue(16)}px`}
         >
           {on}
         </Text>
       </HStack>
 
       <HStack
-        h="36px"
+        h={`${RFValue(30)}px`}
         alignItems="center"
         w="full"
         justifyContent="space-between"
       >
         <Text
-          fontFamily="Montserrat_400Regular"
-          fontSize="13px"
-          color="#878787"
+          fontFamily="Roboto_400Regular"
+          fontSize={`${RFValue(14)}px`}
+          color="#717171"
         >
           Parado ignição desligada
         </Text>
         <Text
-          fontFamily="Montserrat_400Regular"
+          fontFamily="Roboto_400Regular"
           color="blue.700"
-          fontSize="18px"
+          fontSize={`${RFValue(16)}px`}
         >
           {off}
         </Text>

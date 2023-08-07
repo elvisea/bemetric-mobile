@@ -30,6 +30,7 @@ import { ButtonDate } from "@components/ButtonDate";
 import { GenericModal } from "@components/GenericModal";
 import { PeriodOption } from "@components/PeriodOption";
 import { HeaderDefault } from "@components/HeaderDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import api from "@services/api";
 
@@ -55,6 +56,7 @@ export function TelemetryData() {
 
   const [data, setData] = useState<ITelemetryData | null>(null);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const [end, setEnd] = useState(endOfDay(new Date()));
@@ -149,12 +151,16 @@ export function TelemetryData() {
     };
 
     try {
+      setIsLoading(true);
+
       const response = await api.post("/Equipamento/DadosTelemetrias", data);
 
       setData(response.data);
       setIsOpenModal(false);
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -186,29 +192,32 @@ export function TelemetryData() {
         />
       </HeaderDefault>
 
-      {Array.of(0, 1, 2, 3).map((item) => (
-        <TouchableOpacity
-          key={item}
-          disabled={typeof data !== "object"}
-          activeOpacity={0.7}
-          onPress={() => handleNextPage(list[item].url)}
-        >
-          <Item icon={list[item].icon} title={list[item].title} mb="8px">
-            <Text
-              color={
-                typeof data === "object" ? colors.blue[700] : colors.red[600]
-              }
-              fontSize="16px"
-              fontFamily={fonts.Roboto_400Regular}
-              isTruncated
-            >
-              {typeof data === "object"
-                ? `${list[item].value} ${list[item].label}`
-                : "Vazio"}
-            </Text>
-          </Item>
-        </TouchableOpacity>
-      ))}
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+
+      {!isLoading &&
+        Array.of(0, 1, 2, 3).map((item) => (
+          <TouchableOpacity
+            key={item}
+            disabled={typeof data !== "object"}
+            activeOpacity={0.7}
+            onPress={() => handleNextPage(list[item].url)}
+          >
+            <Item icon={list[item].icon} title={list[item].title} mb="8px">
+              <Text
+                color={
+                  typeof data === "object" ? colors.blue[700] : colors.red[600]
+                }
+                fontSize="16px"
+                fontFamily={fonts.Roboto_400Regular}
+                isTruncated
+              >
+                {typeof data === "object"
+                  ? `${list[item].value} ${list[item].label}`
+                  : ""}
+              </Text>
+            </Item>
+          </TouchableOpacity>
+        ))}
 
       <GenericModal
         title="Período"
