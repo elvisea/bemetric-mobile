@@ -12,9 +12,13 @@ import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 
 import { HeaderDefault } from "@components/HeaderDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { styles } from "./styles";
 import { IParams } from "../interfaces/IEquipamentDetails";
+
+import { calculateDelta } from "@screens/AppScreens/Markers/utils";
+import { IDelta } from "@screens/AppScreens/Markers/UpdateGeofences/interfaces";
 
 interface ILocation {
   lat: number;
@@ -30,21 +34,43 @@ export function Route() {
   const { colors } = THEME;
   const { params } = route.params as IParams;
 
+  const [delta, setDelta] = useState<IDelta>({} as IDelta);
   const [location, setLocation] = useState<ILocation | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchLocation() {
     try {
+      setIsLoading(true);
+
       const response = await api.post("/Equipamento/TrajetoApp", {
         codigoEquipamento: params.codigoEquipamento,
         codigoCliente: customer?.codigoCliente,
       });
 
-      // Inicialmente retornava um Objeto. Agora volta uma Lista.
-      // Testar se está ok novo retorno.
+      if (response.data[0].lat === -1 && response.data[0].lon === -1) {
+        setLocation({
+          ...response.data[0],
+          lat: -25.4541998,
+          lon: -49.2913508,
+        });
 
-      setLocation(response.data[0]);
+        setDelta(
+          calculateDelta([{ latitude: -25.4541998, longitude: -49.2913508 }])
+        );
+      } else {
+        setLocation(response.data[0]);
+
+        setDelta(
+          calculateDelta([
+            { latitude: response.data[0].lat, longitude: response.data[0].lon },
+          ])
+        );
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -69,14 +95,16 @@ export function Route() {
         />
       </HeaderDefault>
 
-      {location && (
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+
+      {!isLoading && location && (
         <MapView
           zoomControlEnabled
           initialRegion={{
             latitude: location.lat,
             longitude: location.lon,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
+            latitudeDelta: delta.latitudeDelta,
+            longitudeDelta: delta.longitudeDelta,
           }}
           style={styles.map}
         >

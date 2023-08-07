@@ -1,100 +1,140 @@
 import { Alert } from "react-native";
-import React, { ReactNode, useCallback, useState } from "react";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { Box, Center, HStack, ScrollView, Text, VStack } from "native-base";
+import React, { useCallback, useState } from "react";
 
 import {
-  FontAwesome5,
-  MaterialIcons,
-  MaterialCommunityIcons,
-  AntDesign,
-  FontAwesome,
-} from "@expo/vector-icons";
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 
 import axios from "axios";
+import { ScrollView, Text, VStack } from "native-base";
+import { RFValue } from "react-native-responsive-fontsize";
+
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-
-import { Item } from "@components/Item";
-import { HeaderDefault } from "@components/HeaderDefault";
-import { Signals } from "@components/EquipmentDetails/Signals";
-
-import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
-import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
-
+import { useBluetooth } from "@hooks/bluetooth";
 import { ITelemetry } from "@interfaces/ITelemetry";
-import { IParams } from "../interfaces/IEquipamentDetails";
 
-interface IStatus {
-  [index: number]: {
-    title: string;
-    icon: ReactNode;
-  };
-}
+import { StatusButton } from "@components/StatusButton";
+import { HeaderDefault } from "@components/HeaderDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
+
+import { IParams } from "../interfaces/IEquipamentDetails";
 
 export function TelemetryDevice() {
   const route = useRoute();
+  const navigation = useNavigation();
+
+  const {
+    scanForDevices,
+    isDeviceConnected,
+    requestPermissions,
+    disconnectDevice,
+    changeGrantedPermissions,
+    connectToDevice,
+    resetReturnValues,
+    writeCharacteristicWithResponseForService,
+
+    devices,
+    bluetoothEnabled,
+    deviceIsConnected,
+    permissionsGranted,
+  } = useBluetooth();
+
   const { colors } = THEME;
   const { params } = route.params as IParams;
 
-  const status: IStatus = {
-    0: {
-      title: "Desativado",
-      icon: (
-        <MaterialIcons
-          name="radio-button-on"
-          size={22}
-          color={colors.red[700]}
-        />
-      ),
-    },
-    1: {
-      title: "Offline Coleta Manual",
-      icon: (
-        <MaterialIcons
-          name="radio-button-on"
-          size={22}
-          color={colors.gray[700]}
-        />
-      ),
-    },
-    2: {
-      title: "Offline sem Dados",
-      icon: <MaterialIcons name="cancel" size={22} color={colors.gray[200]} />,
-    },
-    3: {
-      title: "Crítico",
-      icon: (
-        <MaterialCommunityIcons
-          name="lightning-bolt-circle"
-          size={22}
-          color={colors.primary[700]}
-        />
-      ),
-    },
-    4: {
-      title: "Atenção",
-      icon: (
-        <AntDesign
-          name="exclamationcircle"
-          size={22}
-          color={colors.secondary[700]}
-        />
-      ),
-    },
-    5: {
-      title: "Ativo",
-      icon: (
-        <MaterialIcons
-          name="radio-button-on"
-          size={22}
-          color={colors.green[400]}
-        />
-      ),
-    },
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const [telemetry, setTelemetry] = useState<ITelemetry | null>(null);
+
+  const handleConnect = async () => {
+    if (typeof telemetry === "object" && telemetry) {
+      setIsConnecting(true);
+
+      const name = telemetry.serial.trim().toUpperCase();
+      const deviceFound = devices.find((device) => device.name === name);
+
+      const COMMAND = {
+        BT_PASSWORD: telemetry.chave.trim(),
+        GET_SERIAL_KEY: "",
+      };
+
+      if (deviceFound) {
+        setIsConnecting(true);
+
+        const isConnected = await isDeviceConnected(deviceFound.id);
+
+        if (isConnected) {
+          await disconnectDevice(deviceFound.id);
+
+          await connectToDevice(deviceFound.id);
+          await writeCharacteristicWithResponseForService(deviceFound, COMMAND);
+
+          resetReturnValues();
+          setIsConnecting(false);
+        } else {
+          await connectToDevice(deviceFound.id);
+          await writeCharacteristicWithResponseForService(deviceFound, COMMAND);
+
+          resetReturnValues();
+          setIsConnecting(false);
+        }
+      } else {
+        setIsConnecting(false);
+
+        Alert.alert(
+          "Dispositivo não encontrado.",
+          "Verifique se o Dispositivo está ligado ou se o Serial está correto e tente novamente."
+        );
+      }
+    } else {
+      Alert.alert(
+        "Informações para conexão não estão disponíveis",
+        "Informações para conexão não estão disponíveis."
+      );
+    }
+  };
+
+  const configureDataConnection = async () => {
+    if (deviceIsConnected) {
+      if (typeof telemetry === "object" && telemetry) {
+        resetReturnValues();
+
+        navigation.navigate("IncludeStackRoutes", {
+          screen: "ConfigurarConexaoDados",
+          params: {
+            chave: telemetry.chave.trim(),
+          },
+        });
+      }
+    } else {
+      Alert.alert(
+        "Dispositivo Desconectado.",
+        "Você precisa estar conectado para Configurar Conexão de Dados."
+      );
+    }
+  };
+
+  const handleTestDevice = async () => {
+    if (deviceIsConnected) {
+      if (typeof telemetry === "object" && telemetry) {
+        console.log("Você pode testar o Dispositivo.");
+      }
+    } else {
+      Alert.alert(
+        "Dispositivo Desconectado.",
+        "Você precisa estar conectado para testar Dispositivo."
+      );
+    }
+  };
+
+  const requestUsagePermissions = async () => {
+    const isGranted = await requestPermissions();
+    changeGrantedPermissions(isGranted);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -102,6 +142,8 @@ export function TelemetryDevice() {
 
       async function fetchData() {
         try {
+          setIsLoading(true);
+
           const response = await api.post(
             "/Equipamento/DetalhamentoDispositivoTelemetria",
             {
@@ -112,6 +154,8 @@ export function TelemetryDevice() {
           isActive && setTelemetry(response.data);
         } catch (error) {
           if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+        } finally {
+          setIsLoading(false);
         }
       }
 
@@ -123,148 +167,151 @@ export function TelemetryDevice() {
     }, [])
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      requestUsagePermissions();
+
+      if (permissionsGranted && bluetoothEnabled) {
+        scanForDevices();
+      }
+    }, [permissionsGranted, bluetoothEnabled])
+  );
+
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
       <HeaderDefault title="Dispositivo de Telemetria" />
 
-      <ScrollView
-        bg={colors.shape}
-        flex={1}
-        width="full"
-        showsVerticalScrollIndicator={false}
-        style={{ marginBottom: 16 }}
-      >
-        <VStack marginBottom="24px" paddingX="16px" width="full">
-          <HStack marginTop="16px">
-            <Box w="50%">
-              <DetailsTitle title="Nº de série" />
-              <DetailsDescription title={telemetry ? telemetry.serial : ""} />
-            </Box>
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-            <Box>
-              <DetailsTitle title="ID" />
-              <DetailsDescription title={telemetry ? telemetry.serial : ""} />
-            </Box>
-          </HStack>
-
-          <HStack marginTop="16px">
-            <Box w="50%">
-              <DetailsTitle title="Chave de segurança" />
-              <DetailsDescription title={telemetry ? telemetry.chave : ""} />
-            </Box>
-
-            <Box>
-              <DetailsTitle title="Versão de firmware" />
-              <DetailsDescription title={telemetry ? telemetry.firmware : ""} />
-            </Box>
-          </HStack>
-        </VStack>
-
-        <HeaderDefault title="Registros" mb="8px" />
-
-        <Item title="Última atualização" mb="8px">
+      {!isLoading && (
+        <ScrollView
+          bg={colors.shape}
+          flex={1}
+          width="full"
+          showsVerticalScrollIndicator={false}
+        >
           <Text
             color="blue.700"
-            fontSize="16px"
-            fontFamily="Roboto_400Regular"
+            fontSize={`${RFValue(16)}px`}
+            fontFamily="Roboto_500Medium"
+            mt={`${RFValue(16)}px`}
+            mb={`${RFValue(8)}px`}
+            ml={`${RFValue(16)}px`}
             isTruncated
           >
-            {telemetry ? telemetry.dataUltimaAtualizacao : ""}
+            Informações
           </Text>
-        </Item>
 
-        <Item title="Ativa desde">
+          <StatusButton
+            title="Nº de Série"
+            value={telemetry ? telemetry.serial : ""}
+            mb={8}
+            disabled
+          />
+          <StatusButton
+            title="Identificação"
+            value={telemetry ? telemetry.codigoEquipamento.toString() : ""}
+            mb={8}
+            disabled
+          />
+          <StatusButton
+            title="Chave de segurança"
+            value={telemetry ? telemetry.chave : ""}
+            mb={8}
+            disabled
+          />
+          <StatusButton
+            title="Versão de Firmware"
+            value={telemetry ? telemetry.firmware : ""}
+            disabled
+          />
+
           <Text
             color="blue.700"
-            fontSize="16px"
-            fontFamily="Roboto_400Regular"
+            fontSize={`${RFValue(16)}px`}
+            fontFamily="Roboto_500Medium"
+            mt={`${RFValue(16)}px`}
+            mb={`${RFValue(8)}px`}
+            ml={`${RFValue(16)}px`}
             isTruncated
           >
-            {telemetry ? telemetry.dataAtivacao : ""}
+            Registros
           </Text>
-        </Item>
 
-        <Center mt="16px">
-          <Box flexWrap="wrap" w="331px" flexDirection="row">
-            <Signals
-              icon={
-                <MaterialIcons
-                  name="bluetooth-connected"
-                  color={THEME.colors.blue[700]}
-                  size={22}
-                />
-              }
-              title="Conectado"
-              mr="10px"
-              onPress={() => {}}
-            />
+          <StatusButton
+            title="Última atualização"
+            value={telemetry ? telemetry.dataUltimaAtualizacao : ""}
+            mb={8}
+            disabled
+          />
 
-            <Signals
-              icon={
-                <FontAwesome
-                  name="gears"
-                  color={THEME.colors.blue[700]}
-                  size={22}
-                />
-              }
-              title="Teste do Dispositivo"
-              onPress={() => {}}
-            />
+          <StatusButton
+            title="Ativa desde"
+            value={telemetry ? telemetry.dataAtivacao : ""}
+            disabled
+          />
 
-            <Signals
-              icon={telemetry && status[telemetry.status].icon}
-              title="Status"
-              value={telemetry ? status[telemetry.status].title : ""}
-              mt="10px"
-              onPress={() => {}}
-            />
+          <Text
+            color="blue.700"
+            fontSize={`${RFValue(16)}px`}
+            fontFamily="Roboto_500Medium"
+            mt={`${RFValue(16)}px`}
+            mb={`${RFValue(8)}px`}
+            ml={`${RFValue(16)}px`}
+            isTruncated
+          >
+            Status
+          </Text>
 
-            <Signals
-              icon={
-                <FontAwesome5
-                  name="battery-full"
-                  color={THEME.colors.green[400]}
-                  size={22}
-                />
-              }
-              title="Nível de bateria"
-              value={telemetry ? `${telemetry.bat.toString()} %` : ""}
-              ml="10px"
-              mt="10px"
-              onPress={() => {}}
-            />
+          <StatusButton
+            onPress={handleConnect}
+            title="Conectado"
+            value={
+              isConnecting
+                ? "Conectando..."
+                : deviceIsConnected
+                ? "Ligado"
+                : "Desligado"
+            }
+            mb={8}
+          />
 
-            <Signals
-              icon={
-                <FontAwesome5
-                  name="wifi"
-                  color={THEME.colors.green[400]}
-                  size={22}
-                />
-              }
-              title="Sinal de Wi-fi"
-              value={telemetry ? `${telemetry.wfl.toString()} %` : ""}
-              mt="10px"
-              onPress={() => {}}
-            />
+          <StatusButton title="Status" value="100%" mb={8} disabled />
 
-            <Signals
-              icon={
-                <FontAwesome5
-                  name="signal"
-                  color={THEME.colors.green[400]}
-                  size={22}
-                />
-              }
-              title="Sinal de dados móveis"
-              value={telemetry ? `${telemetry.slt.toString()} %` : ""}
-              mt="10px"
-              ml="10px"
-              onPress={() => {}}
-            />
-          </Box>
-        </Center>
-      </ScrollView>
+          <StatusButton title="Nível de Bateria" value="100%" mb={8} disabled />
+
+          <StatusButton
+            title="Sinal Wi-Fi"
+            value="100%"
+            mb={8}
+            onPress={configureDataConnection}
+          />
+
+          <StatusButton
+            title="Sinal Dados Móveis"
+            value="100%"
+            onPress={configureDataConnection}
+          />
+
+          <Text
+            color="blue.700"
+            fontSize={`${RFValue(16)}px`}
+            fontFamily="Roboto_500Medium"
+            mt={`${RFValue(16)}px`}
+            mb={`${RFValue(8)}px`}
+            ml={`${RFValue(16)}px`}
+            isTruncated
+          >
+            Dispositivo
+          </Text>
+
+          <StatusButton
+            title="Testar Dispositivo"
+            mb={16}
+            onPress={handleTestDevice}
+          />
+        </ScrollView>
+      )}
     </VStack>
   );
 }

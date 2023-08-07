@@ -4,7 +4,8 @@ import { HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, FontAwesome5 } from "@expo/vector-icons";
+
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import axios from "axios";
@@ -26,6 +27,7 @@ import { ButtonDate } from "@components/ButtonDate";
 import { GenericModal } from "@components/GenericModal";
 import { PeriodOption } from "@components/PeriodOption";
 import { HeaderDefault } from "@components/HeaderDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { Permanencia } from "../components/Permanencia";
 import { IParams } from "../interfaces/IEquipamentDetails";
@@ -47,6 +49,8 @@ export function PeriodoPermanencia() {
   const [data, setData] = useState<IPeriodStay | null>(null);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [end, setEnd] = useState(endOfDay(new Date()));
   const [start, setStart] = useState(startOfDay(subDays(new Date(), 1)));
@@ -117,12 +121,16 @@ export function PeriodoPermanencia() {
     };
 
     try {
+      setIsLoading(true);
+      setIsOpenModal(false);
+
       const response = await api.post("/Equipamento/PeriodoPermanencia", data);
 
       setData(response.data);
-      setIsOpenModal(false);
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -147,46 +155,54 @@ export function PeriodoPermanencia() {
         />
       </HeaderDefault>
 
-      <ScrollView w="full" px="16px" showsVerticalScrollIndicator={false}>
-        <Permanencia
-          icon={<MaterialCommunityIcons name="filter" size={22} color="#FFF" />}
-          title="Em geocercas"
-          total={data ? formatHours(data.totalHorasGeocerca) : "-"}
-          hours={data ? formatHours(data.horasTrabalhadasGeocerca) : "-"}
-          on={data ? formatHours(data.paradoIgnicaoLigadaGeocerca) : "-"}
-          off={data ? formatHours(data.paradoIgnicaoDesligadaGeocerca) : "-"}
-        />
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-        <Permanencia
-          icon={
-            <MaterialCommunityIcons name="arrow-right" size={22} color="#FFF" />
-          }
-          title="Em pontos de interesse"
-          total={data ? formatHours(data.totalHorasPontoInteresse) : "-"}
-          hours={data ? formatHours(data.horasTrabalhadasPontoInteresse) : "-"}
-          on={data ? formatHours(data.paradoIgnicaoLigadaPontoInteresse) : "-"}
-          off={
-            data ? formatHours(data.paradoIgnicaoDesligadaPontoInteresse) : "-"
-          }
-        />
+      {!isLoading && (
+        <ScrollView w="full" px="16px" showsVerticalScrollIndicator={false}>
+          <Permanencia
+            icon={<Entypo name="location" size={20} color="#FFF" />}
+            title="Em geocercas"
+            total={data ? formatHours(data.totalHorasGeocerca) : "-"}
+            hours={data ? formatHours(data.horasTrabalhadasGeocerca) : "-"}
+            on={data ? formatHours(data.paradoIgnicaoLigadaGeocerca) : "-"}
+            off={data ? formatHours(data.paradoIgnicaoDesligadaGeocerca) : "-"}
+          />
 
-        <Permanencia
-          icon={
-            <MaterialCommunityIcons name="map-marker" size={22} color="#FFF" />
-          }
-          title="Outras localizações"
-          total={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
-          hours={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
-          on={
-            data ? formatHours(data.paradoIgnicaoLigadaOutrasLocalizacoes) : "-"
-          }
-          off={
-            data
-              ? formatHours(data.paradoIgnicaoDesligadaOutrasLocalizacoes)
-              : "-"
-          }
-        />
-      </ScrollView>
+          <Permanencia
+            icon={<FontAwesome5 name="dot-circle" size={22} color="#FFF" />}
+            title="Em pontos de interesse"
+            total={data ? formatHours(data.totalHorasPontoInteresse) : "-"}
+            hours={
+              data ? formatHours(data.horasTrabalhadasPontoInteresse) : "-"
+            }
+            on={
+              data ? formatHours(data.paradoIgnicaoLigadaPontoInteresse) : "-"
+            }
+            off={
+              data
+                ? formatHours(data.paradoIgnicaoDesligadaPontoInteresse)
+                : "-"
+            }
+          />
+
+          <Permanencia
+            icon={<FontAwesome5 name="map-marked-alt" size={22} color="#FFF" />}
+            title="Outras localizações"
+            total={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
+            hours={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
+            on={
+              data
+                ? formatHours(data.paradoIgnicaoLigadaOutrasLocalizacoes)
+                : "-"
+            }
+            off={
+              data
+                ? formatHours(data.paradoIgnicaoDesligadaOutrasLocalizacoes)
+                : "-"
+            }
+          />
+        </ScrollView>
+      )}
 
       <GenericModal
         title="Período"
