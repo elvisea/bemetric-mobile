@@ -8,8 +8,11 @@ import {
 } from "@react-navigation/native";
 
 import axios from "axios";
-import { ScrollView, Text, VStack } from "native-base";
+
+import { FontAwesome5 } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
+import { HStack, ScrollView, VStack } from "native-base";
+
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
@@ -19,6 +22,7 @@ import { ITelemetry } from "@interfaces/ITelemetry";
 import { StatusButton } from "@components/StatusButton";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
+import { RowInformation } from "@components/RowInformation";
 
 import { IParams } from "../interfaces/IEquipamentDetails";
 
@@ -190,126 +194,146 @@ export function TelemetryDevice() {
           width="full"
           showsVerticalScrollIndicator={false}
         >
-          <Text
-            color="blue.700"
-            fontSize={`${RFValue(16)}px`}
-            fontFamily="Roboto_500Medium"
-            mt={`${RFValue(16)}px`}
-            mb={`${RFValue(8)}px`}
-            ml={`${RFValue(16)}px`}
-            isTruncated
-          >
-            Informações
-          </Text>
-
-          <StatusButton
-            title="Nº de Série"
-            value={telemetry ? telemetry.serial : ""}
-            mb={8}
-            disabled
-          />
-          <StatusButton
-            title="Identificação"
-            value={telemetry ? telemetry.codigoEquipamento.toString() : ""}
-            mb={8}
-            disabled
-          />
-          <StatusButton
-            title="Chave de segurança"
-            value={telemetry ? telemetry.chave : ""}
-            mb={8}
-            disabled
-          />
-          <StatusButton
-            title="Versão de Firmware"
-            value={telemetry ? telemetry.firmware : ""}
-            disabled
-          />
-
-          <Text
-            color="blue.700"
-            fontSize={`${RFValue(16)}px`}
-            fontFamily="Roboto_500Medium"
-            mt={`${RFValue(16)}px`}
-            mb={`${RFValue(8)}px`}
-            ml={`${RFValue(16)}px`}
-            isTruncated
-          >
-            Registros
-          </Text>
-
-          <StatusButton
-            title="Última atualização"
-            value={telemetry ? telemetry.dataUltimaAtualizacao : ""}
-            mb={8}
-            disabled
-          />
-
-          <StatusButton
-            title="Ativa desde"
-            value={telemetry ? telemetry.dataAtivacao : ""}
-            disabled
-          />
-
-          <Text
-            color="blue.700"
-            fontSize={`${RFValue(16)}px`}
-            fontFamily="Roboto_500Medium"
-            mt={`${RFValue(16)}px`}
-            mb={`${RFValue(8)}px`}
-            ml={`${RFValue(16)}px`}
-            isTruncated
-          >
-            Status
-          </Text>
-
-          <StatusButton
-            onPress={handleConnect}
-            title="Conectado"
-            value={
-              isConnecting
-                ? "Conectando..."
-                : deviceIsConnected
-                ? "Ligado"
-                : "Desligado"
+          <RowInformation
+            mt={16}
+            primaryTitle="N° de Série"
+            primaryDescription={telemetry ? telemetry.serial : "-"}
+            secondaryTitle="ID"
+            secondaryDescription={
+              telemetry ? telemetry.codigoEquipamento.toString() : "-"
             }
-            mb={8}
           />
 
-          <StatusButton title="Status" value="100%" mb={8} disabled />
-
-          <StatusButton title="Nível de Bateria" value="100%" mb={8} disabled />
-
-          <StatusButton
-            title="Sinal Wi-Fi"
-            value="100%"
-            mb={8}
-            onPress={configureDataConnection}
+          <RowInformation
+            mt={16}
+            primaryTitle="Chave de Segurança"
+            primaryDescription={telemetry ? telemetry.chave : "-"}
+            secondaryTitle="Versão de Firmware"
+            secondaryDescription={telemetry ? telemetry.firmware : "-"}
           />
 
-          <StatusButton
-            title="Sinal Dados Móveis"
-            value="100%"
-            onPress={configureDataConnection}
+          <RowInformation
+            mt={16}
+            primaryTitle="Ativa Desde"
+            primaryDescription={telemetry ? telemetry.dataAtivacao : "-"}
+            secondaryTitle="Última Atualização"
+            secondaryDescription={
+              telemetry ? telemetry.dataUltimaAtualizacao : "-"
+            }
           />
 
-          <Text
-            color="blue.700"
-            fontSize={`${RFValue(16)}px`}
-            fontFamily="Roboto_500Medium"
-            mt={`${RFValue(16)}px`}
-            mb={`${RFValue(8)}px`}
-            ml={`${RFValue(16)}px`}
-            isTruncated
+          <HStack
+            w="full"
+            mt={`${RFValue(24)}px`}
+            px={`${RFValue(16)}px`}
+            alignItems="center"
+            justifyContent="space-between"
           >
-            Dispositivo
-          </Text>
+            <StatusButton
+              onPress={handleConnect}
+              title={
+                isConnecting
+                  ? "Conectando..."
+                  : deviceIsConnected
+                    ? "Conectado"
+                    : "Desconectado"
+              }
+              width="49"
+              icon={
+                <FontAwesome5
+                  name="bluetooth-b"
+                  size={24}
+                  color={THEME.colors.blue[700]}
+                />
+              }
+            />
 
-          <StatusButton
-            title="Testar Dispositivo"
-            mb={16}
-            onPress={handleTestDevice}
-          />
+            <StatusButton
+              onPress={handleTestDevice}
+              title="Testar"
+              width="49"
+              icon={
+                <FontAwesome5
+                  name="cogs"
+                  size={24}
+                  color={THEME.colors.blue[700]}
+                />
+              }
+            />
+          </HStack>
+
+          <HStack
+            w="full"
+            mt={`${RFValue(8)}px`}
+            px={`${RFValue(16)}px`}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <StatusButton
+              onPress={configureDataConnection}
+              title="Sinal WiFi"
+              value="100%"
+              width="49"
+              icon={
+                <FontAwesome5
+                  name="wifi"
+                  size={24}
+                  color={THEME.colors.green[500]}
+                />
+              }
+            />
+
+            <StatusButton
+              onPress={configureDataConnection}
+              title="Sinal Dados Móveis"
+              value="100%"
+              width="49"
+              icon={
+                <FontAwesome5
+                  name="signal"
+                  size={24}
+                  color={THEME.colors.green[500]}
+                />
+              }
+            />
+          </HStack>
+
+          <HStack
+            w="full"
+            mt={`${RFValue(8)}px`}
+            mb={`${RFValue(16)}px`}
+            px={`${RFValue(16)}px`}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <StatusButton
+              title="Status"
+              value="Ativo"
+              width="49"
+              disabled
+              icon={
+                <FontAwesome5
+                  name="dot-circle"
+                  size={24}
+                  color={THEME.colors.green[500]}
+                />
+              }
+            />
+
+            <StatusButton
+              title="Nível Bateria"
+              value="100%"
+              width="49"
+              disabled
+              icon={
+                <FontAwesome5
+                  name="battery-full"
+                  size={24}
+                  color={THEME.colors.green[500]}
+                />
+              }
+            />
+          </HStack>
         </ScrollView>
       )}
     </VStack>

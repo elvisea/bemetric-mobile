@@ -6,29 +6,39 @@ import { THEME } from "@theme/theme";
 type TypeContainer = {
   mt: number;
   mb: number;
+  width: string;
 };
 
 export const Container = styled.TouchableOpacity<TypeContainer>`
+  width: ${({ width }) => `${width}%`};
+  height: ${RFValue(68)}px;
+  background: ${THEME.colors.white};
+  align-items: center;
+  justify-content: center;
+
+  border-radius: ${RFValue(4)}px;
+
+  border-width: ${RFValue(1)}px;
+  border-color: ${THEME.colors.blue[700]};
+`;
+
+export const Content = styled.View`
   flex-direction: row;
   width: 100%;
-  height: ${RFValue(58)}px;
-  background: ${THEME.colors.white};
-  padding: 0 ${RFValue(16)}px;
   align-items: center;
-  justify-content: space-between;
-
-  margin-top: ${({ mt }) => `${RFValue(mt)}px`};
-  margin-bottom: ${({ mb }) => `${RFValue(mb)}px`};
+  justify-content: center;
+  margin-bottom: ${RFValue(4)}px;
 `;
 
 export const Title = styled.Text`
-  font-size: ${RFValue(14)}px;
+  font-size: ${RFValue(12)}px;
   font-family: ${THEME.fonts.Roboto_400Regular};
-  color: #878787;
+  color: ${THEME.colors.blue[700]};
 `;
 
 export const Value = styled.Text`
-  font-size: ${RFValue(16)}px;
+  font-size: ${RFValue(13)}px;
   font-family: ${THEME.fonts.Roboto_400Regular};
-  color: ${THEME.colors.blue[700]};
+  color: ${THEME.colors.gray[450]};
+  margin-left: ${RFValue(8)}px;
 `;

@@ -6,7 +6,7 @@ import axios from "axios";
 
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
-import { Box, HStack, IconButton, ScrollView, Text, VStack } from "native-base";
+import { IconButton, ScrollView, Text, VStack } from "native-base";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
@@ -23,8 +23,7 @@ import { Item } from "@components/Item";
 
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
-import { DetailsTitle } from "@components/EquipmentDetails/Typography/DetailsTitle";
-import { DetailsDescription } from "@components/EquipmentDetails/Typography/DetailsDescription";
+import { RowInformation } from "@components/RowInformation";
 
 export function Equipament() {
   const route = useRoute();
@@ -105,94 +104,62 @@ export function Equipament() {
           bg={colors.shape}
           showsVerticalScrollIndicator={false}
         >
-          <VStack marginBottom="24px" paddingX="16px" width="full">
-            <Box marginTop="16px">
-              <DetailsTitle title="Nome do equipamento" />
-              <DetailsDescription
-                title={equipment ? equipment.nomeEquipamento : ""}
-              />
-            </Box>
+          <RowInformation
+            mt={16}
+            primaryTitle="Nome do equipamento"
+            primaryDescription={equipment ? equipment.nomeEquipamento : "-"}
+          />
 
-            <Box marginTop="16px">
-              <DetailsTitle title="Nome do cliente" />
-              <DetailsDescription
-                title={equipment ? equipment.nomeCliente : ""}
-              />
-            </Box>
+          <RowInformation
+            mt={12}
+            primaryTitle="Nome do Cliente"
+            primaryDescription={equipment ? equipment.nomeCliente : "-"}
+          />
 
-            <Box marginTop="16px">
-              <DetailsTitle title="Agrupamento" />
-              <DetailsDescription
-                title={equipment ? equipment.nomeEquipamento : ""}
-              />
-            </Box>
+          <RowInformation
+            mt={12}
+            primaryTitle="Agrupamento"
+            primaryDescription={equipment ? equipment.nomeEquipamento : "-"}
+          />
 
-            <HStack marginTop="16px">
-              <Box w="50%">
-                <DetailsTitle title="Tipo" />
-                <DetailsDescription
-                  title={equipment ? equipment.tipoEquipamento : ""}
-                />
-              </Box>
+          <RowInformation
+            mt={12}
+            primaryTitle="Tipo"
+            primaryDescription={equipment ? equipment.tipoEquipamento : "-"}
+            secondaryTitle="Data de aquisição"
+            secondaryDescription={
+              equipment ? equipment.dataAquisicaoFormatado : "-"
+            }
+          />
 
-              <Box>
-                <DetailsTitle title="Data de aquisição" />
-                <DetailsDescription
-                  title={equipment ? equipment.dataAquisicaoFormatado : ""}
-                />
-              </Box>
-            </HStack>
+          <RowInformation
+            mt={12}
+            primaryTitle="Placa"
+            primaryDescription={equipment ? equipment.placa : "-"}
+            secondaryTitle="Identificador"
+            secondaryDescription={equipment ? equipment.identificador : "-"}
+          />
 
-            <HStack marginTop="16px">
-              <Box w="50%">
-                <DetailsTitle title="Placa" />
-                <DetailsDescription title={equipment ? equipment.placa : ""} />
-              </Box>
+          <RowInformation
+            mt={12}
+            primaryTitle="Modelo"
+            primaryDescription={equipment ? equipment.modelo : "-"}
+            secondaryTitle="Ano"
+            secondaryDescription={equipment ? equipment.ano : "-"}
+          />
 
-              <Box>
-                <DetailsTitle title="Identificador" />
-                <DetailsDescription
-                  title={equipment ? equipment.identificador : ""}
-                />
-              </Box>
-            </HStack>
-
-            <HStack marginTop="16px">
-              <Box w="50%">
-                <DetailsTitle title="Modelo" />
-                <DetailsDescription title={equipment ? equipment.modelo : ""} />
-              </Box>
-
-              <Box>
-                <DetailsTitle title="Ano" />
-                <DetailsDescription title={equipment ? equipment.ano : ""} />
-              </Box>
-            </HStack>
-
-            <HStack marginTop="16px">
-              <Box w="50%">
-                <DetailsTitle title="Horímetro inicial" />
-                <DetailsDescription
-                  title={
-                    equipment
-                      ? `${equipment.horimetroIncial.toString()} horas`
-                      : ""
-                  }
-                />
-              </Box>
-
-              <Box>
-                <DetailsTitle title="Hodômetro inicial" />
-                <DetailsDescription
-                  title={
-                    equipment
-                      ? `${equipment.hodometroIncial.toString()} km`
-                      : ""
-                  }
-                />
-              </Box>
-            </HStack>
-          </VStack>
+          <RowInformation
+            mt={12}
+            mb={16}
+            primaryTitle="Horímetro inicial"
+            primaryDescription={
+              equipment ? `${equipment.horimetroIncial.toString()} horas` : "-"
+            }
+            secondaryTitle="Hodômetro inicial"
+            secondaryDescription={
+              equipment ? `${equipment.hodometroIncial.toString()} km` : ""
+            }
+          />
 
           <Item
             icon={<IconSnapshot />}
