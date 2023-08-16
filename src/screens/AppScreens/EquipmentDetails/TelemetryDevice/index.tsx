@@ -13,7 +13,6 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { HStack, ScrollView, VStack } from "native-base";
 
-
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
@@ -235,8 +234,8 @@ export function TelemetryDevice() {
                 isConnecting
                   ? "Conectando..."
                   : deviceIsConnected
-                    ? "Conectado"
-                    : "Desconectado"
+                  ? "Conectado"
+                  : "Desconectado"
               }
               width="49"
               icon={

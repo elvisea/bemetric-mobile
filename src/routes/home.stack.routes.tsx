@@ -43,7 +43,7 @@ export default function HomeStackRoutes() {
           name="Notifications"
           component={NotificationsTopTabs}
           options={{
-            header: () => <Cabecalho />,
+            header: () => <Cabecalho hasIcon={false} />,
             animation: "none",
           }}
         />

@@ -23,7 +23,7 @@ export function HeaderDefault({ title, children, ...rest }: Props) {
       <Text
         color="blue.700"
         fontSize={`${RFValue(16)}px`}
-        fontFamily="Roboto_500Medium"
+        fontFamily={THEME.fonts.Roboto_400Regular}
         isTruncated
       >
         {title}

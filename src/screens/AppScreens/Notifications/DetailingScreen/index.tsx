@@ -1,35 +1,74 @@
+import React, { ReactNode, useCallback, useState } from "react";
+import { Alert, ScrollView, StyleSheet, View, Dimensions } from "react-native";
+
 import { useFocusEffect, useRoute } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
-import { Item } from "@components/Item";
 
-import { GrayText, Row, ValueText, ViewBox } from "./styles";
+import axios from "axios";
 
+import { RFValue } from "react-native-responsive-fontsize";
+import MapView, { Marker, Polygon, Circle } from "react-native-maps";
+
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  AntDesign,
+} from "@expo/vector-icons";
+
+import api from "@services/api";
+import { THEME } from "@theme/theme";
+
+import Truck from "@assets/truck.svg";
 import IconHourMeter from "@assets/hourmeter.svg";
 import IconSpeedometer from "@assets/speedometer.svg";
-import { Cabecalho } from "@components/Cabecalho";
 
-import { Ionicons, MaterialCommunityIcons,AntDesign } from "@expo/vector-icons";
-import { THEME } from "@theme/theme";
-import api from "@services/api";
-import axios from "axios";
+import { Item } from "@components/Item";
+import { Cabecalho } from "@components/Cabecalho";
 import { LoadingSpinner } from "@components/LoadingSpinner";
+
+import { Data } from "./types";
+import { createCoordsGeofence } from "./utils";
+
+import {
+  ContentHeader,
+  Text,
+  Header,
+  Row,
+  Value,
+  HeaderSecondary,
+} from "./styles";
+
+const icons: { [index: number]: ReactNode } = {
+  0: <Ionicons name="flag" size={20} color={THEME.colors.blue[700]} />,
+  1: (
+    <MaterialCommunityIcons
+      name="bell-ring"
+      color={THEME.colors.yellow[100]}
+      size={20}
+    />
+  ),
+};
+
+const typeCoord: { [index: number]: string } = {
+  0: "Geocerca",
+  1: "Ponto de interesse",
+};
+
+const { height } = Dimensions.get("screen");
 
 export default function DetailingDoisStackRoutes() {
   const route = useRoute();
   const params = route.params as { codigoEvento: number };
 
-  const [data, setData] = useState<any | null>()
+  const [data, setData] = useState<Data | null>(null);
 
   async function fetchData() {
     const data = {
-      codigoEvento: params.codigoEvento
+      codigoEvento: params.codigoEvento,
     };
 
     try {
       const response = await api.post("/Evento/DetalharEvento", data);
       setData(response.data);
-
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
@@ -47,102 +86,141 @@ export default function DetailingDoisStackRoutes() {
     }, [])
   );
 
-  const icones = {
-    0: <Ionicons name="flag" size={20} color={THEME.colors.blue[700]} />,
-    1: <MaterialCommunityIcons name="bell-ring" color={THEME.colors.yellow[100]} size={20} />
-  };
-
-  const TipoCoord:any = {
-    0: "Geocerca",
-    1: "Ponto de interesse"
-  }
-
   return (
     <>
       <Cabecalho hasIcon={false} />
-      <ScrollView>
-        {data ? 
-          <>
-            <ViewBox>
-              <Row style={{borderBottomColor: THEME.colors.gray[100], borderBottomWidth: 1}}>
-                {icones[0]}
-                <Row>
-                  <AntDesign name="clockcircle" size={15} color={THEME.colors.gray[50]}/>
-                  <GrayText style={{marginLeft: 5 }}>
-                    {data.criadoEmFormatado}
-                  </GrayText>
-                </Row>
-              </Row>
 
+      {!data && <LoadingSpinner color={THEME.colors.blue[700]} />}
+
+      {data && (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.container}
+        >
+          <Header>
+            {icons[0]}
+
+            <ContentHeader>
+              <AntDesign
+                size={15}
+                name="clockcircle"
+                color={THEME.colors.gray[50]}
+                style={{ marginRight: 8 }}
+              />
+              <Text>{data.criadoEmFormatado}</Text>
+            </ContentHeader>
+          </Header>
+
+          <HeaderSecondary>
+            <Row>
+              <Text>Equipamento</Text>
+              <Value>{data.nomeEquipamento}</Value>
+            </Row>
+
+            <Row>
+              <Text>Registro</Text>
+              <Value>{data.registroApp}</Value>
+            </Row>
+
+            {data.tipoCoordenadas === 2 ? null : (
               <Row>
-                <GrayText>
-                  Equipamento
-                </GrayText>
-                <ValueText>
-                  {data.nomeEquipamento}
-                </ValueText>
+                <Text>{typeCoord[data.tipoCoordenadas]}</Text>
+                <Value>{data.marcadorApp}</Value>
               </Row>
+            )}
+          </HeaderSecondary>
 
-              <Row>
-                <GrayText>
-                  Registro
-                </GrayText>
-                <ValueText>
-                  {/* Não tem no retorno, deve pedir para o back inserir */}
-                </ValueText>
-              </Row>
+          <Item
+            h={`${RFValue(58)}px`}
+            mb={`${RFValue(8)}px`}
+            icon={<IconSpeedometer />}
+            title="Velocimetro"
+          >
+            <Value>{data.velocidade} Km/h</Value>
+          </Item>
 
-              {data.tipoCoordenadas === -1 ?
-                null :
-                <Row>
-                  <GrayText>
-                    {/* Aqui vai precisar de uma verificação, pois existem os eventos de: geocerca, ponto de interesse e equipamento 
-                      -1 – Equipamento | 0 – Geocerca | 1 – Ponto de Interesse
-                    */}
-                    {TipoCoord[data.tipoCoordenadas]}
-                  </GrayText>
-                  <ValueText>
-                    {/* Não tem no retorno, deve pedir para o back inserir */}
-                  </ValueText>
-                </Row>
-              }
+          <Item
+            h={`${RFValue(58)}px`}
+            mb={`${RFValue(8)}px`}
+            icon={<IconHourMeter />}
+            title="Horímetro"
+          >
+            <Value>{data.horimetro} Horas</Value>
+          </Item>
 
-            </ViewBox>
+          <Item
+            h={`${RFValue(58)}px`}
+            icon={
+              <Ionicons
+                name="speedometer-outline"
+                color={THEME.colors.gray[50]}
+                size={22}
+              />
+            }
+            title="Hodômetro"
+          >
+            <Value>{data.hodometro} Km</Value>
+          </Item>
 
-            <Item 
-              mb="8px"
-              icon={<IconSpeedometer />}
-              title="Velocimetro"
-            >
-              <ValueText>
-                {data.velocidade} Km/h
-              </ValueText>
-            </Item>
+          <View style={styles.mapContainer}>
+            {data && (
+              <MapView
+                initialRegion={{
+                  latitude: data.latitude,
+                  longitude: data.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }}
+                style={styles.map}
+                zoomControlEnabled
+              >
+                <Marker
+                  coordinate={{
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                  }}
+                >
+                  <Truck />
+                </Marker>
 
-            <Item 
-              mb="8px"
-              icon={<IconHourMeter />}
-              title="Horímetro"
-            >
-              <ValueText>
-                {data.horimetro} Horas
-              </ValueText>
-            </Item>
+                {data.tipoCoordenadas === 0 && (
+                  <Polygon
+                    coordinates={createCoordsGeofence(data.geoFence)}
+                    fillColor="rgba(160, 198, 229, 0.3)"
+                    strokeColor="rgba(0, 105, 192, 1)"
+                    strokeWidth={2}
+                  />
+                )}
 
-            <Item
-              mb="8px" 
-              icon={<Ionicons name="speedometer-outline" color={THEME.colors.gray[50]} size={22} />}
-              title="Hodômetro"
-            >
-              <ValueText>
-                {data.hodometro} Km
-              </ValueText>
-            </Item>
-          </>
-          :
-          <LoadingSpinner color={THEME.colors.blue[700]} />
-        }
-      </ScrollView>
+                {data.tipoCoordenadas === 1 && (
+                  <Circle
+                    center={{
+                      latitude: data.pointFence.latitude,
+                      longitude: data.pointFence.longitude,
+                    }}
+                    radius={data.pointFence.raio}
+                    fillColor="rgba(160, 198, 229, 0.3)"
+                    strokeColor="rgba(0, 105, 192, 1)"
+                    strokeWidth={2}
+                  />
+                )}
+              </MapView>
+            )}
+          </View>
+        </ScrollView>
+      )}
     </>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  mapContainer: {
+    height: height - 400,
+  },
+  map: {
+    flex: 1,
+  },
+});

@@ -2,6 +2,8 @@ import React, { ReactNode } from "react";
 import { Box, HStack, IBoxProps, Text } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
+import { THEME } from "@theme/theme";
+
 interface IProps extends IBoxProps {
   icon: ReactNode;
   title: string;
@@ -26,7 +28,7 @@ function Permanencia({ icon, title, total, hours, on, off, ...rest }: IProps) {
         <Box
           h={`${RFValue(30)}px`}
           w={`${RFValue(30)}px`}
-          bg="#17C3C4"
+          bg={THEME.colors.cyan[300]}
           borderRadius={`${RFValue(4)}px`}
           alignItems="center"
           justifyContent="center"
