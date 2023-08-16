@@ -1,11 +1,11 @@
-import { FontAwesome, AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-import { Detailing } from "@screens/AppScreens/Notifications/Detailing";
 import { EventLog } from "@screens/AppScreens/Notifications/EventLog";
 
 import { THEME } from "@theme/theme";
+import { LogScreen } from "@screens/AppScreens/Notifications/LogScreen";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -25,16 +25,16 @@ export function NotificationsTopTabs() {
         component={EventLog}
         options={{
           tabBarIcon: ({}) => (
-            <FontAwesome name="gears" color="#FFF" size={22} />
+            <MaterialCommunityIcons name="bell-ring" color="#FFF" size={22} />
           ),
         }}
       />
       <Tab.Screen
-        name="Detailing"
-        component={Detailing}
+        name="LogScreen"
+        component={LogScreen}
         options={{
           tabBarIcon: ({}) => (
-            <AntDesign name="database" color="#FFF" size={22} />
+            <MaterialCommunityIcons name="bell-plus" color="#FFF" size={22} />
           ),
         }}
       />

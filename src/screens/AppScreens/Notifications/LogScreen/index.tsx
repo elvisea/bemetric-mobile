@@ -1,9 +1,12 @@
-import { Alert, Platform, ScrollView } from "react-native";
 import React, { useCallback, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { Alert, FlatList, Platform, ScrollView } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import axios from "axios";
 import { HStack, Text } from "native-base";
+
+import { RFValue } from "react-native-responsive-fontsize";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import {
   addDays,
@@ -13,49 +16,41 @@ import {
   startOfDay,
 } from "date-fns";
 
-import { RFValue } from "react-native-responsive-fontsize";
-import DateTimePicker from "@react-native-community/datetimepicker";
-
-import {
-  Foundation,
-  FontAwesome,
-  FontAwesome5,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
+import { date } from "@constants/date";
 import { useCustomer } from "@hooks/customer";
 
-import { date } from "@constants/date";
-
 import { Button } from "@components/Button";
+import { LogCard } from "./components/LogCard";
 import { ItemOption } from "@components/ItemOption";
 import { ButtonDate } from "@components/ButtonDate";
-import { SelectButton } from "@components/SelectButton";
 import { GenericModal } from "@components/GenericModal";
+import { SelectButton } from "@components/SelectButton";
 import { HeaderDefault } from "@components/HeaderDefault";
-import { CardEventLog } from "./components/CardEventLog";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { Marker, Options, Search, Value } from "./types";
+import { ButtonFilter } from "./styles";
+
+import { Marker, Options, Search, Value } from "../EventLog/types";
 
 import {
   inputs,
-  inicialOptionsState,
   inicialSearchState,
-} from "./constants/inputs";
-
-import { ButtonFilter } from "./styles";
+  inicialOptionsState,
+} from "../EventLog/constants/inputs";
 
 import {
   transformEquipmentsData,
   transformEventsData,
   transformMarkersData,
-} from "./utils";
+} from "../EventLog/utils";
 
-export function EventLog() {
-  const { colors } = THEME;
+export function LogScreen() {
+  const navigation = useNavigation();
+
   const { customer } = useCustomer();
 
   const [data, setData] = useState<any | null>();
@@ -106,6 +101,22 @@ export function EventLog() {
     setOptionModal(modalOption);
   };
 
+  const choosePeriod = (codigo: number) => {
+    setSearch((rest) => ({ ...rest, period: codigo }));
+    setSearch((rest) => ({ ...rest, start: date[codigo] }));
+  };
+
+  const chooseEventType = (codigo: number) => {
+    setSearch((rest) => ({ ...rest, eventType: codigo }));
+  };
+
+  const handleNextPage = (codigoEvento: number) => {
+    navigation.navigate("NotificationDetailing", {
+      screen: "DetailingScreen",
+      params: { codigoEvento: codigoEvento },
+    });
+  };
+
   const includeEvents = (codigo: number) => {
     const include = search.events.includes(codigo);
 
@@ -154,15 +165,6 @@ export function EventLog() {
     }
   };
 
-  const choosePeriod = (codigo: number) => {
-    setSearch((rest) => ({ ...rest, period: codigo }));
-    setSearch((rest) => ({ ...rest, start: date[codigo] }));
-  };
-
-  const chooseEventType = (codigo: number) => {
-    setSearch((rest) => ({ ...rest, eventType: codigo }));
-  };
-
   const closePrimaryModal = () => {
     setIsOpenPrimaryModal(false);
     setSearch(inicialSearchState);
@@ -195,22 +197,6 @@ export function EventLog() {
     }
   }, [search]);
 
-  const fetchData = async () => {
-    const data = {
-      tipoIntervalo: 3,
-      codigoCliente: customer?.codigoCliente,
-    };
-
-    try {
-      const response = await api.post("/Evento/ObterLista", data);
-      setData(response.data);
-    } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const fetchDataLists = async () => {
     if (customer) {
       try {
@@ -237,6 +223,21 @@ export function EventLog() {
 
         if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       }
+    }
+  };
+
+  const fetchData = async () => {
+    const data = {
+      codigoCliente: customer?.codigoCliente,
+      tipoIntervalo: 3,
+    };
+
+    try {
+      const response = await api.post("/Evento/ObterLista", data);
+
+      setData(response.data.listaEventos);
+    } catch (error) {
+      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
 
@@ -426,55 +427,20 @@ export function EventLog() {
       )}
 
       {data && (
-        <ScrollView
-          style={{ flex: 1, paddingHorizontal: 20 }}
+        <FlatList
+          data={data}
+          style={{ width: "100%", padding: 16 }}
           showsVerticalScrollIndicator={false}
-        >
-          <CardEventLog
-            title={"Equipamento"}
-            icon={<FontAwesome name="gears" size={18} color={colors.white} />}
-            totalEquip={data?.totalEquipamentos}
-            stopOFF={
-              data?.totalEquipamentoMovimentoEquipamentosParadoIgnicaoDesligada
-            }
-            movement={data?.totalEquipamentosMovimento}
-            stopON={data?.totalEquipamentosParadoIgnicaoLigada}
-            speedExcd={data?.totalEquipamentosVelocidadeExcedida}
-          />
-
-          <CardEventLog
-            title={"Outras localizações"}
-            icon={<Foundation name="map" size={20} color={colors.white} />}
-            stopOFF={data?.intOutraLocalizacaoParadoIgnicaoDesligada}
-            stopON={data?.totalOutraLocalizacaoParadoIgnicaoLiagada}
-          />
-
-          <CardEventLog
-            title={"Em geocercas"}
-            icon={
-              <MaterialCommunityIcons
-                name="map-marker-path"
-                size={22}
-                color="white"
-              />
-            }
-            stopOFF={data?.totalGeocercaParadoIgnicaoDesligada}
-            stayExcd={data?.totalGeocercaPermanenciaExcedida}
-            stopON={data?.totalGeocercaParadoIgnicaoLigada}
-            stayObd={data?.totalGeocercaPermanenciaObedecida}
-          />
-
-          <CardEventLog
-            title={"Em pontos de interesse"}
-            icon={
-              <FontAwesome5 color={colors.white} size={20} name="dot-circle" />
-            }
-            stopOFF={data?.totalPontoInteresseParadoIgnicaoDesligada}
-            stayExcd={data?.totalPontoInteressePermanenciaExcedida}
-            stopON={data?.totalPontoInteresseParadoIgnicaoLiagada}
-            stayObd={data?.totalPontoInteressePermanenciaObedecida}
-          />
-        </ScrollView>
+          keyExtractor={(item) => item.codigoEvento.toString()}
+          renderItem={({ item }) => (
+            <LogCard
+              search={() => handleNextPage(item.codigoEvento)}
+              icon={item.tipoEvento === 0 ? "bell" : "flag"}
+              html={item.mensagemHtml}
+              date={item.criadoEmFormatado}
+            />
+          )}
+        />
       )}
     </>
   );

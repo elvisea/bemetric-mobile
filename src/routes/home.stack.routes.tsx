@@ -15,6 +15,7 @@ import IncludeStackRoutes from "./include.stack.routes";
 
 import { ChartTelemetryData } from "@screens/AppScreens/EquipmentDetails/ChartTelemetryData";
 import SyncDataStackRoutes from "./sync.data.stack.routes";
+import NotificationDetailingStackRoutes from "./detailing.stack.routes";
 
 const Stack = createNativeStackNavigator();
 
@@ -42,7 +43,7 @@ export default function HomeStackRoutes() {
           name="Notifications"
           component={NotificationsTopTabs}
           options={{
-            header: () => <Cabecalho />,
+            header: () => <Cabecalho hasIcon={false} />,
             animation: "none",
           }}
         />
@@ -77,6 +78,15 @@ export default function HomeStackRoutes() {
         <Stack.Screen
           name="SyncDataStackRoutes"
           component={SyncDataStackRoutes}
+          options={{
+            animation: "none",
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="NotificationDetailing"
+          component={NotificationDetailingStackRoutes}
           options={{
             animation: "none",
             headerShown: false,

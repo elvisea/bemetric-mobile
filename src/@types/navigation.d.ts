@@ -170,6 +170,11 @@ export declare global {
         codigoPontoInteresse: number;
       };
 
+      NotificationDetailing: {
+        screen: "DetailingScreen";
+        params: { codigoEvento: number };
+      };
+
       // Pra Cima OK
 
       Clients: undefined;
