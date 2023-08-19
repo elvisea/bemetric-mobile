@@ -1,8 +1,12 @@
 import React, { ReactNode } from "react";
 import { Text, VStack } from "native-base";
 
-import { Container } from "./styles";
 import { TouchableProps } from "react-native-svg";
+import { RFValue } from "react-native-responsive-fontsize";
+
+import { THEME } from "@theme/theme";
+
+import { Container } from "./styles";
 
 type Props = TouchableProps & {
   icon: ReactNode;
@@ -15,15 +19,15 @@ export function EquipmentCard({ icon, title, description, ...rest }: Props) {
     <Container activeOpacity={0.5} {...rest}>
       {icon}
       <VStack
-        ml="24px"
+        ml={`${RFValue(16)}px`}
         h="full"
         alignItems="flex-start"
         justifyContent="center"
       >
         <Text
           color="#686868"
-          fontSize="16px"
-          fontFamily="Montserrat_400Regular"
+          fontSize={`${RFValue(16)}px`}
+          fontFamily={THEME.fonts.Roboto_400Regular}
           isTruncated
         >
           {title}
@@ -31,8 +35,8 @@ export function EquipmentCard({ icon, title, description, ...rest }: Props) {
 
         <Text
           color="#686868"
-          fontSize="10px"
-          fontFamily="Montserrat_400Regular"
+          fontSize={`${RFValue(10)}px`}
+          fontFamily={THEME.fonts.Roboto_400Regular}
           isTruncated
         >
           {description}

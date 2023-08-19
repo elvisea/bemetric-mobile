@@ -98,6 +98,8 @@ export declare global {
         serial: string;
       };
 
+      ConfigurarConexaoBluetooth: undefined;
+
       IncludeStackRoutes: {
         screen: string;
         params?: {
