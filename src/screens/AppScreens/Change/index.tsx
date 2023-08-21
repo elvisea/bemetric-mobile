@@ -51,7 +51,7 @@ export function Change() {
   const desvincular = async () => {
     try {
       setIsLoading(true);
-      const response = await api.post(
+      const response = await api.put(
         "/AppMobile/DesvincularDispositivoEquipamento",
         {
           codigoEquipamento: selectedEquipment?.codigoEquipamento,
@@ -136,7 +136,7 @@ export function Change() {
             fontFamily={THEME.fonts.Roboto_400Regular}
           >
             {action === "desvincular"
-              ? `O dispositivo XXXX está vinculado ao equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}`
+              ? `O dispositivo ${selectedEquipment?.dispositivoSerial.toUpperCase()} está vinculado ao equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}`
               : "Equipamento desvinculado com sucesso!"}
           </Text>
 
@@ -146,7 +146,8 @@ export function Change() {
           >
             {action === "desvincular"
               ? "Deseja Desvincular?"
-              : "Deseja vincular um novo dispositivo para o equipamento XXXXX?"}
+              : `Deseja vincular um novo dispositivo para o equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}?`
+            }
           </Text>
         </Center>
 
