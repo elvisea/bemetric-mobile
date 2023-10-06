@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "bemetrics",
+    "name": "BeMetric",
     "slug": "bemetrics",
     "version": "1.0.0",
     "orientation": "default",
@@ -45,7 +45,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.elvisea.bemetrics"
+      "bundleIdentifier": "com.elvisea.bemetrics",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access camera.",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
+      }
     },
     "android": {
       "config": {
@@ -61,7 +65,8 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.BLUETOOTH",
         "android.permission.BLUETOOTH_ADMIN",
-        "android.permission.BLUETOOTH_CONNECT"
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.CAMERA"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -72,13 +77,13 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "f52fcfed-7c2d-4265-9cf7-5ae87f222951"
-      }
-    },
     "runtimeVersion": {
       "policy": "sdkVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "14e82de4-3b42-4ad9-a9a4-6acb6f1ef84a"
+      }
     }
   }
 }
