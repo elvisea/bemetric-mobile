@@ -39,9 +39,13 @@ export function Change() {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const [equipments, setEquipments] = useState<IEquipamento[] | null>(null);
-  const [selectedEquipment, setSelectedEquipment] = useState<IEquipamento | null>(null);
 
-  const [action, setAction] = useState<"vincular" | "desvincular">("desvincular");
+  const [selectedEquipment, setSelectedEquipment] =
+    useState<IEquipamento | null>(null);
+
+  const [action, setAction] = useState<"vincular" | "desvincular">(
+    "desvincular"
+  );
 
   const handleSelectEquipment = (equipment: IEquipamento) => {
     setSelectedEquipment(equipment);
@@ -87,7 +91,7 @@ export function Change() {
   };
 
   const vincular = () => {
-    navigation.navigate("ConfigurarConexaoBluetooth")
+    navigation.navigate("ConfigurarConexaoBluetooth");
   };
 
   useFocusEffect(
@@ -125,7 +129,11 @@ export function Change() {
   return (
     <>
       <GenericModal
-        title={action === "desvincular" ? "Desvincular Equipamento" : "Vincular Equipamento"}
+        title={
+          action === "desvincular"
+            ? "Desvincular Equipamento"
+            : "Vincular Equipamento"
+        }
         isOpen={isOpenModal}
         closeModal={() => setIsOpenModal(false)}
       >
@@ -146,8 +154,7 @@ export function Change() {
           >
             {action === "desvincular"
               ? "Deseja Desvincular?"
-              : `Deseja vincular um novo dispositivo para o equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}?`
-            }
+              : `Deseja vincular um novo dispositivo para o equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}?`}
           </Text>
         </Center>
 

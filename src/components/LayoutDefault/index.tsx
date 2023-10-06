@@ -9,7 +9,7 @@ import { THEME } from "@theme/theme";
 import { BadgeCustom, Icon } from "./styles";
 
 type ICount = {
-  contadorAlerta: number;
+  contadorEvento: number;
   contadorMensagem: number;
 };
 
@@ -72,10 +72,10 @@ export function LayoutDefault({
         >
           {secondIcon && (
             <Box>
-              {count?.contadorAlerta !== 0 && (
+              {count?.contadorEvento !== 0 && (
                 <BadgeCustom>
                   <Text textAlign="center" fontSize={12} color="white">
-                    {count?.contadorAlerta}
+                    {count?.contadorEvento}
                   </Text>
                 </BadgeCustom>
               )}

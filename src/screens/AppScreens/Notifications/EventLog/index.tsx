@@ -25,7 +25,9 @@ import {
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
+
 import { useCustomer } from "@hooks/customer";
+import { useAuth } from "@hooks/authentication";
 
 import { date } from "@constants/date";
 
@@ -56,6 +58,8 @@ import {
 
 export function EventLog() {
   const { colors } = THEME;
+
+  const { user } = useAuth();
   const { customer } = useCustomer();
 
   const [data, setData] = useState<any | null>();
@@ -178,6 +182,7 @@ export function EventLog() {
       listaEventos: search.events,
       listaMarcadores: search.markers,
       listaEquipamentos: search.equipments,
+      codigoUsuario: user?.codigoUsuario,
     };
 
     try {
@@ -199,6 +204,7 @@ export function EventLog() {
     const data = {
       tipoIntervalo: 3,
       codigoCliente: customer?.codigoCliente,
+      codigoUsuario: user?.codigoUsuario,
     };
 
     try {
