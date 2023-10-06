@@ -13,4 +13,4 @@ const responses: { [key: number]: { title: string; subtitle: string } } = {
   },
 };
 
-export { responses }
+export { responses };

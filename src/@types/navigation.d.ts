@@ -174,7 +174,11 @@ export declare global {
 
       NotificationDetailing: {
         screen: "DetailingScreen";
-        params: { codigoEvento: number };
+        params: {
+          codigoEvento: number;
+          codigoEquipamento: number;
+          codigoDispositivo: number;
+        };
       };
 
       // Pra Cima OK

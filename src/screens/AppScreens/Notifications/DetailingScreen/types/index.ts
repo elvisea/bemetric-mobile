@@ -21,4 +21,10 @@ type Data = {
   pointFence: { latitude: number; longitude: number; raio: number };
 };
 
-export { Data };
+type IParams = {
+  codigoEvento: number;
+  codigoEquipamento: number;
+  codigoDispositivo: number;
+};
+
+export { Data, IParams };

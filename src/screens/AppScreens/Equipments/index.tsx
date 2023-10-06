@@ -27,6 +27,11 @@ import { useCustomer } from "@hooks/customer";
 
 import { IGrouping } from "@interfaces/IGrouping";
 
+type ICount = {
+  contadorEvento: number;
+  contadorMensagem: number;
+};
+
 export function Equipments() {
   const navigation = useNavigation();
 
@@ -36,7 +41,12 @@ export function Equipments() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [expanded, setExpanded] = useState("");
-  const [count, setCount] = useState();
+
+  const [count, setCount] = useState<ICount>({
+    contadorEvento: 0,
+    contadorMensagem: 0,
+  });
+
   const [groupings, setGroupings] = useState<IGrouping[]>([]);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
@@ -84,6 +94,7 @@ export function Equipments() {
   const fetchNotifications = async () => {
     try {
       const response = await api.post("/Dashboard/ObterListaIndicadores", {
+        localDashboard: 3,
         codigoUsuario: user?.codigoUsuario,
         codigoCliente: user?.codigoCliente,
       });

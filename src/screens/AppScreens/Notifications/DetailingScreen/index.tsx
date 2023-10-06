@@ -25,7 +25,7 @@ import { Item } from "@components/Item";
 import { Cabecalho } from "@components/Cabecalho";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { Data } from "./types";
+import { Data, IParams } from "./types";
 import { createCoordsGeofence } from "./utils";
 
 import {
@@ -36,6 +36,8 @@ import {
   Value,
   HeaderSecondary,
 } from "./styles";
+
+import { useAuth } from "@hooks/authentication";
 
 const icons: { [index: number]: ReactNode } = {
   0: <Ionicons name="flag" size={20} color={THEME.colors.blue[700]} />,
@@ -57,13 +59,20 @@ const { height } = Dimensions.get("screen");
 
 export default function DetailingDoisStackRoutes() {
   const route = useRoute();
-  const params = route.params as { codigoEvento: number };
+  const params = route.params as IParams;
+
+  const { user } = useAuth();
 
   const [data, setData] = useState<Data | null>(null);
 
   async function fetchData() {
     const data = {
+      localDashboard: 3,
+      codigoUsuario: user?.codigoUsuario,
+
       codigoEvento: params.codigoEvento,
+      codigoEquipamento: params.codigoEquipamento,
+      codigoDispositivo: params.codigoDispositivo,
     };
 
     try {

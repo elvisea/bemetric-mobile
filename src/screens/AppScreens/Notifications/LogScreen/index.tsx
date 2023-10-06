@@ -21,7 +21,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { date } from "@constants/date";
+
 import { useCustomer } from "@hooks/customer";
+import { useAuth } from "@hooks/authentication";
 
 import { Button } from "@components/Button";
 import { LogCard } from "./components/LogCard";
@@ -48,12 +50,15 @@ import {
   transformMarkersData,
 } from "../EventLog/utils";
 
+import { IEvento } from "./types";
+
 export function LogScreen() {
   const navigation = useNavigation();
 
+  const { user } = useAuth();
   const { customer } = useCustomer();
 
-  const [data, setData] = useState<any | null>();
+  const [data, setData] = useState<IEvento[]>([]);
 
   const [isOpenPrimaryModal, setIsOpenPrimaryModal] = useState(false);
   const [isOpenSecondaryModal, setIsOpenSecondaryModal] = useState(false);
@@ -110,10 +115,14 @@ export function LogScreen() {
     setSearch((rest) => ({ ...rest, eventType: codigo }));
   };
 
-  const handleNextPage = (codigoEvento: number) => {
+  const handleNextPage = (evento: IEvento) => {
     navigation.navigate("NotificationDetailing", {
       screen: "DetailingScreen",
-      params: { codigoEvento: codigoEvento },
+      params: {
+        codigoEvento: evento.codigoEvento,
+        codigoDispositivo: evento.codigoDispositivo,
+        codigoEquipamento: evento.codigoEquipamento,
+      },
     });
   };
 
@@ -180,6 +189,7 @@ export function LogScreen() {
       listaEventos: search.events,
       listaMarcadores: search.markers,
       listaEquipamentos: search.equipments,
+      codigoUsuario: user?.codigoUsuario,
     };
 
     try {
@@ -230,6 +240,7 @@ export function LogScreen() {
     const data = {
       codigoCliente: customer?.codigoCliente,
       tipoIntervalo: 3,
+      codigoUsuario: user?.codigoUsuario,
     };
 
     try {
@@ -434,7 +445,7 @@ export function LogScreen() {
           keyExtractor={(item) => item.codigoEvento.toString()}
           renderItem={({ item }) => (
             <LogCard
-              search={() => handleNextPage(item.codigoEvento)}
+              search={() => handleNextPage(item)}
               icon={item.tipoEvento === 0 ? "bell" : "flag"}
               html={item.mensagemHtml}
               date={item.criadoEmFormatado}
