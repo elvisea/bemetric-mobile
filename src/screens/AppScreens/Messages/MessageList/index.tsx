@@ -80,18 +80,28 @@ export function MessageList() {
     },
   };
 
-  const [messages, setMessages] = useState<IMessage[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   const fetchMessages = async () => {
     try {
+      setIsLoading(true);
+
       const response = await api.post("/Mensagem/ObterListaApp", {
         codigoUsuario: user?.codigoUsuario,
         codigoCliente: customer?.codigoCliente,
       });
 
-      setMessages(response.data);
+      if (typeof response.data !== "string") {
+        setMessages(response.data);
+      } else {
+        setMessages([]);
+      }
+
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,18 +116,18 @@ export function MessageList() {
         });
 
         if (response.data === 0) {
-          if (messages) {
-            const filtered = messages.filter(
-              (item) => item.codigoMensagem !== message.codigoMensagem
-            );
-            setMessages(filtered);
-          }
+          const filtered = messages.filter(
+            (item) => item.codigoMensagem !== message.codigoMensagem
+          );
+
+          setMessages(filtered);
         }
 
         Alert.alert(
           responses[response.data].subtitle,
           responses[response.data].subtitle
         );
+
       } catch (error) {
         if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       } finally {
@@ -146,9 +156,9 @@ export function MessageList() {
           Mensagens
         </Text>
 
-        {!messages && <LoadingSpinner color={colors.blue[700]} />}
+        {isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-        {messages && (
+        {!isLoading && (
           <FlatList
             data={messages}
             keyExtractor={(item) => item.codigoMensagem.toString()}
@@ -180,6 +190,7 @@ export function MessageList() {
             )}
           />
         )}
+
       </VStack>
     </>
   );
