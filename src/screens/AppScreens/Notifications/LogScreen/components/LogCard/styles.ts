@@ -40,6 +40,8 @@ export const Date = styled.Text`
 export const ButtonSearch = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
+  width: ${RFValue(32)}px;
+  height: ${RFValue(32)}px;
 `;
 
 export const ContentWebView = styled.View`
