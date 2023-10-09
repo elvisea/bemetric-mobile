@@ -2,7 +2,7 @@ type Data = {
   atividade: number;
   criadoEmFormatado: string;
   hodometro: number;
-  horimetro: number;
+  horimetro: string;
   identificador: string;
   jsonCoordenads: string;
   latitude: number;
@@ -19,6 +19,7 @@ type Data = {
   marcadorApp: string;
   geoFence: [{ latitude: number; longitude: number }];
   pointFence: { latitude: number; longitude: number; raio: number };
+  horimetroFormatado: string;
 };
 
 type IParams = {

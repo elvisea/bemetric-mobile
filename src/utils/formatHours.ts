@@ -16,4 +16,11 @@ function formatHours(label: string, value: number | null) {
   }
 }
 
-export { formatHours };
+const formatHour = (value: string) => {
+  const [hours, minutes] = value.split(".");
+  const min = minutes ? minutes : "00"
+
+  return `${hours}h ${min}m`
+}
+
+export { formatHours, formatHour };

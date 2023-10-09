@@ -3,4 +3,5 @@ export interface IData {
   horimetro: number;
   status: number;
   velocimetro: number;
+  horimetroFormatado: string;
 }

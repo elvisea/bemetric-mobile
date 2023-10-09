@@ -28,6 +28,8 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { Data, IParams } from "./types";
 import { createCoordsGeofence } from "./utils";
 
+import { formatHour } from "@utils/formatHours";
+
 import {
   ContentHeader,
   Text,
@@ -154,7 +156,7 @@ export default function DetailingDoisStackRoutes() {
             icon={<IconHourMeter />}
             title="Horímetro"
           >
-            <Value>{data.horimetro} Horas</Value>
+            <Value>{data ? formatHour(data.horimetro) : ""}</Value>
           </Item>
 
           <Item
