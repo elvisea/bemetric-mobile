@@ -15,6 +15,8 @@ import IconSnapshot from "@assets/snapshot.svg";
 import IconHourMeter from "@assets/hourmeter.svg";
 import IconSpeedometer from "@assets/speedometer.svg";
 
+import { formatHour } from "@utils/formatHours";
+
 import { IData } from "./interfaces/IData";
 import { IParams } from "../interfaces/IEquipamentDetails";
 import { IEquipmentDetails } from "./interfaces/IEquipamentDetails";
@@ -212,7 +214,7 @@ export function Equipament() {
               fontFamily="Roboto_400Regular"
               isTruncated
             >
-              {data ? `${data.horimetro} horas` : ""}
+              {data ? formatHour(data.horimetroFormatado) : ""}
             </Text>
           </Item>
 
