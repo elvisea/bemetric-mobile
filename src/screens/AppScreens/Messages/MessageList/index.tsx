@@ -97,7 +97,6 @@ export function MessageList() {
       } else {
         setMessages([]);
       }
-
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
@@ -127,7 +126,6 @@ export function MessageList() {
           responses[response.data].subtitle,
           responses[response.data].subtitle
         );
-
       } catch (error) {
         if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       } finally {
@@ -190,7 +188,6 @@ export function MessageList() {
             )}
           />
         )}
-
       </VStack>
     </>
   );

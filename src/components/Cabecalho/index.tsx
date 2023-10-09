@@ -92,7 +92,6 @@ export function Cabecalho({ hasIcon = true }: Props) {
             onPress={() => setIsOpenModal(true)}
           />
         )} */}
-
       </HStack>
     </>
   );

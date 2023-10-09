@@ -43,6 +43,8 @@ import { IList, ITelemetryData } from "./interfaces/TelemetryData";
 import { Icon } from "./styles";
 import { THEME } from "@theme/theme";
 
+import { formatHours } from "@utils/formatHours";
+
 import { url } from "@constants/url";
 import { date } from "@constants/date";
 import { dateOptions } from "@constants/dateOptions";
@@ -212,7 +214,8 @@ export function TelemetryData() {
                 isTruncated
               >
                 {typeof data === "object"
-                  ? `${list[item].value} ${list[item].label}`
+                  ? `${formatHours(list[item].label, list[item].value)} ${list[item].label !== "horas" ? list[item].label : ""
+                  }`
                   : ""}
               </Text>
             </Item>
