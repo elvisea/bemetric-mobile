@@ -18,9 +18,9 @@ function formatHours(label: string, value: number | null) {
 
 const formatHour = (value: string) => {
   const [hours, minutes] = value.split(".");
-  const min = minutes ? minutes : "00"
+  const min = minutes ? minutes : "00";
 
-  return `${hours}h ${min}m`
-}
+  return `${hours}h ${min}m`;
+};
 
 export { formatHours, formatHour };
