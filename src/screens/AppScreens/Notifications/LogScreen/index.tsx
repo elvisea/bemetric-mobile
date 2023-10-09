@@ -182,6 +182,7 @@ export function LogScreen() {
   const fetchSearch = useCallback(async () => {
     const data = {
       codigoCliente: customer?.codigoCliente,
+      localDashboard: 3,
       tipoEvento: search.eventType,
       tipoIntervalo: 4,
       periodoDe: search.start,
@@ -197,7 +198,7 @@ export function LogScreen() {
 
       const response = await api.post("/Evento/ObterLista", data);
 
-      setData(response.data);
+      setData(response.data.listaEventos);
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
@@ -442,7 +443,9 @@ export function LogScreen() {
           data={data}
           style={{ width: "100%", padding: 16 }}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.codigoEvento.toString()}
+          keyExtractor={(item, index) =>
+            `${index}-${item.codigoEvento.toString()}`
+          }
           renderItem={({ item }) => (
             <LogCard
               search={() => handleNextPage(item)}

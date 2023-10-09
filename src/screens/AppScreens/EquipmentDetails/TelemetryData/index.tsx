@@ -214,8 +214,9 @@ export function TelemetryData() {
                 isTruncated
               >
                 {typeof data === "object"
-                  ? `${formatHours(list[item].label, list[item].value)} ${list[item].label !== "horas" ? list[item].label : ""
-                  }`
+                  ? `${formatHours(list[item].label, list[item].value)} ${
+                      list[item].label !== "horas" ? list[item].label : ""
+                    }`
                   : ""}
               </Text>
             </Item>
