@@ -30,8 +30,6 @@ import {
   ISelected,
 } from "../interfaces";
 
-// Inserir isLoading nas outras telas de mapa.
-
 export function FullMap() {
   const { colors } = THEME;
 
@@ -58,6 +56,12 @@ export function FullMap() {
     geofences: [] as number[],
     equipments: [] as number[],
   });
+
+  const [selected, setSelected] = useState<ISelected>({} as ISelected);
+
+  const [initialRegion, setInitialRegion] = useState<IInicialRegion>(
+    {} as IInicialRegion
+  );
 
   const handleSelecionarItens = (codigo: number) => {
     const include = itens[selected.type].includes(codigo);
@@ -108,12 +112,6 @@ export function FullMap() {
 
     setIsOpenModal(false);
   };
-
-  const [selected, setSelected] = useState<ISelected>({} as ISelected);
-
-  const [initialRegion, setInitialRegion] = useState<IInicialRegion>(
-    {} as IInicialRegion
-  );
 
   const handleSelectedItem = ({ title, type }: ISelected) => {
     setSelected({ title, type });
