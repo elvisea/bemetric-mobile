@@ -84,12 +84,15 @@ export function Cabecalho({ hasIcon = true }: Props) {
 
         {/* <Logo /> */}
 
-        {hasIcon && (
+        {/* Quando implementar a funcionalidade de Exportar e Importar dados, descomentar o bloco de códigos abaixos */}
+
+        {/* {hasIcon && (
           <IconButton
             icon={<Icon name="settings" />}
             onPress={() => setIsOpenModal(true)}
           />
-        )}
+        )} */}
+
       </HStack>
     </>
   );
