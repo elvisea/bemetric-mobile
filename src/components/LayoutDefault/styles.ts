@@ -35,6 +35,6 @@ export const BadgeCustom = styled.View`
 `;
 
 export const Icon = styled(MaterialIcons).attrs(() => ({
-  size: 24,
+  size: 26,
   color: THEME.colors.white,
 }))``;
