@@ -13,6 +13,18 @@ export const Container = styled.View`
   flex-direction: row;
 `;
 
+export const LogoContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ImageLogo = styled.Image`
+  width: ${RFValue(57)}px;
+  height: ${RFValue(20)}px;
+  margin-left: ${RFValue(-20)}px;
+`;
+
 export const Icon = styled(MaterialIcons).attrs(() => ({
   size: 24,
   color: THEME.colors.white,
