@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Alert, FlatList } from "react-native";
 
 import axios from "axios";
@@ -21,6 +21,10 @@ import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
+import { ICoordinate } from "../UpdateGeofences/interfaces";
+
+import { calculateDelta, calculateInitialRegion } from "../utils";
+
 import {
   IEquipment,
   IGeofence,
@@ -35,6 +39,8 @@ export function FullMap() {
 
   const { user } = useAuth();
   const { customer } = useCustomer();
+
+  const mapRef = useRef<MapView>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -51,7 +57,7 @@ export function FullMap() {
     equipments: [] as IEquipment[],
   });
 
-  const [itens, setItens] = useState({
+  const [itens, setItems] = useState({
     points: [] as number[],
     geofences: [] as number[],
     equipments: [] as number[],
@@ -59,14 +65,14 @@ export function FullMap() {
 
   const [selected, setSelected] = useState<ISelected>({} as ISelected);
 
-  const [initialRegion, setInitialRegion] = useState<IInicialRegion>(
-    {} as IInicialRegion
-  );
+  const [initialRegion, setInitialRegion] = useState<
+    IInicialRegion | undefined
+  >(undefined);
 
   const handleSelecionarItens = (codigo: number) => {
     const include = itens[selected.type].includes(codigo);
 
-    setItens((oldState) => {
+    setItems((oldState) => {
       const newState = { ...oldState };
       newState[selected.type] = include
         ? newState[selected.type].filter((item) => item !== codigo)
@@ -79,146 +85,135 @@ export function FullMap() {
     const selectedPoints = marker.points.filter((point) =>
       itens.points.includes(point.codigoPontoInteresse)
     );
+
     setSelectedMarkers((prevMarkers) => ({
       ...prevMarkers,
       points: selectedPoints,
     }));
+
+    const coordsPoints = selectedPoints.map(({ latitude, longitude }) => ({
+      latitude,
+      longitude,
+    }));
+
+    return coordsPoints;
   };
 
   const updateSelectedGeofences = () => {
     const selectedGeofences = marker.geofences.filter((geofence) =>
       itens.geofences.includes(geofence.codigoGeocerca)
     );
+
     setSelectedMarkers((prevMarkers) => ({
       ...prevMarkers,
       geofences: selectedGeofences,
     }));
+
+    const coordsGeofences = selectedGeofences.flatMap(
+      ({ listaPontosGeocerca }) =>
+        listaPontosGeocerca.map(({ latitude, longitude }) => ({
+          latitude,
+          longitude,
+        }))
+    );
+
+    return coordsGeofences;
   };
 
   const updateSelectedEquipments = () => {
     const selectedEquipments = marker.equipments.filter((equipment) =>
       itens.equipments.includes(equipment.codigoEquipamento)
     );
+
     setSelectedMarkers((prevMarkers) => ({
       ...prevMarkers,
       equipments: selectedEquipments,
     }));
+
+    const coordsEquipments = selectedEquipments.map(
+      ({ latitude, longitude }) => ({ latitude, longitude })
+    );
+
+    return coordsEquipments;
+  };
+
+  const gerarListaDeCoordenadas = ({
+    points,
+    geofences,
+    equipments,
+  }: IMarker): ICoordinate[] => {
+    const coordsPoints = points.map(({ latitude, longitude }) => ({
+      latitude,
+      longitude,
+    }));
+
+    const coordsEquipments = equipments.map(({ latitude, longitude }) => ({
+      latitude,
+      longitude,
+    }));
+
+    const coordsGeofences = geofences.flatMap(({ listaPontosGeocerca }) =>
+      listaPontosGeocerca.map(({ latitude, longitude }) => ({
+        latitude,
+        longitude,
+      }))
+    );
+
+    return [...coordsPoints, ...coordsEquipments, ...coordsGeofences];
   };
 
   const handleFilter = () => {
-    updateSelectedPoints();
-    updateSelectedGeofences();
-    updateSelectedEquipments();
+    const coordsPoints = updateSelectedPoints();
+    const coordsGeofences = updateSelectedGeofences();
+    const coordsEquipments = updateSelectedEquipments();
 
-    setIsOpenModal(false);
+    const coords = [...coordsPoints, ...coordsEquipments, ...coordsGeofences];
+
+    if (coords.length > 0) {
+      setInitialRegion({
+        latitude: calculateInitialRegion(coords).latitude,
+        longitude: calculateInitialRegion(coords).longitude,
+        latitudeDelta: calculateDelta(coords).latitudeDelta,
+        longitudeDelta: calculateDelta(coords).longitudeDelta,
+      });
+
+      mapRef.current?.animateCamera({
+        center: {
+          latitude: calculateInitialRegion(coords).latitude,
+          longitude: calculateInitialRegion(coords).longitude,
+        },
+      });
+
+      setIsOpenModal(false);
+    } else {
+      const coords = gerarListaDeCoordenadas(marker);
+
+      if (coords.length > 0) {
+        const startInitialRegion = {
+          latitude: calculateInitialRegion(coords).latitude,
+          longitude: calculateInitialRegion(coords).longitude,
+          latitudeDelta: calculateDelta(coords).latitudeDelta,
+          longitudeDelta: calculateDelta(coords).longitudeDelta,
+        };
+
+        setInitialRegion(startInitialRegion);
+
+        mapRef.current?.animateCamera({
+          center: {
+            latitude: calculateInitialRegion(coords).latitude,
+            longitude: calculateInitialRegion(coords).longitude,
+          },
+        });
+
+        setIsOpenModal(false);
+      }
+    }
   };
 
   const handleSelectedItem = ({ title, type }: ISelected) => {
     setSelected({ title, type });
     setIsOpenModal(true);
   };
-
-  const handleSelectedMarker = useCallback(
-    (data: IPoint | IGeofence | IEquipment) => {
-      if ("codigoGeocerca" in data) {
-        const include = selectedMarkers.geofences.includes(data);
-
-        if (!include) {
-          setSelectedMarkers({
-            ...selectedMarkers,
-            geofences: [...selectedMarkers.geofences, data],
-          });
-        }
-
-        if (include) {
-          const filtrados = selectedMarkers.geofences.filter(
-            (item) => item.codigoGeocerca !== data.codigoGeocerca
-          );
-          setSelectedMarkers({
-            ...selectedMarkers,
-            geofences: filtrados,
-          });
-        }
-      }
-
-      if ("codigoEquipamento" in data) {
-        const include = selectedMarkers.equipments.includes(data);
-
-        if (!include) {
-          setSelectedMarkers({
-            ...selectedMarkers,
-            equipments: [...selectedMarkers.equipments, data],
-          });
-        }
-
-        if (include) {
-          const filtrados = selectedMarkers.equipments.filter(
-            (item) => item.codigoEquipamento !== data.codigoEquipamento
-          );
-          setSelectedMarkers({
-            ...selectedMarkers,
-            equipments: filtrados,
-          });
-        }
-      }
-
-      if ("codigoPontoInteresse" in data) {
-        const include = selectedMarkers.points.includes(data);
-
-        if (!include) {
-          setSelectedMarkers({
-            ...selectedMarkers,
-            points: [...selectedMarkers.points, data],
-          });
-        }
-
-        if (include) {
-          const filtrados = selectedMarkers.points.filter(
-            (item) => item.codigoPontoInteresse !== data.codigoPontoInteresse
-          );
-          setSelectedMarkers({
-            ...selectedMarkers,
-            points: filtrados,
-          });
-        }
-      }
-    },
-    [selectedMarkers]
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      isActive &&
-        setItens({
-          points: [] as number[],
-          geofences: [] as number[],
-          equipments: [] as number[],
-        });
-
-      return () => {
-        isActive = false;
-      };
-    }, [])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      isActive &&
-        setSelectedMarkers({
-          points: [] as IPoint[],
-          geofences: [] as IGeofence[],
-          equipments: [] as IEquipment[],
-        });
-
-      return () => {
-        isActive = false;
-      };
-    }, [])
-  );
 
   useFocusEffect(
     useCallback(() => {
@@ -247,13 +242,47 @@ export function FullMap() {
               }),
             ]);
 
-            isActive &&
-              setMarker({
-                points: points.data,
-                geofences:
-                  typeof geofences.data === "string" ? [] : geofences.data,
-                equipments: equipments.data,
-              });
+            const startMarker = {
+              points: typeof points.data === "string" ? [] : points.data,
+              geofences: typeof geofences.data === "string" ? [] : geofences.data,
+              equipments: typeof equipments.data === "string" ? [] : equipments.data,
+            };
+
+            if (isActive) {
+              setMarker(startMarker);
+              setSelectedMarkers(startMarker);
+
+              const startItems = {
+                points: startMarker.points.map(
+                  ({ codigoPontoInteresse }) => codigoPontoInteresse
+                ),
+                geofences: startMarker.geofences.map(
+                  ({ codigoGeocerca }) => codigoGeocerca
+                ),
+                equipments: startMarker.equipments.map(
+                  ({ codigoEquipamento }) => codigoEquipamento
+                ),
+              };
+
+              setItems(startItems);
+
+              const coords = gerarListaDeCoordenadas(startMarker);
+
+              if (coords.length > 0) {
+                const startInitialRegion = {
+                  latitude: calculateInitialRegion(coords).latitude,
+                  longitude: calculateInitialRegion(coords).longitude,
+                  latitudeDelta: calculateDelta(coords).latitudeDelta,
+                  longitudeDelta: calculateDelta(coords).longitudeDelta,
+                };
+
+                setInitialRegion(startInitialRegion);
+                setIsOpenModal(false);
+              }
+            } else {
+              setIsOpenModal(false);
+              setInitialRegion(undefined);
+            }
           }
         } catch (error) {
           if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
@@ -384,11 +413,16 @@ export function FullMap() {
         {isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
         {!isLoading && (
-          <MapView style={{ flex: 1 }} zoomControlEnabled>
-            {selectedMarkers.points.map((point) => (
+          <MapView
+            ref={mapRef}
+            style={{ flex: 1 }}
+            initialRegion={initialRegion}
+            zoomControlEnabled
+          >
+            {selectedMarkers.points.map((point, index) => (
               <>
                 <Circle
-                  key={`${point.codigoPontoInteresse}${point.nomePonto}`}
+                  key={`${point.codigoPontoInteresse}${point.nomePonto}${index}`}
                   center={{
                     latitude: point.latitude,
                     longitude: point.longitude,

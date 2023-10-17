@@ -41,6 +41,8 @@ interface ISelected {
 interface IInicialRegion {
   latitude: number;
   longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
 }
 
 export { IPoint, IGeofence, IEquipment, IMarker, ISelected, IInicialRegion };
