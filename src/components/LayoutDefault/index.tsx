@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { Box, VStack, IconButton, HStack, Text } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -6,7 +7,7 @@ import { ColorSchemeType } from "native-base/lib/typescript/components/types";
 
 import { THEME } from "@theme/theme";
 
-import { BadgeCustom, Icon } from "./styles";
+import { BadgeCustom, Icon, ImageLogo } from "./styles";
 
 type ICount = {
   contadorEvento: number;
@@ -62,7 +63,7 @@ export function LayoutDefault({
           onPress={handleFirstIcon}
         />
 
-        {/* <Logo /> */}
+        <ImageLogo source={require("@assets/b2k.png")} />
 
         <Box
           flexDirection="row"

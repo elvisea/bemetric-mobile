@@ -2,16 +2,16 @@ import React, { useState } from "react";
 
 import { IconButton, HStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+
 import { RFValue } from "react-native-responsive-fontsize";
 
-import Logo from "@assets/b2k.svg";
 import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
 import { GenericModal } from "@components/GenericModal";
 import { PeriodOption } from "@components/PeriodOption";
 
-import { Icon } from "./styles";
+import { Icon, ImageContainer, ImageLogo } from "./styles";
 
 type Props = {
   hasIcon?: boolean;
@@ -82,7 +82,9 @@ export function Cabecalho({ hasIcon = true }: Props) {
           onPress={() => navigation.goBack()}
         />
 
-        {/* <Logo /> */}
+        <ImageContainer>
+          <ImageLogo source={require("@assets/b2k.png")} />
+        </ImageContainer>
 
         {/* Quando implementar a funcionalidade de Exportar e Importar dados, descomentar o bloco de códigos abaixos */}
 

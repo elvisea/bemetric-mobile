@@ -34,6 +34,12 @@ export const BadgeCustom = styled.View`
   background: #ffc401;
 `;
 
+export const ImageLogo = styled.Image`
+  width: ${RFValue(57)}px;
+  height: ${RFValue(20)}px;
+  margin-left: ${RFValue(-20)}px;
+`;
+
 export const Icon = styled(MaterialIcons).attrs(() => ({
   size: 26,
   color: THEME.colors.white,
