@@ -3,6 +3,7 @@
     "name": "BeMetric",
     "slug": "bemetrics",
     "version": "1.0.0",
+    "sdkVersion": "33.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
