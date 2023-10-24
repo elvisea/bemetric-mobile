@@ -2,15 +2,16 @@ import React, { useState } from "react";
 
 import {
   Alert,
-  Platform,
   StyleSheet,
-  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 
 import { Box, Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import axios from "axios";
+import { RFValue } from "react-native-responsive-fontsize";
+
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -88,8 +89,6 @@ export function VerifyToken() {
 
   const route = useRoute();
   const params = route.params as Params;
-
-  const behavior = Platform.OS === "ios" ? "padding" : "height";
 
   const {
     control,
@@ -174,7 +173,7 @@ export function VerifyToken() {
       justifyContent="flex-start"
       handleFirstIcon={() => navigation.goBack()}
     >
-      <KeyboardAvoidingView style={styles.keyboard} behavior={behavior}>
+      <ScrollView style={styles.scroll} >
         <VStack flex={1} w="full" justifyContent="space-between" bg="blue.700">
           <VStack flex={1} w="full" p={4} bg="blue.700">
             <Text
@@ -195,7 +194,7 @@ export function VerifyToken() {
 
             <HStack mt={12} justifyContent="space-between" w="100%">
               {Array.of("1", "2", "3", "4", "5", "6").map((item) => (
-                <Box key={item} width="52px">
+                <Box key={item} width={`${RFValue(52)}px`}>
                   <Controller
                     control={control}
                     name={item}
@@ -206,7 +205,7 @@ export function VerifyToken() {
                         borderWidth={1}
                         borderRadius={6}
                         keyboardType="numeric"
-                        h="52px"
+                        h={`${RFValue(52)}px`}
                         onChangeText={onChange}
                         errorMessage={errors[item]?.message}
                       />
@@ -220,7 +219,7 @@ export function VerifyToken() {
           <VStack w="full" p={4} bg="blue.700">
             <Button
               title="Reenviar Código"
-              h="52px"
+              h={`${RFValue(52)}px`}
               w="full"
               mb={4}
               isLoading={isResending}
@@ -229,20 +228,20 @@ export function VerifyToken() {
 
             <Button
               title="Enviar"
-              h="52px"
+              h={`${RFValue(52)}px`}
               w="full"
               isLoading={isSending}
               onPress={handleSubmit(handleNextPage)}
             />
           </VStack>
         </VStack>
-      </KeyboardAvoidingView>
+      </ScrollView>
     </LayoutDefault>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboard: {
+  scroll: {
     flex: 1,
     width: "100%",
   },
