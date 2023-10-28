@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet } from "react-native";
 
 import { Box, HStack, Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";

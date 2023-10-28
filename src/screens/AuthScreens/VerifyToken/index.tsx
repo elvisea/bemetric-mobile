@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 
-import {
-  Alert,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { Alert, StyleSheet, ScrollView } from "react-native";
 
 import { Box, Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -173,7 +169,7 @@ export function VerifyToken() {
       justifyContent="flex-start"
       handleFirstIcon={() => navigation.goBack()}
     >
-      <ScrollView style={styles.scroll} >
+      <ScrollView style={styles.scroll}>
         <VStack flex={1} w="full" justifyContent="space-between" bg="blue.700">
           <VStack flex={1} w="full" p={4} bg="blue.700">
             <Text
