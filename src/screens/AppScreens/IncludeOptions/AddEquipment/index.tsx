@@ -1,4 +1,4 @@
-import { Alert, Platform, TouchableOpacity, View } from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 
 import { useCallback, useState } from "react";
 
@@ -14,7 +14,7 @@ import { Feather } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ScrollView, Select, Text, VStack } from "native-base";
 
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
@@ -76,14 +76,10 @@ export function AddEquipment() {
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const handleSelectAcquisitionDate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      if (Platform.OS === "android") setSelectDate(false);
-
-      if (date) setAcquisitionDate(date);
-    },
-    [selectDate]
-  );
+  const handleSelectAcquisitionDate = (date: Date) => {
+    setSelectDate(false);
+    setAcquisitionDate(date);
+  };
 
   const fetchGrouping = async () => {
     try {
@@ -417,16 +413,14 @@ export function AddEquipment() {
               </Text>
             </TouchableOpacity>
 
-            {selectDate && (
-              <DateTimePicker
-                mode="date"
-                value={acquisitionDate}
-                maximumDate={new Date()}
-                testID="dateTimePicker"
-                display="default"
-                onChange={handleSelectAcquisitionDate}
-              />
-            )}
+            <DateTimePickerModal
+              isVisible={selectDate}
+              mode="date"
+              date={acquisitionDate}
+              maximumDate={new Date()}
+              onCancel={() => setSelectDate(false)}
+              onConfirm={handleSelectAcquisitionDate}
+            />
           </VStack>
         </ScrollView>
 
