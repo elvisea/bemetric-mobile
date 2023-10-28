@@ -90,7 +90,7 @@ export function EventLog() {
   };
 
   const handleSetFinalDate = (date: Date) => {
-    setSelectFinalDate(!selectFinalDate);
+    setSelectFinalDate(false);
     setSearch((rest) => ({ ...rest, end: endOfDay(date) }));
   };
 
