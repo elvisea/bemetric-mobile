@@ -244,8 +244,10 @@ export function FullMap() {
 
             const startMarker = {
               points: typeof points.data === "string" ? [] : points.data,
-              geofences: typeof geofences.data === "string" ? [] : geofences.data,
-              equipments: typeof equipments.data === "string" ? [] : equipments.data,
+              geofences:
+                typeof geofences.data === "string" ? [] : geofences.data,
+              equipments:
+                typeof equipments.data === "string" ? [] : equipments.data,
             };
 
             if (isActive) {
