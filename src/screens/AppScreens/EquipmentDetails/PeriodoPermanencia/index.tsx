@@ -1,4 +1,4 @@
-import { Alert, Platform } from "react-native";
+import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 import { HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 
@@ -6,7 +6,7 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import axios from "axios";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -80,29 +80,19 @@ export function PeriodoPermanencia() {
     setUseData(false);
   };
 
-  const handleStartSate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      setSelectedRange(5);
-      setUseData(true);
+  const handleSetStartDate = (date: Date) => {
+    setSelectStartDate(false);
+    setSelectedRange(5);
+    setUseData(true);
+    setStart(date);
+  };
 
-      if (Platform.OS === "android") setSelectStartDate(!selectStartDate);
-
-      if (date) setStart(date);
-    },
-    [selectStartDate]
-  );
-
-  const handleEndDate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      setSelectedRange(5);
-      setUseData(true);
-
-      if (Platform.OS === "android") setSelectFinalDate(!selectFinalDate);
-
-      if (date) setEnd(endOfDay(date));
-    },
-    [selectFinalDate]
-  );
+  const handleSetFinalDate = (date: Date) => {
+    setSelectFinalDate(false);
+    setSelectedRange(5);
+    setUseData(true);
+    setEnd(endOfDay(date));
+  };
 
   const maximumDate = () => {
     const difference = differenceInDays(new Date(), start);
@@ -248,28 +238,24 @@ export function PeriodoPermanencia() {
         />
       </GenericModal>
 
-      {selectStartDate && (
-        <DateTimePicker
-          mode="date"
-          value={start}
-          maximumDate={new Date()}
-          testID="dateTimePicker"
-          display="default"
-          onChange={handleStartSate}
-        />
-      )}
+      <DateTimePickerModal
+        isVisible={selectStartDate}
+        mode="date"
+        date={start}
+        maximumDate={new Date()}
+        onCancel={() => setSelectStartDate(false)}
+        onConfirm={handleSetStartDate}
+      />
 
-      {selectFinalDate && (
-        <DateTimePicker
-          mode="date"
-          value={end}
-          minimumDate={start}
-          maximumDate={maximumDate()}
-          testID="dateTimePicker"
-          display="default"
-          onChange={handleEndDate}
-        />
-      )}
+      <DateTimePickerModal
+        isVisible={selectFinalDate}
+        mode="date"
+        date={end}
+        minimumDate={start}
+        maximumDate={maximumDate()}
+        onCancel={() => setSelectFinalDate(false)}
+        onConfirm={handleSetFinalDate}
+      />
     </VStack>
   );
 }
