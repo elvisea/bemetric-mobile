@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from "react";
-import { Alert, FlatList, Platform, ScrollView } from "react-native";
+import { Alert, FlatList, ScrollView } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import axios from "axios";
 import { HStack, Text } from "native-base";
 
 import { RFValue } from "react-native-responsive-fontsize";
-import DateTimePicker from "@react-native-community/datetimepicker";
+
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import {
   addDays,
@@ -79,27 +80,15 @@ export function LogScreen() {
     return new Date();
   };
 
-  const handleStartSate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      if (Platform.OS === "android") setSelectStartDate(!selectStartDate);
+  const handleSetStartDate = (date: Date) => {
+    setSelectStartDate(false);
+    setSearch((rest) => ({ ...rest, start: startOfDay(date) }));
+  };
 
-      if (date) {
-        setSearch((rest) => ({ ...rest, start: startOfDay(date) }));
-      }
-    },
-    [selectStartDate]
-  );
-
-  const handleEndDate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      if (Platform.OS === "android") setSelectFinalDate(!selectFinalDate);
-
-      if (date) {
-        setSearch((rest) => ({ ...rest, end: endOfDay(date) }));
-      }
-    },
-    [selectFinalDate]
-  );
+  const handleSetFinalDate = (date: Date) => {
+    setSelectFinalDate(false);
+    setSearch((rest) => ({ ...rest, end: endOfDay(date) }));
+  };
 
   const chooseModalOption = (modalOption: Value) => {
     setIsOpenSecondaryModal(true);
@@ -314,28 +303,24 @@ export function LogScreen() {
           />
         </HStack>
 
-        {selectStartDate && (
-          <DateTimePicker
-            mode="date"
-            value={search.start}
-            maximumDate={new Date()}
-            testID="dateTimePicker"
-            display="default"
-            onChange={handleStartSate}
-          />
-        )}
+        <DateTimePickerModal
+          isVisible={selectStartDate}
+          mode="date"
+          date={search.start}
+          maximumDate={new Date()}
+          onCancel={() => setSelectStartDate(false)}
+          onConfirm={handleSetStartDate}
+        />
 
-        {selectFinalDate && (
-          <DateTimePicker
-            mode="date"
-            value={search.end}
-            minimumDate={search.start}
-            maximumDate={maximumDate()}
-            testID="dateTimePicker"
-            display="default"
-            onChange={handleEndDate}
-          />
-        )}
+        <DateTimePickerModal
+          isVisible={selectFinalDate}
+          mode="date"
+          date={search.end}
+          minimumDate={search.start}
+          maximumDate={maximumDate()}
+          onCancel={() => setSelectFinalDate(false)}
+          onConfirm={handleSetFinalDate}
+        />
 
         <Button
           h={`${RFValue(48)}px`}
