@@ -1,4 +1,4 @@
-import { Alert, Platform, TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import React, { useCallback, useState } from "react";
 import { HStack, IconButton, Text, VStack } from "native-base";
 
@@ -20,7 +20,7 @@ import {
 } from "date-fns";
 
 import { RFValue } from "react-native-responsive-fontsize";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -119,29 +119,19 @@ export function TelemetryData() {
     setUseData(false);
   };
 
-  const handleStartSate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      setSelectedRange(5);
-      setUseData(true);
+  const handleSetStartDate = (date: Date) => {
+    setSelectStartDate(false);
+    setSelectedRange(5);
+    setUseData(true);
+    setStart(date);
+  };
 
-      if (Platform.OS === "android") setSelectStartDate(!selectStartDate);
-
-      if (date) setStart(date);
-    },
-    [selectStartDate]
-  );
-
-  const handleEndDate = useCallback(
-    (_event: unknown, date: Date | undefined) => {
-      setSelectedRange(5);
-      setUseData(true);
-
-      if (Platform.OS === "android") setSelectFinalDate(!selectFinalDate);
-
-      if (date) setEnd(endOfDay(date));
-    },
-    [selectFinalDate]
-  );
+  const handleSetFinalDate = (date: Date) => {
+    setSelectFinalDate(false);
+    setSelectedRange(5);
+    setUseData(true);
+    setEnd(endOfDay(date));
+  };
 
   const fetchData = async () => {
     const data = {
@@ -267,28 +257,24 @@ export function TelemetryData() {
         />
       </GenericModal>
 
-      {selectStartDate && (
-        <DateTimePicker
-          mode="date"
-          value={start}
-          maximumDate={new Date()}
-          testID="dateTimePicker"
-          display="default"
-          onChange={handleStartSate}
-        />
-      )}
+      <DateTimePickerModal
+        isVisible={selectStartDate}
+        mode="date"
+        date={start}
+        maximumDate={new Date()}
+        onCancel={() => setSelectStartDate(false)}
+        onConfirm={handleSetStartDate}
+      />
 
-      {selectFinalDate && (
-        <DateTimePicker
-          mode="date"
-          value={end}
-          minimumDate={start}
-          maximumDate={maximumDate()}
-          testID="dateTimePicker"
-          display="default"
-          onChange={handleEndDate}
-        />
-      )}
+      <DateTimePickerModal
+        isVisible={selectFinalDate}
+        mode="date"
+        date={end}
+        minimumDate={start}
+        maximumDate={maximumDate()}
+        onCancel={() => setSelectFinalDate(false)}
+        onConfirm={handleSetFinalDate}
+      />
     </VStack>
   );
 }
