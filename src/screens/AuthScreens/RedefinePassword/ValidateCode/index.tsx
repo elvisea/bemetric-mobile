@@ -7,32 +7,17 @@ import { Box, HStack, Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
 import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
+import { FormProps, Params } from "./types";
+import { resposta, schema } from "./constants";
+
 import { Button } from "@components/Button";
 import { InputToken } from "@components/InputToken";
 import { LayoutDefault } from "@components/LayoutDefault";
-
-interface FormProps {
-  [index: string]: string;
-}
-
-interface Params {
-  email: string;
-}
-
-const schema = yup.object({
-  "1": yup.string().required("Inválido"),
-  "2": yup.string().required("Inválido"),
-  "3": yup.string().required("Inválido"),
-  "4": yup.string().required("Inválido"),
-  "5": yup.string().required("Inválido"),
-  "6": yup.string().required("Inválido"),
-});
 
 export function ValidateCode() {
   const route = useRoute();
@@ -68,17 +53,10 @@ export function ValidateCode() {
         });
       }
 
-      if (response.data === 1) {
+      if (response.data !== 0) {
         Alert.alert(
-          "Erro ao tentar criar conta",
-          "Código de ativação inválido. Tente novamente."
-        );
-      }
-
-      if (response.data === 2) {
-        Alert.alert(
-          "Erro ao tentar criar conta",
-          "Código de ativação expirado. Tente novamente."
+          resposta.validation[response.data].title,
+          resposta.validation[response.data].subtitle,
         );
       }
     } catch (error) {
@@ -94,19 +72,19 @@ export function ValidateCode() {
       setIsResending(true);
 
       const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${email}`
+        `/Usuario/GerarCodigoAtivacao?email=${email}`,
       );
 
       if (response.data === 1) {
         Alert.alert(
-          "Código reenviado com sucesso!",
-          "Código reenviado com sucesso. Verifique seu e-mail."
+          resposta.resend[response.data].title,
+          resposta.resend[response.data].subtitle,
         );
       }
     } catch (error) {
       Alert.alert(
         "Não foi possível reenviar o código!",
-        "Não foi possível reenviar o código. Tente novamente mais tarde."
+        "Não foi possível reenviar o código. Tente novamente mais tarde.",
       );
     } finally {
       setIsResending(false);
@@ -129,7 +107,7 @@ export function ValidateCode() {
               color={THEME.colors.white}
               fontFamily="Roboto_400Regular"
             >
-              Um código de ativação foi enviado para o{"\n"}e-mail cadastrado.
+              Um código de validação foi enviado para o{"\n"}e-mail cadastrado.
               {"\n"}
               {"\n"}
               Aguarde alguns minutos e confira seu{"\n"}e-mail. Se não
