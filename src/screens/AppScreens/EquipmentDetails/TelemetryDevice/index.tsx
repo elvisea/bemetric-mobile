@@ -39,7 +39,6 @@ export function TelemetryDevice() {
   const {
     isDeviceConnected,
     requestPermissions,
-    monitorCharacteristic,
     changeGrantedPermissions,
     connectToDevice,
     removeValues,
@@ -79,7 +78,6 @@ export function TelemetryDevice() {
             await writeCharacteristic(COMMAND);
           } else {
             await connectToDevice(deviceFound.id);
-            await monitorCharacteristic();
             await writeCharacteristic(COMMAND);
           }
         } catch (error) {

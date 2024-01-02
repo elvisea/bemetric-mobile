@@ -134,20 +134,6 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     dispatch({ type: "ENABLE_BLUETOOTH", payload: isPoweredOn });
   };
 
-  const monitorCharacteristic = async (
-    onValueChange: (value: string) => void,
-  ) => {
-    const subscription = await bluetoothManager.monitorCharacteristic(
-      SERVICE_UUID,
-      MONITORED_FEATURE_UUID,
-      (value) => {
-        onValueChange(value);
-      },
-    );
-
-    return subscription;
-  };
-
   const connectToDevice = async (id: string) => {
     try {
       const device = await bluetoothManager.connectToDevice(id);
@@ -239,7 +225,6 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         setDevices,
         removeDevices,
 
-        monitorCharacteristic,
       }}
     >
       {children}

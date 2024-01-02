@@ -20,10 +20,6 @@ type BluetoothContextData = {
   removeDevices(): void;
   setDevices(devices: Device[]): void;
 
-  monitorCharacteristic(
-    onValueChange: (value: string) => void,
-  ): Promise<Subscription | undefined>;
-
   connectToDevice(id: string): Promise<void>;
   monitorBluetoothState(state: State): void;
 
