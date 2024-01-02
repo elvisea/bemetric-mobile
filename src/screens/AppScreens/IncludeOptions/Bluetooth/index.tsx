@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { useCallback, useState } from "react";
+import { BackHandler, FlatList, StyleSheet } from "react-native";
 
 import {
   useNavigation,
@@ -7,53 +7,96 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import { Device } from "react-native-ble-plx";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Device, State } from "react-native-ble-plx";
 
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
+
+import BluetoothManager from "@manager/bluetooth";
+import { requestPermissions } from "@manager/permissions";
 
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { DeviceBluetooth } from "@components/DeviceBluetooth";
 
+import { initialState } from "./constants";
 import { Content, TitleHeader, Warning, Status } from "./styles";
 
+const bluetoothManager = BluetoothManager.getInstance();
+
 export function Bluetooth() {
+  const { removeValues } = useBluetooth();
   const { navigate, dispatch } = useNavigation();
 
-  const {
-    devices,
-    bluetoothEnabled,
-    permissionsGranted,
-    scanForDevices,
-    requestPermissions,
-    changeGrantedPermissions,
-  } = useBluetooth();
+  const [state, setState] = useState(initialState);
 
-  const canDisplay = () => bluetoothEnabled && devices.length > 0;
+  const canDisplay = () => state.bluetoothEnabled && state.devices.length > 0;
 
   const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
-    changeGrantedPermissions(isGranted);
+    setState((oldState) => ({ ...oldState, permissionsGranted: isGranted }));
   };
 
   const handleChooseDevice = (device: Device) => {
     if (device.name) {
-      navigate("VincularDispositivo", { serial: device.name });
+      navigate("VincularDispositivo", { serial: device.name, id: device.id });
     }
+  };
+
+  const monitorBluetoothState = (state: State) => {
+    const isPoweredOn = state === State.PoweredOn;
+    setState((oldState) => ({ ...oldState, bluetoothEnabled: isPoweredOn }));
   };
 
   useFocusEffect(
     useCallback(() => {
       requestUsagePermissions();
 
-      if (permissionsGranted && bluetoothEnabled) {
-        scanForDevices();
+      if (state.permissionsGranted && state.bluetoothEnabled) {
+        bluetoothManager.scanForDevices((scannedDevices) => {
+          setState((oldState) => ({ ...oldState, devices: scannedDevices }));
+        });
       }
-    }, [permissionsGranted, bluetoothEnabled])
+
+      return () => {
+        bluetoothManager.stopScan();
+      };
+    }, [state.permissionsGranted, state.bluetoothEnabled]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const stateChangeListener = bluetoothManager.monitorBluetoothState(
+        (state) => {
+          monitorBluetoothState(state);
+        },
+      );
+
+      return () => {
+        stateChangeListener.remove();
+      };
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
   );
 
   return (
@@ -64,7 +107,7 @@ export function Bluetooth() {
     >
       <HeaderDefault title="Bluetooth" />
 
-      {!bluetoothEnabled && (
+      {!state.bluetoothEnabled && (
         <Content>
           <Warning>
             Ative o Bluetooth nas configurações do seu celular. Após ativar o
@@ -83,7 +126,7 @@ export function Bluetooth() {
 
       {canDisplay() && (
         <FlatList
-          data={devices}
+          data={state.devices}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             <TitleHeader>Selecione um dispositivo</TitleHeader>

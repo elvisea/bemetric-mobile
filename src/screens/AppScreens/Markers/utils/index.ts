@@ -8,16 +8,16 @@ interface ICoordinate {
 const calculateDelta = (coordenadas: ICoordinate[]) => {
   const margemAjuste = 1;
   const minLatitude = Math.min(
-    ...coordenadas.map((coordenada) => coordenada.latitude)
+    ...coordenadas.map((coordenada) => coordenada.latitude),
   );
   const maxLatitude = Math.max(
-    ...coordenadas.map((coordenada) => coordenada.latitude)
+    ...coordenadas.map((coordenada) => coordenada.latitude),
   );
   const minLongitude = Math.min(
-    ...coordenadas.map((coordenada) => coordenada.longitude)
+    ...coordenadas.map((coordenada) => coordenada.longitude),
   );
   const maxLongitude = Math.max(
-    ...coordenadas.map((coordenada) => coordenada.longitude)
+    ...coordenadas.map((coordenada) => coordenada.longitude),
   );
 
   const amplitudeLatitude = maxLatitude - minLatitude;
@@ -56,7 +56,7 @@ const calculateInitialRegion = (coordenadas: ICoordinate[]) => {
 
 function getDeltaFromRadius(
   center: LatLng,
-  radius: number
+  radius: number,
 ): { latitude: number; longitude: number } {
   const earthCircumference = 40075016.686;
 

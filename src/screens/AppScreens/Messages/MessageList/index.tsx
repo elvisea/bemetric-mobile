@@ -116,7 +116,7 @@ export function MessageList() {
 
         if (response.data === 0) {
           const filtered = messages.filter(
-            (item) => item.codigoMensagem !== message.codigoMensagem
+            (item) => item.codigoMensagem !== message.codigoMensagem,
           );
 
           setMessages(filtered);
@@ -124,14 +124,14 @@ export function MessageList() {
 
         Alert.alert(
           responses[response.data].subtitle,
-          responses[response.data].subtitle
+          responses[response.data].subtitle,
         );
       } catch (error) {
         if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       } finally {
       }
     },
-    [messages]
+    [messages],
   );
 
   useFocusEffect(
@@ -143,7 +143,7 @@ export function MessageList() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

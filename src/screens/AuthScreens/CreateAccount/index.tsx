@@ -53,7 +53,7 @@ export function CreateAccount() {
       setIsLoading(true);
 
       const response = await api.get(
-        `/Cliente/ValidarCpfCnpj?CpfCnpj=${Number(identification)}`
+        `/Cliente/ValidarCpfCnpj?CpfCnpj=${Number(identification)}`,
       );
 
       if (response.data === 0) {

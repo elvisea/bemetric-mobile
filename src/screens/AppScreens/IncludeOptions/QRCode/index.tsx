@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
-import { Text, StyleSheet, Alert } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Text, StyleSheet, Alert, BackHandler } from "react-native";
 
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
 
@@ -16,8 +20,8 @@ export function QRCode() {
   const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
   const {
+    removeValues,
     permissionsGranted,
-
     requestPermissions,
     changeGrantedPermissions,
   } = useBluetooth();
@@ -48,9 +52,27 @@ export function QRCode() {
           text: "Verificar",
           onPress: () => navigate("VincularDispositivo", { serial, chave }),
         },
-      ]
+      ],
     );
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
+  );
 
   useEffect(() => {
     !permissionsGranted && requestUsagePermissions();

@@ -1,23 +1,22 @@
 import { useCallback, useState } from "react";
-import { Alert, FlatList } from "react-native";
+import { Alert, BackHandler, FlatList } from "react-native";
 
 import {
   useNavigation,
   DrawerActions,
-  useFocusEffect,
   useRoute,
+  useFocusEffect,
 } from "@react-navigation/native";
 
 import axios from "axios";
 import { Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
+import { BleError } from "react-native-ble-plx";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 
 import { Input } from "@components/Input";
-import { schema } from "./constants/schema";
-import { inputs } from "./constants/inputs";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
@@ -27,41 +26,31 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { useBluetooth } from "@hooks/bluetooth";
-import { processReturnValues } from "@utils/processReturnValues";
+import BluetoothManager from "@manager/bluetooth";
+import { requestPermissions } from "@manager/permissions";
 
-import { response } from "./constants/response";
-import { IFormProps, IParams, IResponseObject } from "./interfaces";
+import { processReceivedValues } from "@utils/processReceivedValues";
+
+import { TypeForm, TypeParams } from "./types";
+import { initialState, inputs, responses, schema } from "./constants";
+
+const bluetoothManager = BluetoothManager.getInstance();
 
 export function VincularDispositivo() {
   const navigation = useNavigation();
+  const bluetoothContextData = useBluetooth();
 
   const route = useRoute();
-  const params = route.params as IParams;
+  const params = route.params as TypeParams;
 
-  const {
-    devices,
-    returnedValues,
-    bluetoothEnabled,
-    permissionsGranted,
-    scanForDevices,
-    resetBluetooth,
-    resetTotal,
-    connectToDevice,
-    resetReturnValues,
-    writeCharacteristicWithResponseForService,
-    requestPermissions,
-    changeGrantedPermissions,
-    checkConnectedDevices,
-    isDeviceConnected,
-    disconnectDevice,
-  } = useBluetooth();
+  const [state, setState] = useState(initialState);
 
   const {
     control,
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm<IFormProps>({
+  } = useForm<TypeForm>({
     defaultValues: {
       chave: params?.chave ? params.chave : undefined,
       serial: params?.serial ? params.serial : undefined,
@@ -69,62 +58,57 @@ export function VincularDispositivo() {
     resolver: yupResolver(schema),
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [responseObject, setResponseObject] = useState<IResponseObject>(null);
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const chooseAnotherDevice = async () => resetBluetooth();
-
-  async function handleAdvance({ chave, serial }: IFormProps) {
-    setIsLoading(true);
-
-    const name = serial.trim().toUpperCase();
-    const deviceFound = devices.find((device) => device.name === name);
-
+  const sendCommand = async (chave: string) => {
     const COMMAND = { BT_PASSWORD: chave.trim(), GET_SERIAL_KEY: "" };
+    await bluetoothContextData.writeCharacteristic(COMMAND);
+  };
 
-    if (deviceFound) {
-      setIsLoading(true);
+  const handleAdvance = async ({ chave, serial }: TypeForm) => {
+    try {
+      clearReturnedValues();
 
-      const isConnected = await isDeviceConnected(deviceFound.id);
+      setState((oldState) => ({ ...oldState, isLoading: true }));
 
-      if (isConnected) {
-        await disconnectDevice(deviceFound.id);
-
-        await connectToDevice(deviceFound.id);
-        await writeCharacteristicWithResponseForService(deviceFound, COMMAND);
-
-        setIsLoading(false);
-      } else {
-        await connectToDevice(deviceFound.id);
-        await writeCharacteristicWithResponseForService(deviceFound, COMMAND);
-
-        setIsLoading(false);
-      }
-    } else {
-      setIsLoading(false);
-
-      Alert.alert(
-        "Dispositivo não encontrado.",
-        "Verifique se o Dispositivo está ligado ou se o Serial está correto e tente novamente."
+      const device = state.devices.find(
+        (device) => device.name === serial.trim().toUpperCase(),
       );
+
+      if (device) {
+        await bluetoothContextData.connectToDevice(device.id);
+
+        const isConnected = await bluetoothContextData.isDeviceConnected(
+          device.id,
+        );
+
+        if (isConnected) {
+          setState((oldState) => ({ ...oldState, isConnected: isConnected }));
+          await sendCommand(chave);
+        }
+      } else {
+        setState((oldState) => ({ ...oldState, isLoading: false }));
+        Alert.alert(responses[4].title, responses[4].subtitle);
+      }
+    } catch (error) {
+      if (error instanceof BleError) {
+        Alert.alert(error.message, error.message);
+      }
     }
-  }
+  };
 
   const continueRegistration = () => {
+    clearReturnedValues();
     const chave = getValues("chave");
 
     navigation.navigate("ConfigurarConexaoDados", {
       chave,
     });
-
-    resetReturnValues();
-    setResponseObject(null);
   };
 
-  async function checkAvailability() {
+  const checkDeviceAvailability = async () => {
     try {
+      setState((oldState) => ({ ...oldState, isLoading: true }));
       const chave = getValues("chave");
       const serial = getValues("serial");
 
@@ -134,96 +118,107 @@ export function VincularDispositivo() {
       });
 
       if (data === 0) {
-        resetReturnValues();
+        clearReturnedValues();
 
-        Alert.alert(
-          "Dispositivo liberado.",
-          "Dispositivo liberado para ser associado. Continue seu cadastro.",
-          [
-            {
-              text: "Continuar",
-              onPress: () => continueRegistration(),
-            },
-          ]
-        );
+        Alert.alert(responses[5].title, responses[5].subtitle, [
+          {
+            text: "Continuar",
+            onPress: () => continueRegistration(),
+          },
+        ]);
       }
 
       if (data !== 0) {
-        Alert.alert(response[data].title, response[data].subtitle, [
+        clearReturnedValues();
+
+        Alert.alert(responses[data].title, responses[data].subtitle, [
           {
             text: "Tente outro dispositivo",
-            onPress: () => chooseAnotherDevice(),
+            onPress: () => clearReturnedValues(),
           },
         ]);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     } finally {
-      setIsLoading(false);
+      setState((oldState) => ({ ...oldState, isLoading: false }));
     }
-  }
+  };
 
-  const checkIsConnected = async () => {
-    const someConnected = await checkConnectedDevices();
-    if (someConnected) await resetTotal();
+  const clearReturnedValues = () => {
+    bluetoothContextData.removeValues();
   };
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
-    changeGrantedPermissions(isGranted);
+    setState((oldState) => ({ ...oldState, permissionsGranted: isGranted }));
+  };
+
+  const checkObjectProperties = (retorno: object) => {
+    if ("BT_PASSWORD" in retorno) {
+      setState((oldState) => ({ ...oldState, isLoading: false }));
+
+      Alert.alert(responses[6].title, responses[6].subtitle, [
+        {
+          text: "Tentar Novamente",
+          onPress: () => clearReturnedValues(),
+        },
+      ]);
+    }
+
+    if ("GET_SERIAL_KEY" in retorno) {
+      checkDeviceAvailability();
+    }
+  };
+
+  const onValueChange = () => {
+    const response = processReceivedValues(bluetoothContextData.values);
+    checkObjectProperties(response);
   };
 
   useFocusEffect(
     useCallback(() => {
-      setIsLoading(true);
-      checkIsConnected();
-      setIsLoading(false);
-    }, [])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const processedValue = processReturnValues(returnedValues);
-
-      if (processedValue) {
-        setResponseObject(processedValue);
+      if (bluetoothContextData.values.length > 0) {
+        onValueChange();
       }
-    }, [returnedValues])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      if (responseObject) {
-        const hasProperty = "BT_PASSWORD" in responseObject;
-
-        if (hasProperty) {
-          resetBluetooth();
-          resetReturnValues();
-          setResponseObject(null);
-
-          Alert.alert(
-            "Credenciais inválidas.",
-            "Verifique se as credenciais de acesso estão corretas."
-          );
-        }
-      }
-
-      if (responseObject) {
-        const hasProperty = "GET_SERIAL_KEY" in responseObject;
-
-        if (hasProperty) checkAvailability();
-      }
-    }, [responseObject])
+    }, [bluetoothContextData.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
       requestUsagePermissions();
 
-      if (permissionsGranted && bluetoothEnabled) {
-        scanForDevices();
+      const allowed =
+        state.permissionsGranted && bluetoothContextData.bluetoothEnabled;
+
+      if (allowed) {
+        bluetoothManager.scanForDevices((scannedDevices) => {
+          setState((oldState) => ({ ...oldState, devices: scannedDevices }));
+        });
       }
-    }, [permissionsGranted, bluetoothEnabled])
+
+      return () => {
+        bluetoothManager.stopScan();
+      };
+    }, [state.permissionsGranted, bluetoothContextData.bluetoothEnabled]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        bluetoothContextData.removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
   );
 
   return (
@@ -234,9 +229,9 @@ export function VincularDispositivo() {
     >
       <HeaderDefault title="Vincular ao dispositivo" />
 
-      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <VStack flex={1} w="full" paddingX="16px">
           <FlatList
             data={inputs}
@@ -280,10 +275,10 @@ export function VincularDispositivo() {
         </VStack>
       )}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <ButtonFull
           title="Avançar"
-          isLoading={isLoading}
+          isLoading={state.isLoading}
           onPress={handleSubmit(handleAdvance)}
         />
       )}

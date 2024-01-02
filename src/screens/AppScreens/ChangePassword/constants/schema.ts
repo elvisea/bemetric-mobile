@@ -14,7 +14,7 @@ const schema = yup.object({
     .required("Confirme sua senha.")
     .oneOf(
       [yup.ref("newPassword"), null],
-      "A confirmação da senha não confere"
+      "A confirmação da senha não confere",
     ),
 });
 

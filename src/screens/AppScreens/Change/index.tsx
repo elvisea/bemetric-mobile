@@ -44,7 +44,7 @@ export function Change() {
     useState<IEquipamento | null>(null);
 
   const [action, setAction] = useState<"vincular" | "desvincular">(
-    "desvincular"
+    "desvincular",
   );
 
   const handleSelectEquipment = (equipment: IEquipamento) => {
@@ -59,7 +59,7 @@ export function Change() {
         "/AppMobile/DesvincularDispositivoEquipamento",
         {
           codigoEquipamento: selectedEquipment?.codigoEquipamento,
-        }
+        },
       );
 
       if (response.data === 0) {
@@ -69,18 +69,16 @@ export function Change() {
       if (response.data === 1) {
         Alert.alert(
           responses[response.data].title,
-          responses[response.data].subtitle
+          responses[response.data].subtitle,
         );
       }
 
       if (response.data === 2) {
         Alert.alert(
           responses[response.data].title,
-          responses[response.data].subtitle
+          responses[response.data].subtitle,
         );
       }
-
-      console.log(response.data);
     } catch (error) {
       console.log(error);
 
@@ -106,7 +104,7 @@ export function Change() {
               "/AppMobile/ObterListaEquipamentosAssociados",
               {
                 codigoCliente: customer.codigoCliente,
-              }
+              },
             );
 
             isActive && setEquipments(response.data);
@@ -123,7 +121,7 @@ export function Change() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

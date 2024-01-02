@@ -3,15 +3,13 @@ import { State } from "react-native-ble-plx";
 import { AuthState } from "./types";
 
 const initialState: AuthState = {
+  values: [],
   devices: [],
   connectedDevice: null,
-
-  bluetoothState: State.Unknown,
-
-  bluetoothEnabled: false,
   deviceIsConnected: false,
 
-  returnedValues: [],
+  bluetoothState: State.Unknown,
+  bluetoothEnabled: false,
 
   permissionsGranted: false,
 };

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList } from "react-native";
+import { useCallback, useState } from "react";
+import { Alert, BackHandler, FlatList } from "react-native";
 
 import {
   useNavigation,
@@ -16,7 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
-import { processReturnValues } from "@utils/processReturnValues";
+import { processReceivedValues } from "@utils/processReceivedValues";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
@@ -24,10 +24,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { inputs } from "./constants/inputs";
-import { schema } from "./constants/schema";
-
-import { IResponseObject } from "../VincularDispositivo/interfaces";
+import { inputs, resposta, schema } from "./constants";
 
 export function ConexaoManual() {
   const route = useRoute();
@@ -44,52 +41,42 @@ export function ConexaoManual() {
     resolver: yupResolver(schema),
   });
 
-  const {
-    connectedDevice,
-    returnedValues,
-    resetReturnValues,
-    writeCharacteristicWithResponseForService,
-  } = useBluetooth();
+  const bluetoothContextData = useBluetooth();
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [statusCommandResponse, setStatusCommandResponse] =
-    useState<IResponseObject>(null);
-
-  const [configureCommandResponse, setConfigureCommandResponse] =
-    useState<IResponseObject>(null);
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
+  const clearReturnedValues = () => {
+    bluetoothContextData.removeValues();
+  };
+
+  const sendCommand = async (data: { nome: string; senha: string }) => {
+    setIsLoading(true);
+
+    const CONFIGURE_COMMAND = {
+      BT_PASSWORD: params.chave,
+      SET_WIFI_SSID: data.nome,
+      SET_WIFI_PWD: data.senha,
+    };
+
+    await bluetoothContextData.writeCharacteristic(CONFIGURE_COMMAND);
+  };
+
   const handleNextPage = async (data: { nome: string; senha: string }) => {
-    if (connectedDevice) {
-      setIsLoading(true);
-
-      const CONFIGURE_COMMAND = {
-        BT_PASSWORD: params.chave,
-        SET_WIFI_SSID: params.nomeRede,
-        SET_WIFI_PWD: data.senha,
-      };
-
-      await writeCharacteristicWithResponseForService(
-        connectedDevice,
-        CONFIGURE_COMMAND
-      );
-    }
+    await sendCommand(data);
   };
 
   const getStatusConnection = async () => {
-    if (connectedDevice) {
-      const STATUS_COMMAND = {
-        BT_PASSWORD: params.chave,
-        GET_WIFI_STATUS: "",
-      };
+    setIsLoading(true);
 
-      await writeCharacteristicWithResponseForService(
-        connectedDevice,
-        STATUS_COMMAND
-      );
-    }
+    const STATUS_COMMAND = {
+      BT_PASSWORD: params.chave,
+      GET_WIFI_STATUS: "",
+    };
+
+    await bluetoothContextData.writeCharacteristic(STATUS_COMMAND);
+    setIsLoading(false);
   };
 
   const handleGoToNextScreen = () => {
@@ -97,79 +84,71 @@ export function ConexaoManual() {
       chave: params.chave,
     });
 
-    resetReturnValues();
-    setStatusCommandResponse(null);
-    setConfigureCommandResponse(null);
+    bluetoothContextData.removeValues();
   };
 
-  useEffect(() => {
-    resetReturnValues();
-  }, []);
-
-  const handleTryAgain = () => {
-    resetReturnValues();
-    setConfigureCommandResponse(null);
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      if (configureCommandResponse) {
-        const hasProperty = "SET_TRANSM_MODE" in configureCommandResponse;
-
-        if (hasProperty) {
-          if (configureCommandResponse.SET_TRANSM_MODE === "WIFI") {
-            getStatusConnection();
-          }
+  const checarObjeto = (retorno: object) => {
+    if (Object.entries(retorno).length > 0) {
+      if ("SET_TRANSM_MODE" in retorno) {
+        if (retorno.SET_TRANSM_MODE === "WIFI") {
+          clearReturnedValues();
+          getStatusConnection();
         }
       }
-    }, [configureCommandResponse])
-  );
 
-  useFocusEffect(
-    useCallback(() => {
-      if (statusCommandResponse) {
-        const hasProperty = "WIFI_STATUS_CONNECTION" in statusCommandResponse;
-
-        if (hasProperty) {
-          if (statusCommandResponse.WIFI_STATUS_CONNECTION === "1") {
-            Alert.alert("Conectado com Sucesso.", "Conectado com Sucesso.", [
-              {
-                text: "Continuar cadastro.",
-                onPress: () => handleGoToNextScreen(),
-              },
-            ]);
-          }
-
-          if (statusCommandResponse.WIFI_STATUS_CONNECTION === "0") {
-            Alert.alert(
-              "Credenciais inválidas.",
-              "Verifique se as credenciais de acesso estão corretas.",
-              [
-                {
-                  text: "Tentar novamente.",
-                  onPress: () => handleTryAgain(),
-                },
-              ]
-            );
-          }
-        }
-      }
-    }, [statusCommandResponse])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const processedValue = processReturnValues(returnedValues);
-
-      if (processedValue) {
-        if (!configureCommandResponse) {
-          setConfigureCommandResponse(processedValue);
-        } else {
-          setStatusCommandResponse(processedValue);
+      if ("WIFI_STATUS_CONNECTION" in retorno) {
+        if (retorno.WIFI_STATUS_CONNECTION === "0") {
           setIsLoading(false);
+          Alert.alert(resposta[0].title, resposta[0].subtitle, [
+            {
+              text: resposta[0].text,
+              onPress: () => clearReturnedValues(),
+            },
+          ]);
+        }
+
+        if (retorno.WIFI_STATUS_CONNECTION === "1") {
+          setIsLoading(false);
+          Alert.alert(resposta[1].title, resposta[1].subtitle, [
+            {
+              text: resposta[1].text,
+              onPress: () => handleGoToNextScreen(),
+            },
+          ]);
         }
       }
-    }, [returnedValues])
+    }
+  };
+
+  const onValueChange = () => {
+    const retorno = processReceivedValues(bluetoothContextData.values);
+    checarObjeto(retorno);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (bluetoothContextData.values.length > 0) {
+        onValueChange();
+      }
+    }, [bluetoothContextData.values]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        bluetoothContextData.removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
   );
 
   return (

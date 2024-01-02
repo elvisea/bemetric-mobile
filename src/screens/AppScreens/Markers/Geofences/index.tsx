@@ -63,7 +63,7 @@ export function Geofences() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

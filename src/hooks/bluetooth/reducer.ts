@@ -15,13 +15,13 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
         connectedDevice: null,
       };
 
-    case "SET_DEVICE_LIST":
+    case "SET_DEVICES":
       return {
         ...state,
         devices: action.payload,
       };
 
-    case "REMOVE_DEVICES_LIST":
+    case "REMOVE_DEVICES":
       return {
         ...state,
         devices: [],
@@ -51,16 +51,16 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
         permissionsGranted: action.payload,
       };
 
-    case "INCLUDE_RETURN_Value":
+    case "SET_VALUES":
       return {
         ...state,
-        returnedValues: [...state.returnedValues, action.payload],
+        values: [...state.values, action.payload],
       };
 
-    case "RESET_RETURN_VALUES":
+    case "REMOVE_VALUES":
       return {
         ...state,
-        returnedValues: [],
+        values: [],
       };
 
     case "RESET_BLUETOOTH":
@@ -70,7 +70,7 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
         deviceIsConnected: false,
       };
 
-    case "RESET_TOTAL":
+    case "RESET_STATE":
       return (state = initialState);
 
     default:

@@ -2,6 +2,8 @@ import { Alert, TouchableOpacity, View } from "react-native";
 
 import { useCallback, useState } from "react";
 
+import uuid from "react-native-uuid";
+
 import {
   useRoute,
   useNavigation,
@@ -33,12 +35,17 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 import { styles } from "./styles";
+import { inputs, resposta, schema } from "./constants";
 
-import { inputs } from "./constants/inputs";
-import { schema } from "./constants/schema";
-import { response } from "./constants/response";
+import {
+  Agrupamento,
+  TypeForm,
+  Typeparams,
+  ListaAgrupamento,
+  Data,
+  ListaEquipamento,
+} from "./types";
 
-import { TypeGrouping, TypeForm, TypeEquipment, Typeparams } from "./types";
 import { formatDate } from "@utils/formatDate";
 
 export function AddEquipment() {
@@ -64,15 +71,18 @@ export function AddEquipment() {
 
   const [acquisitionDate, setAcquisitionDate] = useState<Date>(new Date());
 
-  const [groupings, setGroupings] = useState<TypeGrouping[]>([]);
-  const [typesEquipment, setTypesEquipment] = useState<TypeEquipment[]>([]);
+  const [data, setData] = useState<Data>({
+    agrupamentos: [],
+    equipamentos: [],
+  });
 
-  const [newGrouping, setNewGrouping] = useState("");
   const [typeSelected, setTypeSelected] = useState("");
+  const [novoAgrupamento, setNovoAgrupamento] = useState("");
 
-  const [selectedGrouping, setSelectedGrouping] = useState<TypeGrouping>(
-    {} as TypeGrouping
-  );
+  const [agrupamentoSelecionado, setAgrupamentoSelecionado] =
+    useState<Agrupamento>({} as Agrupamento);
+
+  console.log("Agrupamento Selecionado:", agrupamentoSelecionado);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -81,108 +91,175 @@ export function AddEquipment() {
     setAcquisitionDate(date);
   };
 
-  const fetchGrouping = async () => {
+  const fetchData = async () => {
     try {
-      const response = await api.post("/Agrupamento/ObterLista", {
-        codigoUsuario: user?.codigoUsuario,
-        codigoCliente: customer?.codigoCliente,
-        localDashboard: 3,
-      });
+      const response = await Promise.all([
+        api.post<ListaAgrupamento[]>("/Agrupamento/ObterLista", {
+          localDashboard: 3,
+          codigoUsuario: user?.codigoUsuario,
+          codigoCliente: customer?.codigoCliente,
+        }),
 
-      setGroupings(response.data);
+        api.post<ListaEquipamento[]>("/Equipamento/ObterListaFiltroTipo", {
+          codigoCliente: customer?.codigoCliente,
+        }),
+      ]);
+
+      const agrupamentos = response[0].data.map((item) => ({
+        nome: item.nomeAgrupamento,
+        novo: false,
+        codigo: item.codigoAgrupamento,
+        key: uuid.v4().toString(),
+      }));
+
+      const equipamentos = response[1].data.map((item) => ({
+        tipo: item.tipoEquipamento,
+        key: uuid.v4().toString(),
+      }));
+
+      setData({ agrupamentos, equipamentos });
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      if (axios.isAxiosError(error)) {
+        Alert.alert(`${error}`, `${error}`);
+      }
     }
   };
 
-  const fetchTypesEquipment = async () => {
-    try {
-      const response = await api.post("/Equipamento/ObterListaFiltroTipo", {
-        codigoCliente: customer?.codigoCliente,
-      });
-
-      setTypesEquipment(response.data);
-    } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
-    }
-  };
-
-  const handleSelectGrouping = (selected: string) => {
-    const selectedGrouping = groupings.find(
-      (grouping) => grouping.nomeAgrupamento === selected
+  const selecionarAgrupamento = (selected: string) => {
+    const agrupamentoEncontrado = data.agrupamentos.find(
+      (item) => item.nome.toLowerCase() === selected.toLowerCase(),
     );
-    if (selectedGrouping) setSelectedGrouping(selectedGrouping);
+    if (agrupamentoEncontrado) {
+      setAgrupamentoSelecionado(agrupamentoEncontrado);
+    }
   };
 
-  const handleSaveNewGrouping = () => {
+  const salvarNovoAgrupamento = () => {
     setIsOpenModal(!isOpenModal);
 
-    const lista = groupings;
+    const agrupamentos = [...data.agrupamentos];
 
-    lista.push({ nomeAgrupamento: newGrouping });
-    setGroupings(lista);
+    const itemEncontrado = agrupamentos.find(
+      (item) => item.nome.toLowerCase() === novoAgrupamento.toLowerCase(),
+    );
 
-    setSelectedGrouping({
-      nomeAgrupamento: newGrouping,
-      codigoAgrupamento: Math.floor(Math.random() * 1000),
-    });
+    if (!itemEncontrado) {
+      const item = {
+        nome: novoAgrupamento.toLowerCase(),
+        novo: true,
+        codigo: Math.floor(Math.random() * 1000),
+        key: uuid.v4().toString(),
+      };
+
+      agrupamentos.push(item);
+
+      setData((oldState) => ({ ...oldState, agrupamentos: agrupamentos }));
+
+      setAgrupamentoSelecionado(item);
+    }
   };
 
   const handleCancelNewGrouping = () => {
-    setNewGrouping("");
+    setNovoAgrupamento("");
     setIsOpenModal(!isOpenModal);
   };
 
   const handleSelectTypeEquipment = (selected: string) => {
-    const selectedType = typesEquipment.find(
-      (type) => type.tipoEquipamento === selected
+    const selectedType = data.equipamentos.find(
+      (item) => item.tipo.toLowerCase() === selected.toLowerCase(),
     );
-    if (selectedType) setTypeSelected(selectedType.tipoEquipamento);
+    if (selectedType) setTypeSelected(selectedType.tipo.toLowerCase());
   };
 
   async function handleSaveEquipment(form: TypeForm) {
+    const enviado = {
+      codigoCliente: customer?.codigoCliente,
+      incluirAgrupamento: agrupamentoSelecionado.novo === true ? true : false,
+
+      // nomeAgrupamento:
+      //   agrupamentoSelecionado.novo === true
+      //     ? agrupamentoSelecionado.nome.trim()
+      //     : "",
+
+      nomeAgrupamento: agrupamentoSelecionado.nome.trim(),
+
+      codigoAgrupamento:
+        agrupamentoSelecionado.novo === true
+          ? 0
+          : agrupamentoSelecionado.codigo,
+
+      incluirEquipamento: true,
+      tipoEquipamento: typeSelected.trim(),
+      nomeEquipamento: form.equipmentName.trim(),
+      identificadorEquipamento: form.equipmentIdentifier.trim(),
+      modeloEquipamento: form.equipmentModel.trim(),
+      placaEquipamento: form.equipmentPlate.trim(),
+      anoEquipamento: form.equipmentYear.trim(),
+      serialDispositivo: form.deviceSerial.trim(),
+      chaveDispositivo: form.devicekey.trim(),
+      horimetroIncialEquipamento: Number(form.initialHourMeter),
+      hodometroIncialEquipamento: Number(form.initialOdometer),
+      // dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
+      dataAquisicaoEquipamento: "2023-12-28T02:49:10.411Z",
+    };
+
+    console.log("ENVIADO", enviado);
     try {
       const { data } = await api.post("/AppMobile/Gravar", {
         codigoCliente: customer?.codigoCliente,
-        incluirAgrupamento: newGrouping === "" ? false : true,
+        incluirAgrupamento: agrupamentoSelecionado.novo === true ? true : false,
 
-        incluirEquipamento: true,
-        tipoEquipamento: typeSelected,
-        nomeEquipamento: form.equipmentName,
-        identificadorEquipamento: form.equipmentIdentifier,
-        modeloEquipamento: form.equipmentModel,
-        placaEquipamento: form.equipmentPlate,
-        anoEquipamento: form.equipmentYear,
-        serialDispositivo: form.deviceSerial,
-        chaveDispositivo: form.devicekey,
-        horimetroIncialEquipamento: Number(form.initialHourMeter),
-        hodometroIncialEquipamento: Number(form.initialOdometer),
-        dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
+        // nomeAgrupamento:
+        //   agrupamentoSelecionado.novo === true
+        //     ? agrupamentoSelecionado.nome.trim()
+        //     : "",
+
+        nomeAgrupamento: agrupamentoSelecionado.nome.trim(),
 
         codigoAgrupamento:
-          newGrouping === "" ? 0 : selectedGrouping.codigoAgrupamento, // APENAS se estiver SELECIONANDO o Agrupamento. Se nao 0
-        nomeAgrupamento: newGrouping === "" ? "" : newGrouping, // APENAS na INCLUSÃO de Agrupamento.
+          agrupamentoSelecionado.novo === true
+            ? 0
+            : agrupamentoSelecionado.codigo,
+
+        incluirEquipamento: true,
+        tipoEquipamento: typeSelected.trim(),
+        nomeEquipamento: form.equipmentName.trim(),
+        identificadorEquipamento: form.equipmentIdentifier.trim(),
+        modeloEquipamento: form.equipmentModel.trim(),
+        placaEquipamento: form.equipmentPlate.trim(),
+        anoEquipamento: form.equipmentYear.trim(),
+        serialDispositivo: form.deviceSerial.trim(),
+        chaveDispositivo: form.devicekey.trim(),
+        horimetroIncialEquipamento: Number(form.initialHourMeter),
+        hodometroIncialEquipamento: Number(form.initialOdometer),
+        // dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
+        dataAquisicaoEquipamento: "2023-12-28T02:49:10.411Z",
       });
+
+      console.log("DATA:", data);
 
       if (data.erro === 0) {
         Alert.alert(
-          `${response[data.erro].title}`,
-          `${response[data.erro].subtitle}`,
+          `${resposta[data.erro].title}`,
+          `${resposta[data.erro].subtitle}`,
           [
             {
               text: "Mostrar Equipamentos",
               onPress: () => navigation.navigate("Equipments"),
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
-          `${response[data.erro].title}`,
-          `${response[data.erro].subtitle}`
+          `${resposta[data.erro].title}`,
+          `${resposta[data.erro].subtitle}`,
         );
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      if (axios.isAxiosError(error)) {
+        console.log("CATCH", error.message);
+        Alert.alert(`${error}`, `${error}`);
+      }
     }
   }
 
@@ -191,14 +268,13 @@ export function AddEquipment() {
       let isActive = true;
 
       if (isActive) {
-        fetchGrouping();
-        fetchTypesEquipment();
+        fetchData();
       }
 
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (
@@ -210,8 +286,8 @@ export function AddEquipment() {
       >
         <Input
           mb={4}
-          value={newGrouping}
-          onChangeText={(text) => setNewGrouping(text)}
+          value={novoAgrupamento}
+          onChangeText={(text) => setNovoAgrupamento(text)}
           color={"#363636"}
           _focus={{ borderColor: "blue.700", bg: "white" }}
           variant="outline"
@@ -237,7 +313,7 @@ export function AddEquipment() {
             h={`${RFValue(48)}px`}
             title="Salvar"
             width="48%"
-            onPress={handleSaveNewGrouping}
+            onPress={salvarNovoAgrupamento}
           />
         </View>
       </GenericModal>
@@ -286,15 +362,15 @@ export function AddEquipment() {
                 borderLeftWidth={0}
                 borderRightWidth={0}
                 borderBottomColor="blue.700"
-                onValueChange={(selected) => handleSelectGrouping(selected)}
+                onValueChange={(selected) => selecionarAgrupamento(selected)}
               >
-                {typesEquipment.length > 0 &&
-                  groupings.map((grouping, index) => (
+                {data.agrupamentos.length > 0 &&
+                  data.agrupamentos.map((item) => (
                     <Select.Item
-                      key={`${index}-${grouping.codigoAgrupamento}-${grouping.nomeAgrupamento}`}
+                      key={item.key}
+                      value={item.nome.toLowerCase()}
+                      label={item.nome.toUpperCase()}
                       alignItems="center"
-                      value={grouping.nomeAgrupamento.toString()}
-                      label={grouping.nomeAgrupamento}
                     />
                   ))}
               </Select>
@@ -343,13 +419,13 @@ export function AddEquipment() {
               borderBottomColor="blue.700"
               onValueChange={(selected) => handleSelectTypeEquipment(selected)}
             >
-              {typesEquipment.length > 0 &&
-                typesEquipment.map((customer, index) => (
+              {data.equipamentos.length > 0 &&
+                data.equipamentos.map((item) => (
                   <Select.Item
-                    key={`Index: ${index} Tipo: ${customer.tipoEquipamento}`}
+                    key={item.key}
+                    value={item.tipo.toLowerCase()}
+                    label={item.tipo.toUpperCase()}
                     alignItems="center"
-                    value={customer.tipoEquipamento.toString()}
-                    label={customer.tipoEquipamento}
                   />
                 ))}
             </Select>

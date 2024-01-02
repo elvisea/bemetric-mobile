@@ -62,28 +62,28 @@ export function SignIn() {
       if (response.data.erro === 1) {
         Alert.alert(
           "Erro ao tentar fazer login!",
-          "Email do login não cadastrado. Tente novamente."
+          "Email do login não cadastrado. Tente novamente.",
         );
       }
 
       if (response.data.erro === 2) {
         Alert.alert(
           "Erro ao tentar fazer login!",
-          "Email do login não habilitado. Tente novamente."
+          "Email do login não habilitado. Tente novamente.",
         );
       }
 
       if (response.data.erro === 3) {
         Alert.alert(
           "Erro ao tentar fazer login!",
-          "Email do login não é de cliente."
+          "Email do login não é de cliente.",
         );
       }
 
       if (response.data.erro === 4) {
         Alert.alert(
           "Erro ao tentar fazer login!",
-          "Email ou Senha inválida. Tente novamente."
+          "Email ou Senha inválida. Tente novamente.",
         );
       }
 

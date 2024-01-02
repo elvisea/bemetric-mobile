@@ -56,7 +56,7 @@ export function Route() {
         });
 
         setDelta(
-          calculateDelta([{ latitude: -25.4541998, longitude: -49.2913508 }])
+          calculateDelta([{ latitude: -25.4541998, longitude: -49.2913508 }]),
         );
       } else {
         setLocation(response.data[0]);
@@ -64,7 +64,7 @@ export function Route() {
         setDelta(
           calculateDelta([
             { latitude: response.data[0].lat, longitude: response.data[0].lon },
-          ])
+          ]),
         );
       }
     } catch (error) {
@@ -83,7 +83,7 @@ export function Route() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

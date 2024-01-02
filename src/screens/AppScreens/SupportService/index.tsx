@@ -51,7 +51,7 @@ export function SupportService() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

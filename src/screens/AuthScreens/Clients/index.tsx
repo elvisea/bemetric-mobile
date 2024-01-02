@@ -30,14 +30,14 @@ export function Clients() {
     if (!customer) {
       Alert.alert(
         "Usuário não possui Clientes!",
-        "Usuário não possui Clientes cadastrados."
+        "Usuário não possui Clientes cadastrados.",
       );
     }
   };
 
   const handleAddCustomer = (selected: number) => {
     const selectedCustomer = customers.find(
-      (customer) => customer.codigoCliente === selected
+      (customer) => customer.codigoCliente === selected,
     );
 
     if (selectedCustomer) {
@@ -52,7 +52,6 @@ export function Clients() {
 
   useEffect(() => {
     const fetch = async () => {
-      console.log("user?.codigoUsuario", user?.codigoUsuario);
       try {
         const response = await api.post("/Usuario/ListaClientesUsuario", {
           codigoUsuario: user?.codigoUsuario,
@@ -61,7 +60,7 @@ export function Clients() {
         if (response.status === 204) {
           Alert.alert(
             "Usuário não possui Clientes!",
-            "Usuário não possui Clientes cadastrados."
+            "Usuário não possui Clientes cadastrados.",
           );
         }
 

@@ -71,42 +71,42 @@ export function EnterNewPassword() {
               text: "Efetuar Login!",
               onPress: () => navigation.navigate("SignIn"),
             },
-          ]
+          ],
         );
       }
 
       if (response.data === 1) {
         Alert.alert(
           "Erro ao tentar criar nova senha!",
-          "Código Inválido. Tente novamente."
+          "Código Inválido. Tente novamente.",
         );
       }
 
       if (response.data === 2) {
         Alert.alert(
           "Erro ao tentar criar nova senha!",
-          "Código de ativação expirado. Tente novamente."
+          "Código de ativação expirado. Tente novamente.",
         );
       }
 
       if (response.data === 3) {
         Alert.alert(
           "Erro ao tentar criar nova senha!",
-          "Email não é do cliente. Tente novamente."
+          "Email não é do cliente. Tente novamente.",
         );
       }
 
       if (response.data === 4) {
         Alert.alert(
           "Erro ao tentar criar nova senha!",
-          "Email informado não está cadastrado. Tente novamente."
+          "Email informado não está cadastrado. Tente novamente.",
         );
       }
 
       if (response.data === 5) {
         Alert.alert(
           "Erro ao tentar criar nova senha!",
-          "Email não habilitado. Tente novamente."
+          "Email não habilitado. Tente novamente.",
         );
       }
     } catch (error) {

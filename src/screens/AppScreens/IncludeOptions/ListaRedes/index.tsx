@@ -1,40 +1,37 @@
-import { FlatList, StyleSheet } from "react-native";
 import { useCallback, useState } from "react";
+import { Alert, BackHandler, FlatList, StyleSheet } from "react-native";
+
+import uuid from "react-native-uuid";
+import { BleError } from "react-native-ble-plx";
 
 import {
+  useRoute,
   useNavigation,
   DrawerActions,
   useFocusEffect,
-  useRoute,
 } from "@react-navigation/native";
 
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
-import { processReturnValues } from "@utils/processReturnValues";
+
+import { processReceivedValues } from "@utils/processReceivedValues";
 
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { INetwork } from "./interfaces";
-
+import { initialState } from "./constants";
 import { Icon, Network, TitleList, TitleNetwork } from "./styles";
 
 export function ListaRedes() {
-  const {
-    returnedValues,
-    connectedDevice,
-    resetReturnValues,
-    writeCharacteristicWithResponseForService,
-  } = useBluetooth();
-
   const route = useRoute();
   const navigation = useNavigation();
 
+  const bluetoothContextData = useBluetooth();
+
   const params = route.params as { chave: string };
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [network, setNetwork] = useState<INetwork | null | undefined>();
+  const [state, setState] = useState(initialState);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -44,44 +41,100 @@ export function ListaRedes() {
       nomeRede: nameNetwork,
     });
 
-    resetReturnValues();
+    setState(initialState);
+    bluetoothContextData.removeValues();
   };
 
-  const searchNetworks = async () => {
-    setIsLoading(true);
-
-    setNetwork(null);
-    resetReturnValues();
-
+  const sendCommand = async () => {
     const COMMAND = { BT_PASSWORD: params.chave, GET_WIFI_LIST: "" };
+    await bluetoothContextData.writeCharacteristic(COMMAND);
+  };
 
-    if (connectedDevice) {
-      await writeCharacteristicWithResponseForService(connectedDevice, COMMAND);
+  const findAvailableNetworks = async () => {
+    try {
+      setState((oldState) => ({ ...oldState, isLoading: true }));
+      await sendCommand();
+    } catch (error) {
+      setState((oldState) => ({ ...oldState, isLoading: false }));
+
+      if (error instanceof BleError) {
+        Alert.alert(error.message, error.message);
+      }
     }
+  };
 
-    setIsLoading(false);
+  const checarObjeto = (objeto: { [key: string]: any }) => {
+    const propriedadesDesejadas = [
+      "WIFI_AP_LIST",
+      "GET_WIFI_LIST",
+      "WIFI_SCAN_STATUS",
+    ];
+
+    return propriedadesDesejadas.every(
+      (propriedade) =>
+        Object.prototype.hasOwnProperty.call(objeto, propriedade) &&
+        objeto[propriedade] !== undefined,
+    );
+  };
+
+  const onValueChange = () => {
+    const response: any = processReceivedValues(bluetoothContextData.values);
+
+    const temTodasAsPropriedades = checarObjeto(response);
+
+    if (temTodasAsPropriedades) {
+      const redesComChave = response.WIFI_AP_LIST.map((item: any) => ({
+        ...item,
+        KEY: uuid.v4(),
+      }));
+
+      const network = { ...response, WIFI_AP_LIST: redesComChave };
+      setState({ network: network, isLoading: false });
+    }
   };
 
   useFocusEffect(
     useCallback(() => {
-      const processedValue = processReturnValues(returnedValues);
-
-      if (processedValue) {
-        setNetwork(processedValue as INetwork);
+      if (bluetoothContextData.values.length > 0) {
+        onValueChange();
       }
-    }, [returnedValues])
+    }, [bluetoothContextData.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
-
-      isActive && searchNetworks();
+      findAvailableNetworks();
 
       return () => {
-        isActive = false;
+        setState(initialState);
       };
-    }, [])
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        bluetoothContextData.removeValues();
+      };
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        bluetoothContextData.removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
   );
 
   return (
@@ -90,15 +143,15 @@ export function ListaRedes() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <HeaderDefault title="Conexão WIFI" />
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!network && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {!state.isLoading && <HeaderDefault title="Conexão WIFI" />}
 
-      {network && !isLoading && (
+      {!state.isLoading && (
         <FlatList
-          data={network?.WIFI_AP_LIST}
+          data={state.network.WIFI_AP_LIST}
           style={styles.constainer}
-          keyExtractor={(item, index) => `${index}-${item.WIFI_AP_SSID}`}
+          keyExtractor={(item) => item.KEY}
           ListHeaderComponent={<TitleList>Redes Disponíveis</TitleList>}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (

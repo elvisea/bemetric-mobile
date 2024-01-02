@@ -123,14 +123,14 @@ export function VerifyToken() {
               text: "Login",
               onPress: () => navigation.navigate("SignIn"),
             },
-          ]
+          ],
         );
       }
 
       if (response.data !== 0) {
         Alert.alert(
           responses[response.data].title,
-          responses[response.data].subtitle
+          responses[response.data].subtitle,
         );
       }
     } catch (error) {
@@ -145,13 +145,13 @@ export function VerifyToken() {
       setIsResending(true);
 
       const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${params.email}`
+        `/Usuario/GerarCodigoAtivacao?email=${params.email}`,
       );
 
       if (response.data === 1) {
         Alert.alert(
           "Código reenviado com sucesso!",
-          "Código reenviado com sucesso. Verifique sua caixa de e-mail."
+          "Código reenviado com sucesso. Verifique sua caixa de e-mail.",
         );
       }
     } catch (error) {

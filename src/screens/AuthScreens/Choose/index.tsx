@@ -20,7 +20,7 @@ export function Choose() {
 
   const handleNextPage = (
     screen: "ClientCode" | "CreateAccount",
-    type: number
+    type: number,
   ) => {
     navigation.navigate(screen, { name, email, type });
   };

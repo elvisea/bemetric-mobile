@@ -83,7 +83,7 @@ export function FullMap() {
 
   const updateSelectedPoints = () => {
     const selectedPoints = marker.points.filter((point) =>
-      itens.points.includes(point.codigoPontoInteresse)
+      itens.points.includes(point.codigoPontoInteresse),
     );
 
     setSelectedMarkers((prevMarkers) => ({
@@ -101,7 +101,7 @@ export function FullMap() {
 
   const updateSelectedGeofences = () => {
     const selectedGeofences = marker.geofences.filter((geofence) =>
-      itens.geofences.includes(geofence.codigoGeocerca)
+      itens.geofences.includes(geofence.codigoGeocerca),
     );
 
     setSelectedMarkers((prevMarkers) => ({
@@ -114,7 +114,7 @@ export function FullMap() {
         listaPontosGeocerca.map(({ latitude, longitude }) => ({
           latitude,
           longitude,
-        }))
+        })),
     );
 
     return coordsGeofences;
@@ -122,7 +122,7 @@ export function FullMap() {
 
   const updateSelectedEquipments = () => {
     const selectedEquipments = marker.equipments.filter((equipment) =>
-      itens.equipments.includes(equipment.codigoEquipamento)
+      itens.equipments.includes(equipment.codigoEquipamento),
     );
 
     setSelectedMarkers((prevMarkers) => ({
@@ -131,7 +131,7 @@ export function FullMap() {
     }));
 
     const coordsEquipments = selectedEquipments.map(
-      ({ latitude, longitude }) => ({ latitude, longitude })
+      ({ latitude, longitude }) => ({ latitude, longitude }),
     );
 
     return coordsEquipments;
@@ -156,7 +156,7 @@ export function FullMap() {
       listaPontosGeocerca.map(({ latitude, longitude }) => ({
         latitude,
         longitude,
-      }))
+      })),
     );
 
     return [...coordsPoints, ...coordsEquipments, ...coordsGeofences];
@@ -228,7 +228,7 @@ export function FullMap() {
                 "/PontoInteresse/ObterListaPontoInteresseApp",
                 {
                   codigoCliente: customer.codigoCliente,
-                }
+                },
               ),
 
               api.post<IGeofence[]>("/Geocerca/ObterListaGeocercaApp", {
@@ -256,13 +256,13 @@ export function FullMap() {
 
               const startItems = {
                 points: startMarker.points.map(
-                  ({ codigoPontoInteresse }) => codigoPontoInteresse
+                  ({ codigoPontoInteresse }) => codigoPontoInteresse,
                 ),
                 geofences: startMarker.geofences.map(
-                  ({ codigoGeocerca }) => codigoGeocerca
+                  ({ codigoGeocerca }) => codigoGeocerca,
                 ),
                 equipments: startMarker.equipments.map(
-                  ({ codigoEquipamento }) => codigoEquipamento
+                  ({ codigoEquipamento }) => codigoEquipamento,
                 ),
               };
 
@@ -298,7 +298,7 @@ export function FullMap() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

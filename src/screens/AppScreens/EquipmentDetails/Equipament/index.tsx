@@ -44,7 +44,7 @@ export function Equipament() {
         "/Equipamento/DadosInstantaneosDispositivoTelemetria",
         {
           codigoEquipamento: params.codigoEquipamento,
-        }
+        },
       );
 
       setData(response.data);
@@ -62,7 +62,7 @@ export function Equipament() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   useFocusEffect(
@@ -90,7 +90,7 @@ export function Equipament() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

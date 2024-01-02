@@ -42,7 +42,7 @@ export function PointsInterest() {
               "/PontoInteresse/ObterListaPontoInteresseApp",
               {
                 codigoCliente: customer.codigoCliente,
-              }
+              },
             );
 
             isActive && setPointsInterest(response.data);
@@ -59,7 +59,7 @@ export function PointsInterest() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

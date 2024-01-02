@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Alert, FlatList } from "react-native";
+import { Alert, BackHandler, FlatList } from "react-native";
 
 import {
   useRoute,
@@ -16,9 +16,11 @@ import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 import { useBluetooth } from "@hooks/bluetooth";
 
-import { IEquipment } from "./types";
 import { ListTitle } from "./styles";
+
+import { IEquipment } from "./types";
 import { response } from "./constants";
+import { removerEquipamentosDuplicados } from "./utils";
 
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
@@ -29,7 +31,7 @@ export function EquipamentosDisponiveis() {
   const { customer } = useCustomer();
   const { navigate, dispatch } = useNavigation();
 
-  const { connectedDevice } = useBluetooth();
+  const { connectedDevice, removeValues } = useBluetooth();
 
   const route = useRoute();
   const params = route.params as { chave: string };
@@ -91,12 +93,12 @@ export function EquipamentosDisponiveis() {
               text: "Mostrar Agrupamentos",
               onPress: () => navigate("Equipments"),
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
           `${response[data.erro].title}`,
-          `${response[data.erro].subtitle}`
+          `${response[data.erro].subtitle}`,
         );
       }
     } catch (error) {
@@ -110,14 +112,32 @@ export function EquipamentosDisponiveis() {
         "/AppMobile/ObterListaEquipamentosNaoAssociados",
         {
           codigoCliente: customer?.codigoCliente,
-        }
+        },
       );
 
-      setEquipment(response.data);
+      setEquipment(removerEquipamentosDuplicados(response.data));
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -128,7 +148,7 @@ export function EquipamentosDisponiveis() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

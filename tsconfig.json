@@ -39,6 +39,9 @@
       "@constants/*": [
         "./src/constants/*"
       ],
+      "@manager/*": [
+        "./src/manager/*"
+      ],
     }
   },
   "include": [

@@ -162,7 +162,7 @@ export function CreatePointsInterest() {
           latitude: response.coords.latitude,
           longitude: response.coords.longitude,
         });
-      }
+      },
     );
   }, []);
 

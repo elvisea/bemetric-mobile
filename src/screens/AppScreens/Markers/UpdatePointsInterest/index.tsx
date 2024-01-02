@@ -47,11 +47,11 @@ export function UpdatePointsInterest() {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const [pointInterest, setPointInterest] = useState<IPointsInterest | null>(
-    null
+    null,
   );
 
   const [newPointInterest, setNewPointInterest] = useState<IPointsInterest>(
-    {} as IPointsInterest
+    {} as IPointsInterest,
   );
 
   const handleDeletePointsInterest = async () => {
@@ -70,14 +70,14 @@ export function UpdatePointsInterest() {
                 text: "Visualizar Pontos de Interesse",
                 onPress: () => navigation.navigate("PointsInterest"),
               },
-            ]
+            ],
           );
         }
 
         if (response.data !== 0) {
           Alert.alert(
             deleteResponse[response.data],
-            deleteResponse[response.data]
+            deleteResponse[response.data],
           );
         }
       }
@@ -128,14 +128,14 @@ export function UpdatePointsInterest() {
               text: "Visualizar Pontos de Interesse",
               onPress: () => navigation.navigate("PointsInterest"),
             },
-          ]
+          ],
         );
       }
 
       if (response.data === 1) {
         Alert.alert(
           updateResponse[response.data],
-          updateResponse[response.data]
+          updateResponse[response.data],
         );
         setStateDefault();
         setIsOpenModal(false);
@@ -144,14 +144,14 @@ export function UpdatePointsInterest() {
       if (response.data === 2) {
         Alert.alert(
           updateResponse[response.data],
-          updateResponse[response.data]
+          updateResponse[response.data],
         );
       }
 
       if (response.data === 3) {
         Alert.alert(
           updateResponse[response.data],
-          updateResponse[response.data]
+          updateResponse[response.data],
         );
         setStateDefault();
         setIsOpenModal(false);
@@ -164,7 +164,7 @@ export function UpdatePointsInterest() {
   const handlePressEditMode = () => {
     setIsEditMode(true);
     setNewPointInterest(
-      pointInterest ? pointInterest : ({} as IPointsInterest)
+      pointInterest ? pointInterest : ({} as IPointsInterest),
     );
   };
 
@@ -176,7 +176,7 @@ export function UpdatePointsInterest() {
         "/PontoInteresse/ObterLista",
         {
           codigoPontoInteresse,
-        }
+        },
       );
 
       setPointInterest(data[0]);
@@ -196,7 +196,7 @@ export function UpdatePointsInterest() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (
@@ -379,14 +379,14 @@ export function UpdatePointsInterest() {
                   latitude: pointInterest.latitude,
                   longitude: pointInterest.longitude,
                 },
-                pointInterest.raio
+                pointInterest.raio,
               ).latitude,
               longitudeDelta: getDeltaFromRadius(
                 {
                   latitude: pointInterest.latitude,
                   longitude: pointInterest.longitude,
                 },
-                pointInterest.raio
+                pointInterest.raio,
               ).longitude,
             }}
           >

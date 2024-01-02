@@ -88,7 +88,7 @@ export function Equipments() {
       return () => {
         isActive = false;
       };
-    }, [customer])
+    }, [customer]),
   );
 
   const fetchNotifications = async () => {
@@ -114,7 +114,7 @@ export function Equipments() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

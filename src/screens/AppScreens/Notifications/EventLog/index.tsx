@@ -115,7 +115,7 @@ export function EventLog() {
 
     if (include) {
       const filtered = search.equipments.filter(
-        (equipment) => equipment !== codigo
+        (equipment) => equipment !== codigo,
       );
       setSearch((rest) => ({ ...rest, equipments: filtered }));
     } else {
@@ -128,12 +128,12 @@ export function EventLog() {
 
   const includeMarkers = (marker: Marker) => {
     const include = search.markers.some(
-      (marker) => marker.codigo === marker.codigo
+      (marker) => marker.codigo === marker.codigo,
     );
 
     if (include) {
       const filtered = search.markers.filter(
-        (marker) => marker.codigo !== marker.codigo
+        (marker) => marker.codigo !== marker.codigo,
       );
       setSearch((rest) => ({ ...rest, markers: filtered }));
     } else {
@@ -228,8 +228,6 @@ export function EventLog() {
           equipments: transformEquipmentsData(equipments.data),
         });
       } catch (error) {
-        console.log(error);
-
         if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       }
     }
@@ -244,7 +242,7 @@ export function EventLog() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   useFocusEffect(
@@ -256,7 +254,7 @@ export function EventLog() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (
@@ -387,7 +385,7 @@ export function EventLog() {
                 title={marker.nome}
                 onPress={() => includeMarkers(marker)}
                 isActive={search.markers.some(
-                  (marker) => marker.codigo === marker.codigo
+                  (marker) => marker.codigo === marker.codigo,
                 )}
               />
             ))}

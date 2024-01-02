@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Alert, FlatList } from "react-native";
+import { Alert, BackHandler, FlatList } from "react-native";
 
 import {
   useRoute,
@@ -22,11 +22,10 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { inputs } from "./constants/inputs";
-import { schema } from "./constants/schema";
-
 import { useBluetooth } from "@hooks/bluetooth";
-import { processReturnValues } from "@utils/processReturnValues";
+import { processReceivedValues } from "@utils/processReceivedValues";
+
+import { inputs, schema } from "./constants";
 
 interface IForm {
   ponto: string;
@@ -38,17 +37,11 @@ export function ConexaoRedesMoveis() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const {
-    connectedDevice,
-    returnedValues,
-    resetReturnValues,
-    writeCharacteristicWithResponseForService,
-  } = useBluetooth();
+  const bluetoothContextData = useBluetooth();
 
   const params = route.params as { chave: string };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [responseObject, setResponseObject] = useState<object | null>(null);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -61,7 +54,7 @@ export function ConexaoRedesMoveis() {
   });
 
   const handleNextPage = async (data: IForm) => {
-    if (connectedDevice) {
+    if (bluetoothContextData.connectedDevice) {
       setIsLoading(true);
 
       const COMMAND = {
@@ -71,9 +64,7 @@ export function ConexaoRedesMoveis() {
         SET_MODEM_PWD: data.senha,
       };
 
-      await writeCharacteristicWithResponseForService(connectedDevice, COMMAND);
-
-      setIsLoading(false);
+      await bluetoothContextData.writeCharacteristic(COMMAND);
     }
   };
 
@@ -82,31 +73,48 @@ export function ConexaoRedesMoveis() {
       chave: params.chave,
     });
 
-    resetReturnValues();
-    setResponseObject(null);
+    bluetoothContextData.removeValues();
+  };
+
+  const onValueChange = () => {
+    const response = processReceivedValues(bluetoothContextData.values);
+    console.log("OBJETO RESPOSTA:", response);
+
+    if (Object.entries(response).length > 0) {
+      setIsLoading(false);
+      Alert.alert("Conectado com Sucesso.", "Conectado com Sucesso.", [
+        {
+          text: "Continuar cadastro.",
+          onPress: () => handleGoToNextScreen(),
+        },
+      ]);
+    }
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (responseObject) {
-        Alert.alert("Conectado com Sucesso.", "Conectado com Sucesso.", [
-          {
-            text: "Continuar cadastro.",
-            onPress: () => handleGoToNextScreen(),
-          },
-        ]);
+      if (bluetoothContextData.values.length > 0) {
+        onValueChange();
       }
-    }, [responseObject])
+    }, [bluetoothContextData.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
-      const processedValue = processReturnValues(returnedValues);
+      const handleBackPress = () => {
+        bluetoothContextData.removeValues();
+        return false;
+      };
 
-      if (processedValue) {
-        setResponseObject(processedValue);
-      }
-    }, [returnedValues])
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
   );
 
   return (
@@ -115,11 +123,9 @@ export function ConexaoRedesMoveis() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <HeaderDefault title="Conexão Redes Móveis" />
+      {isLoading && <HeaderDefault title="Conexão Redes Móveis" />}
 
-      {isLoading && !responseObject && (
-        <LoadingSpinner color={THEME.colors.blue[700]} />
-      )}
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
       {!isLoading && (
         <VStack flex={1} w="full" px={`${RFValue(16)}px`}>

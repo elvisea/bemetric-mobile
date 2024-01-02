@@ -35,7 +35,7 @@ export function ChangeClient() {
 
   const handleSelectCustomer = (selected: number) => {
     const selectedCustomer = customers.find(
-      (customer) => customer.codigoCliente === selected
+      (customer) => customer.codigoCliente === selected,
     );
 
     if (selectedCustomer) setSelected(selectedCustomer);
@@ -60,7 +60,7 @@ export function ChangeClient() {
     if (!selected) {
       Alert.alert(
         "Cliente não selecionado!",
-        "Selecione um cliente para fazer a alteração."
+        "Selecione um cliente para fazer a alteração.",
       );
     }
   };
@@ -76,7 +76,7 @@ export function ChangeClient() {
           if (response.status === 204) {
             Alert.alert(
               "Usuário não possui Clientes!",
-              "Usuário não possui Clientes cadastrados."
+              "Usuário não possui Clientes cadastrados.",
             );
           }
 
@@ -89,7 +89,7 @@ export function ChangeClient() {
       };
 
       user && fetch();
-    }, [])
+    }, []),
   );
 
   return (

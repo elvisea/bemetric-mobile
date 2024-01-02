@@ -69,7 +69,7 @@ export function CreatePassword() {
       setIsLoading(true);
 
       const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${email}`
+        `/Usuario/GerarCodigoAtivacao?email=${email}`,
       );
 
       if (response.data === 1) {

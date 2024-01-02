@@ -8,14 +8,18 @@ import {
 } from "@react-navigation/native";
 
 import axios from "axios";
+import { BleError } from "react-native-ble-plx";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { HStack, ScrollView, VStack } from "native-base";
 
 import api from "@services/api";
+import BluetoothManager from "@manager/bluetooth";
+
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
+
 import { ITelemetry } from "@interfaces/ITelemetry";
 
 import { StatusButton } from "@components/StatusButton";
@@ -23,22 +27,24 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { RowInformation } from "@components/RowInformation";
 
+import { response } from "./constants";
 import { IParams } from "../interfaces/IEquipamentDetails";
+
+const bluetoothManager = BluetoothManager.getInstance();
 
 export function TelemetryDevice() {
   const route = useRoute();
   const navigation = useNavigation();
 
   const {
-    scanForDevices,
     isDeviceConnected,
     requestPermissions,
-    disconnectDevice,
+    monitorCharacteristic,
     changeGrantedPermissions,
     connectToDevice,
-    resetReturnValues,
-    writeCharacteristicWithResponseForService,
-
+    removeValues,
+    writeCharacteristic,
+    setDevices,
     devices,
     bluetoothEnabled,
     deviceIsConnected,
@@ -55,56 +61,50 @@ export function TelemetryDevice() {
 
   const handleConnect = async () => {
     if (typeof telemetry === "object" && telemetry) {
-      setIsConnecting(true);
-
       const name = telemetry.serial.trim().toUpperCase();
       const deviceFound = devices.find((device) => device.name === name);
 
-      const COMMAND = {
-        BT_PASSWORD: telemetry.chave.trim(),
-        GET_SERIAL_KEY: "",
-      };
-
       if (deviceFound) {
-        setIsConnecting(true);
+        try {
+          setIsConnecting(true);
 
-        const isConnected = await isDeviceConnected(deviceFound.id);
+          const COMMAND = {
+            BT_PASSWORD: telemetry.chave.trim(),
+            GET_SERIAL_KEY: "",
+          };
 
-        if (isConnected) {
-          await disconnectDevice(deviceFound.id);
+          const isConnected = await isDeviceConnected(deviceFound.id);
 
-          await connectToDevice(deviceFound.id);
-          await writeCharacteristicWithResponseForService(deviceFound, COMMAND);
+          if (isConnected) {
+            await writeCharacteristic(COMMAND);
+          } else {
+            await connectToDevice(deviceFound.id);
+            await monitorCharacteristic();
+            await writeCharacteristic(COMMAND);
+          }
+        } catch (error) {
+          setIsLoading(false);
 
-          resetReturnValues();
-          setIsConnecting(false);
-        } else {
-          await connectToDevice(deviceFound.id);
-          await writeCharacteristicWithResponseForService(deviceFound, COMMAND);
-
-          resetReturnValues();
-          setIsConnecting(false);
+          if (error instanceof BleError) {
+            Alert.alert(error.message, error.message);
+          }
+        } finally {
+          setIsLoading(false);
         }
       } else {
         setIsConnecting(false);
 
-        Alert.alert(
-          "Dispositivo não encontrado.",
-          "Verifique se o Dispositivo está ligado ou se o Serial está correto e tente novamente."
-        );
+        Alert.alert(response[0].title, response[0].subtitle);
       }
     } else {
-      Alert.alert(
-        "Informações para conexão não estão disponíveis",
-        "Informações para conexão não estão disponíveis."
-      );
+      Alert.alert(response[1].title, response[1].subtitle);
     }
   };
 
   const configureDataConnection = async () => {
     if (deviceIsConnected) {
       if (typeof telemetry === "object" && telemetry) {
-        resetReturnValues();
+        removeValues();
 
         navigation.navigate("IncludeStackRoutes", {
           screen: "ConfigurarConexaoDados",
@@ -114,10 +114,7 @@ export function TelemetryDevice() {
         });
       }
     } else {
-      Alert.alert(
-        "Dispositivo Desconectado.",
-        "Você precisa estar conectado para Configurar Conexão de Dados."
-      );
+      Alert.alert(response[2].title, response[2].subtitle);
     }
   };
 
@@ -127,10 +124,7 @@ export function TelemetryDevice() {
         console.log("Você pode testar o Dispositivo.");
       }
     } else {
-      Alert.alert(
-        "Dispositivo Desconectado.",
-        "Você precisa estar conectado para testar Dispositivo."
-      );
+      Alert.alert(response[2].title, response[2].subtitle);
     }
   };
 
@@ -151,7 +145,7 @@ export function TelemetryDevice() {
             "/Equipamento/DetalhamentoDispositivoTelemetria",
             {
               codigoEquipamento: params.codigoEquipamento,
-            }
+            },
           );
 
           isActive && setTelemetry(response.data);
@@ -167,7 +161,7 @@ export function TelemetryDevice() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   useFocusEffect(
@@ -175,9 +169,15 @@ export function TelemetryDevice() {
       requestUsagePermissions();
 
       if (permissionsGranted && bluetoothEnabled) {
-        scanForDevices();
+        bluetoothManager.scanForDevices((scannedDevices) => {
+          setDevices(scannedDevices);
+        });
       }
-    }, [permissionsGranted, bluetoothEnabled])
+
+      return () => {
+        bluetoothManager.stopScan();
+      };
+    }, [permissionsGranted, bluetoothEnabled]),
   );
 
   return (
@@ -234,8 +234,8 @@ export function TelemetryDevice() {
                 isConnecting
                   ? "Conectando..."
                   : deviceIsConnected
-                  ? "Conectado"
-                  : "Desconectado"
+                    ? "Conectado"
+                    : "Desconectado"
               }
               width="49"
               icon={

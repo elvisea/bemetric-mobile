@@ -133,7 +133,7 @@ export function PeriodoPermanencia() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

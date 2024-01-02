@@ -21,6 +21,7 @@ module.exports = function (api) {
             "@fakes": "./src/fakes",
             "@services": "./src/services",
             "@constants": "./src/constants",
+            "@manager": "./src/manager",
           },
         },
       ],

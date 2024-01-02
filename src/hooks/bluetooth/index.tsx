@@ -1,21 +1,15 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 
-import { Buffer } from "buffer";
+import { State, Device, BleError } from "react-native-ble-plx";
 
 import * as ExpoDevice from "expo-device";
-import { PermissionsAndroid, Platform } from "react-native";
-
-import {
-  State,
-  Device,
-  BleManager,
-  BleError,
-  Subscription,
-} from "react-native-ble-plx";
+import { Alert, PermissionsAndroid, Platform } from "react-native";
 
 import { reducer } from "./reducer";
 import { initialState } from "./initial-state";
 import { BluetoothContextData, BluetoothProviderProps } from "./types";
+
+import BluetoothManager from "@manager/bluetooth";
 
 import {
   SERVICE_UUID,
@@ -24,19 +18,18 @@ import {
 } from "@hooks/uuid";
 
 import { removeBytes } from "@utils/removebytes";
+import { removeDuplicateDevices } from "@utils/bluetooth";
 
 export const BluetoothContext = createContext<BluetoothContextData>(
-  {} as BluetoothContextData
+  {} as BluetoothContextData,
 );
 
-const manager = new BleManager();
-
-const HEADER = [0x4d, 0x00, 0x00, 0x2c];
+const bluetoothManager = BluetoothManager.getInstance();
 
 const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("State Bluetooth =>", state);
+  console.log("State Context:", state);
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -45,7 +38,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         title: "Location Permission",
         message: "Bluetooth Low Energy requires Location",
         buttonPositive: "OK",
-      }
+      },
     );
 
     const bluetoothConnectPermission = await PermissionsAndroid.request(
@@ -54,7 +47,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         title: "Location Permission",
         message: "Bluetooth Low Energy requires Location",
         buttonPositive: "OK",
-      }
+      },
     );
 
     const fineLocationPermission = await PermissionsAndroid.request(
@@ -63,7 +56,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         title: "Location Permission",
         message: "Bluetooth Low Energy requires Location",
         buttonPositive: "OK",
-      }
+      },
     );
 
     return (
@@ -82,7 +75,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
             title: "Location Permission",
             message: "Bluetooth Low Energy requires Location",
             buttonPositive: "OK",
-          }
+          },
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       } else {
@@ -99,276 +92,119 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     dispatch({ type: "PERMISSIONS_GRANTED", payload: granted });
   };
 
-  const handleBluetoothStateChange = (state: State) => {
+  const isDeviceConnected = async (id: string) => {
+    return await bluetoothManager.isDeviceConnected(id);
+  };
+
+  const resetState = async () => {
+    dispatch({ type: "RESET_STATE" });
+  };
+
+  const resetBluetooth = async () => {
+    dispatch({ type: "RESET_BLUETOOTH" });
+  };
+
+  const setDevices = (devices: Device[]) => {
+    const allDevices = [...state.devices, ...devices];
+    const devicesRemoved = removeDuplicateDevices(allDevices);
+
+    dispatch({ type: "SET_DEVICES", payload: devicesRemoved });
+  };
+
+  const removeDevices = () => {
+    dispatch({ type: "REMOVE_DEVICES" });
+  };
+
+  const removeValues = () => {
+    dispatch({ type: "REMOVE_VALUES" });
+  };
+
+  const writeCharacteristic = async (command: object): Promise<void> => {
+    await bluetoothManager.writeCharacteristic(
+      SERVICE_UUID,
+      CHARACTERISTIC_UUID,
+      command,
+    );
+  };
+
+  const monitorBluetoothState = (state: State) => {
     const isPoweredOn = state === State.PoweredOn;
 
     dispatch({ type: "BLUETOOTH_STATE", payload: state });
     dispatch({ type: "ENABLE_BLUETOOTH", payload: isPoweredOn });
   };
 
-  const isDuplicateDevice = (devices: Device[], newDevice: Device) =>
-    devices.some((device) => device.id === newDevice.id);
-
-  const scanForDevices = () => {
-    try {
-      if (!state.bluetoothEnabled) {
-        console.log("Bluetooth is turned off. Stopping device scan.");
-        return;
-      }
-
-      manager.startDeviceScan(null, null, (error, device) => {
-        if (error) {
-          console.error("Error when trying to scan for devices", error);
-          return;
-        }
-
-        if (device && device.name?.includes("B2K")) {
-          if (!isDuplicateDevice(state.devices, device)) {
-            dispatch({
-              type: "SET_DEVICE_LIST",
-              payload: [...state.devices, device],
-            });
-          }
-
-          manager.stopDeviceScan();
-        }
-      });
-    } catch (error) {
-      console.error("Error when trying to scan for devices", error);
-    }
-  };
-
-  const disconnectDevice = async (id: string) => {
-    await manager.cancelDeviceConnection(id);
-
-    dispatch({ type: "REMOVE_DEVICE" });
-    dispatch({ type: "CONNECT_DEVICE", payload: false });
-  };
-
-  const writeCharacteristicWithResponseForDevice = async (
-    serviceUUID: string,
-    characteristicUUID: string,
-    command: object
+  const monitorCharacteristic = async (
+    onValueChange: (value: string) => void,
   ) => {
-    if (state.connectedDevice) {
-      console.log("Device is connected and can write to a feature 👍");
+    const subscription = await bluetoothManager.monitorCharacteristic(
+      SERVICE_UUID,
+      MONITORED_FEATURE_UUID,
+      (value) => {
+        onValueChange(value);
+      },
+    );
 
-      try {
-        const discovered =
-          await state.connectedDevice.discoverAllServicesAndCharacteristics();
-
-        const services = await discovered.services();
-
-        const service = services.find(
-          (service) => service.uuid === serviceUUID
-        );
-
-        if (!service) {
-          return;
-        }
-
-        const characteristics = await service.characteristics();
-
-        const characteristic = characteristics.find(
-          (item) => item.uuid === characteristicUUID
-        );
-
-        if (!characteristic) {
-          return;
-        }
-
-        let commandString = JSON.stringify(command);
-
-        const commandBuffer = Buffer.from(commandString);
-
-        const size = commandString.length;
-
-        HEADER[3] = size;
-
-        const concatenatedBuffer = Buffer.concat([
-          Buffer.from(HEADER),
-          commandBuffer,
-        ]);
-
-        const valueBase64 = concatenatedBuffer.toString("base64");
-
-        await characteristic.writeWithResponse(valueBase64);
-
-        console.log("Successfully written ✅");
-      } catch (error) {
-        console.error("Failed when trying to write ❌", error);
-      }
-    }
-
-    console.log("Device is not connected and cannot write to a feature ❌");
-  };
-
-  const monitorCharacteristicForDevice = async (
-    device: Device,
-    serviceUUID: string,
-    characteristicUUID: string,
-    onValueChange: (value: string | null | undefined) => void,
-    onError: (error: BleError | null | unknown) => void
-  ): Promise<Subscription | undefined> => {
-    try {
-      console.log("Discover all services and features 🔎...");
-
-      const discovered = await device.discoverAllServicesAndCharacteristics();
-
-      const services = await discovered.services();
-
-      const service = services.find((service) => service.uuid === serviceUUID);
-
-      if (!service) {
-        return;
-      }
-
-      console.log("Service found 👷");
-
-      const characteristics = await service.characteristics();
-
-      const characteristic = characteristics.find(
-        (item) => item.uuid === characteristicUUID
-      );
-
-      if (!characteristic) {
-        return;
-      }
-
-      console.log("Characteristic found 👷");
-
-      const subscription = characteristic.monitor((error, characteristic) => {
-        if (error) {
-          onError(error);
-        } else if (characteristic?.value) {
-          onValueChange(characteristic.value);
-        }
-      });
-
-      console.log("Subscription ✅");
-
-      return subscription;
-    } catch (error) {
-      onError(error);
-    }
-  };
-
-  const writeCharacteristicWithResponseForService = async (
-    device: Device,
-    command: object
-  ) => {
-    console.log("Write Characteristic With Response For Service 🖊...");
-
-    dispatch({ type: "RESET_RETURN_VALUES" });
-
-    let commandString = JSON.stringify(command);
-
-    const commandBuffer = Buffer.from(commandString);
-
-    const size = commandString.length;
-
-    HEADER[3] = size;
-
-    const concatenatedBuffer = Buffer.concat([
-      Buffer.from(HEADER),
-      commandBuffer,
-    ]);
-
-    const valueBase64 = concatenatedBuffer.toString("base64");
-
-    const characteristic =
-      await device.writeCharacteristicWithResponseForService(
-        SERVICE_UUID,
-        CHARACTERISTIC_UUID,
-        valueBase64
-      );
-
-    return characteristic;
-  };
-
-  const onValueChange = (value: string | null | undefined) => {
-    if (value) {
-      const bytesRemovidos = removeBytes(value);
-      const valueAlreadyExists = state.returnedValues.includes(bytesRemovidos);
-
-      if (!valueAlreadyExists) {
-        dispatch({ type: "INCLUDE_RETURN_Value", payload: bytesRemovidos });
-      }
-    }
-  };
-
-  const onError = (error: BleError | null | unknown) => {
-    console.error("Error when trying to monitor feature.", error);
+    return subscription;
   };
 
   const connectToDevice = async (id: string) => {
     try {
-      dispatch({ type: "RESET_RETURN_VALUES" });
+      const device = await bluetoothManager.connectToDevice(id);
 
-      const connected = await manager.connectToDevice(id, {
-        requestMTU: 500,
-      });
+      if (device instanceof Device) {
+        dispatch({ type: "SET_DEVICE", payload: device });
+        dispatch({ type: "CONNECT_DEVICE", payload: true });
+      }
 
-      monitorCharacteristicForDevice(
-        connected,
-        SERVICE_UUID,
-        MONITORED_FEATURE_UUID,
-        onValueChange,
-        onError
-      );
+      if (device instanceof BleError) {
+        Alert.alert(device.message, device.message);
+      }
 
-      dispatch({ type: "CONNECT_DEVICE", payload: true });
-      dispatch({ type: "SET_DEVICE", payload: connected });
+      if (!device) {
+        Alert.alert(
+          "Failed to connect to device",
+          "Failed to connect to device",
+        );
+      }
     } catch (error) {
-      console.error("Failed when trying to connect:", error);
+      Alert.alert("Failed to connect to device", "Failed to connect to device");
     }
   };
 
-  const resetReturnValues = () => {
-    dispatch({ type: "RESET_RETURN_VALUES" });
-  };
-
-  const isDeviceConnected = async (id: string) => {
-    return await manager.isDeviceConnected(id);
-  };
-
-  const checkConnectedDevices = async () => {
-    const connectedDevices = await manager.connectedDevices([]);
-    if (connectedDevices.length > 0) {
-      console.log("There are connected devices");
-      return true;
-    } else {
-      console.log("No devices connected");
-      return false;
-    }
-  };
-
-  const resetBluetooth = async () => {
-    if (state.connectedDevice) {
-      await disconnectDevice(state.connectedDevice.id);
-    }
-
-    dispatch({ type: "RESET_BLUETOOTH" });
-  };
-
-  const resetTotal = async () => {
-    if (state.connectedDevice) {
-      await disconnectDevice(state.connectedDevice.id);
-      dispatch({ type: "RESET_TOTAL" });
-    }
-    dispatch({ type: "RESET_TOTAL" });
+  const onValueChange = (value: string) => {
+    dispatch({ type: "SET_VALUES", payload: removeBytes(value) });
   };
 
   useEffect(() => {
-    const stateChangeListener = manager.onStateChange(
-      handleBluetoothStateChange,
-      true
+    const startMonitoring = async () => {
+      if (state.connectedDevice) {
+        const subscription = await bluetoothManager.monitorCharacteristic(
+          SERVICE_UUID,
+          MONITORED_FEATURE_UUID,
+          onValueChange,
+        );
+
+        return () => {
+          subscription?.remove();
+        };
+      }
+    };
+
+    startMonitoring();
+  }, [state.connectedDevice]);
+
+  useEffect(() => {
+    const stateChangeListener = bluetoothManager.monitorBluetoothState(
+      (state) => {
+        console.log("Current Bluetooth Status:", state);
+        monitorBluetoothState(state);
+      },
     );
 
     return () => {
-      if (manager) {
+      if (stateChangeListener) {
         stateChangeListener.remove();
-        manager.destroy();
       }
     };
   }, []);
@@ -385,27 +221,25 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
         deviceIsConnected: state.deviceIsConnected,
         permissionsGranted: state.permissionsGranted,
 
-        returnedValues: state.returnedValues,
+        values: state.values,
 
-        writeCharacteristicWithResponseForService,
-        resetReturnValues,
+        removeValues,
 
-        resetTotal,
+        resetState,
         resetBluetooth,
 
         isDeviceConnected,
-        checkConnectedDevices,
-
-        scanForDevices,
-        connectToDevice,
-        disconnectDevice,
-
-        writeCharacteristicWithResponseForDevice,
 
         requestPermissions,
         changeGrantedPermissions,
 
-        monitorCharacteristicForDevice,
+        writeCharacteristic,
+        monitorBluetoothState,
+        connectToDevice,
+        setDevices,
+        removeDevices,
+
+        monitorCharacteristic,
       }}
     >
       {children}

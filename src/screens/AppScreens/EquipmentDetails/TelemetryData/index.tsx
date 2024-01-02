@@ -172,7 +172,7 @@ export function TelemetryData() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

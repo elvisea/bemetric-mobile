@@ -74,7 +74,7 @@ export function MessageDetails() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

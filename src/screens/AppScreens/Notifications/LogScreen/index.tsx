@@ -131,7 +131,7 @@ export function LogScreen() {
 
     if (include) {
       const filtered = search.equipments.filter(
-        (equipment) => equipment !== codigo
+        (equipment) => equipment !== codigo,
       );
       setSearch((rest) => ({ ...rest, equipments: filtered }));
     } else {
@@ -144,12 +144,12 @@ export function LogScreen() {
 
   const includeMarkers = (marker: Marker) => {
     const include = search.markers.some(
-      (marker) => marker.codigo === marker.codigo
+      (marker) => marker.codigo === marker.codigo,
     );
 
     if (include) {
       const filtered = search.markers.filter(
-        (marker) => marker.codigo !== marker.codigo
+        (marker) => marker.codigo !== marker.codigo,
       );
       setSearch((rest) => ({ ...rest, markers: filtered }));
     } else {
@@ -251,7 +251,7 @@ export function LogScreen() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   useFocusEffect(
@@ -263,7 +263,7 @@ export function LogScreen() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (
@@ -394,7 +394,7 @@ export function LogScreen() {
                 title={marker.nome}
                 onPress={() => includeMarkers(marker)}
                 isActive={search.markers.some(
-                  (marker) => marker.codigo === marker.codigo
+                  (marker) => marker.codigo === marker.codigo,
                 )}
               />
             ))}

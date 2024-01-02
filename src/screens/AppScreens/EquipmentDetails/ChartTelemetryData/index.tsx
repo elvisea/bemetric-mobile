@@ -128,7 +128,7 @@ export function ChartTelemetryData() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

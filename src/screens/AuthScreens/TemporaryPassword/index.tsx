@@ -69,27 +69,27 @@ export function TemporaryPassword() {
               text: "Efetuar Login!",
               onPress: () => navigation.navigate("SignIn"),
             },
-          ]
+          ],
         );
       }
 
       if (response.data === 1) {
         Alert.alert(
           "Falha ao tentar alterar senha!",
-          "Falha ao tentar alterar senha!"
+          "Falha ao tentar alterar senha!",
         );
       }
 
       if (response.data === 2) {
         Alert.alert(
           "Falha ao tentar alterar senha!",
-          "Falha ao tentar alterar senha!"
+          "Falha ao tentar alterar senha!",
         );
       }
     } catch (error) {
       Alert.alert(
         "Erro ao tentar alterar senha!",
-        "Erro ao tentar alterar senha!"
+        "Erro ao tentar alterar senha!",
       );
     } finally {
       setIsLoading(false);

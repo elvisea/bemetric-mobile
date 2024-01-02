@@ -155,7 +155,7 @@ export function CreateGeofence() {
           latitude: response.coords.latitude,
           longitude: response.coords.longitude,
         });
-      }
+      },
     );
   }, []);
 

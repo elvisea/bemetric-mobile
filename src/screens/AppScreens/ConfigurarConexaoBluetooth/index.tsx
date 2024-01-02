@@ -1,14 +1,43 @@
-import { HeaderDefault } from "@components/HeaderDefault";
-import { ConnectionOption } from "@components/Include/ConnectionOption";
-import { LayoutDefault } from "@components/LayoutDefault";
-
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import { useCallback } from "react";
+import { BackHandler, FlatList } from "react-native";
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 import { THEME } from "@theme/theme";
+import { useBluetooth } from "@hooks/bluetooth";
+
+import { options } from "./constants";
+
+import { HeaderDefault } from "@components/HeaderDefault";
+import { LayoutDefault } from "@components/LayoutDefault";
+import { ConnectionOption } from "@components/Include/ConnectionOption";
 
 export function ConfigurarConexaoBluetooth() {
   const navigation = useNavigation();
+  const { removeValues } = useBluetooth();
+
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        removeValues();
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, []),
+  );
 
   return (
     <LayoutDefault
@@ -18,30 +47,22 @@ export function ConfigurarConexaoBluetooth() {
     >
       <HeaderDefault title="Configure a conexão bluetooth" />
 
-      <ConnectionOption
-        mt={16}
-        title="Identificar Bluetooth"
-        onPress={() =>
-          navigation.navigate("IncludeStackRoutes", { screen: "Bluetooth" })
-        }
-      />
-
-      <ConnectionOption
-        mt={8}
-        title="Identificar QRcode"
-        onPress={() =>
-          navigation.navigate("IncludeStackRoutes", { screen: "QRCode" })
-        }
-      />
-
-      <ConnectionOption
-        mt={8}
-        title="Identificar Manualmente"
-        onPress={() =>
-          navigation.navigate("IncludeStackRoutes", {
-            screen: "VincularDispositivo",
-          })
-        }
+      <FlatList
+        data={options}
+        style={{ width: "100%" }}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item: option }) => (
+          <ConnectionOption
+            mt={option.mt}
+            title={option.title}
+            onPress={() =>
+              navigation.navigate("IncludeStackRoutes", {
+                screen: option.screen,
+              })
+            }
+          />
+        )}
       />
     </LayoutDefault>
   );

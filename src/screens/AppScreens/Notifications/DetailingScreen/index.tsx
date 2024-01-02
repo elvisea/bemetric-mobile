@@ -94,7 +94,7 @@ export default function DetailingDoisStackRoutes() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (

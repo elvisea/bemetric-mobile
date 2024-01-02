@@ -54,7 +54,7 @@ type EquipmentData = {
 };
 
 const transformEquipmentsData = (
-  equipmentData: EquipmentData[]
+  equipmentData: EquipmentData[],
 ): DataTransform[] => {
   const data: DataTransform[] = [];
 

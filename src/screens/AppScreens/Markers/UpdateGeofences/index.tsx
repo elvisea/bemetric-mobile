@@ -51,7 +51,7 @@ export function UpdateGeofences() {
 
   const [delta, setDelta] = useState<IDelta>({} as IDelta);
   const [initialRegion, setInitialRegion] = useState<ICoordinate>(
-    {} as ICoordinate
+    {} as ICoordinate,
   );
 
   const handleDeleteGeofence = async () => {
@@ -176,7 +176,7 @@ export function UpdateGeofences() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   return (
