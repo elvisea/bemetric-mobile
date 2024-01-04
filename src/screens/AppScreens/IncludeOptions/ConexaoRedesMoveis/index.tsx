@@ -54,7 +54,7 @@ export function ConexaoRedesMoveis() {
   });
 
   const handleNextPage = async (data: IForm) => {
-    if (bluetoothContextData.connectedDevice) {
+    if (bluetoothContextData.device) {
       setIsLoading(true);
 
       const COMMAND = {

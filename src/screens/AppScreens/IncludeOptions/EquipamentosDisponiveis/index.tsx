@@ -31,7 +31,7 @@ export function EquipamentosDisponiveis() {
   const { customer } = useCustomer();
   const { navigate, dispatch } = useNavigation();
 
-  const { connectedDevice, removeValues } = useBluetooth();
+  const { device, removeValues } = useBluetooth();
 
   const route = useRoute();
   const params = route.params as { chave: string };
@@ -55,7 +55,7 @@ export function EquipamentosDisponiveis() {
     } else {
       navigate("AddEquipment", {
         chave: params.chave,
-        serial: connectedDevice?.name || "",
+        serial: device?.name || "",
       });
     }
   };
@@ -74,7 +74,7 @@ export function EquipamentosDisponiveis() {
         modeloEquipamento: selected?.modelo,
         placaEquipamento: selected?.placa,
         anoEquipamento: selected?.ano,
-        serialDispositivo: connectedDevice && connectedDevice.name,
+        serialDispositivo: device && device.name,
         chaveDispositivo: params.chave,
         horimetroIncialEquipamento: selected?.horimetroIncial,
         hodometroIncialEquipamento: selected?.hodometroIncial,

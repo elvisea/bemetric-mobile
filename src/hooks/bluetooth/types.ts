@@ -4,7 +4,7 @@ import { Device, State, Subscription } from "react-native-ble-plx";
 
 type BluetoothContextData = {
   devices: Device[];
-  connectedDevice: Device | null;
+  device: Device | null;
 
   values: string[];
 
@@ -41,7 +41,7 @@ type BluetoothProviderProps = {
 
 type AuthState = {
   devices: Device[];
-  connectedDevice: Device | null;
+  device: Device | null;
 
   bluetoothState: State;
 

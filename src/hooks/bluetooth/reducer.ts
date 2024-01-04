@@ -6,13 +6,13 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
     case "SET_DEVICE":
       return {
         ...state,
-        connectedDevice: action.payload,
+        device: action.payload,
       };
 
     case "REMOVE_DEVICE":
       return {
         ...state,
-        connectedDevice: null,
+        device: null,
       };
 
     case "SET_DEVICES":
@@ -66,7 +66,7 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
     case "RESET_BLUETOOTH":
       return {
         ...state,
-        connectedDevice: null,
+        device: null,
         deviceIsConnected: false,
       };
 

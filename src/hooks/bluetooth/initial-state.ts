@@ -5,7 +5,7 @@ import { AuthState } from "./types";
 const initialState: AuthState = {
   values: [],
   devices: [],
-  connectedDevice: null,
+  device: null,
   deviceIsConnected: false,
 
   bluetoothState: State.Unknown,
