@@ -41,14 +41,14 @@ export function ConexaoManual() {
     resolver: yupResolver(schema),
   });
 
-  const bluetoothContextData = useBluetooth();
+  const context = useBluetooth();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const clearReturnedValues = () => {
-    bluetoothContextData.removeValues();
+    context.removeValues();
   };
 
   const sendCommand = async (data: { nome: string; senha: string }) => {
@@ -60,7 +60,7 @@ export function ConexaoManual() {
       SET_WIFI_PWD: data.senha,
     };
 
-    await bluetoothContextData.writeCharacteristic(CONFIGURE_COMMAND);
+    await context.writeCharacteristic(CONFIGURE_COMMAND);
   };
 
   const handleNextPage = async (data: { nome: string; senha: string }) => {
@@ -75,7 +75,7 @@ export function ConexaoManual() {
       GET_WIFI_STATUS: "",
     };
 
-    await bluetoothContextData.writeCharacteristic(STATUS_COMMAND);
+    await context.writeCharacteristic(STATUS_COMMAND);
     setIsLoading(false);
   };
 
@@ -84,7 +84,7 @@ export function ConexaoManual() {
       chave: params.chave,
     });
 
-    bluetoothContextData.removeValues();
+    context.removeValues();
   };
 
   const checarObjeto = (retorno: object) => {
@@ -121,22 +121,22 @@ export function ConexaoManual() {
   };
 
   const onValueChange = () => {
-    const retorno = processReceivedValues(bluetoothContextData.values);
+    const retorno = processReceivedValues(context.values);
     checarObjeto(retorno);
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (bluetoothContextData.values.length > 0) {
+      if (context.values.length > 0) {
         onValueChange();
       }
-    }, [bluetoothContextData.values]),
+    }, [context.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        bluetoothContextData.removeValues();
+        context.removeValues();
         return false;
       };
 

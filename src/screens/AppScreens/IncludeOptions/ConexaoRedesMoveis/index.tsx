@@ -37,7 +37,7 @@ export function ConexaoRedesMoveis() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const bluetoothContextData = useBluetooth();
+  const context = useBluetooth();
 
   const params = route.params as { chave: string };
 
@@ -54,7 +54,7 @@ export function ConexaoRedesMoveis() {
   });
 
   const handleNextPage = async (data: IForm) => {
-    if (bluetoothContextData.device) {
+    if (context.device) {
       setIsLoading(true);
 
       const COMMAND = {
@@ -64,7 +64,7 @@ export function ConexaoRedesMoveis() {
         SET_MODEM_PWD: data.senha,
       };
 
-      await bluetoothContextData.writeCharacteristic(COMMAND);
+      await context.writeCharacteristic(COMMAND);
     }
   };
 
@@ -73,11 +73,11 @@ export function ConexaoRedesMoveis() {
       chave: params.chave,
     });
 
-    bluetoothContextData.removeValues();
+    context.removeValues();
   };
 
   const onValueChange = () => {
-    const response = processReceivedValues(bluetoothContextData.values);
+    const response = processReceivedValues(context.values);
     console.log("OBJETO RESPOSTA:", response);
 
     if (Object.entries(response).length > 0) {
@@ -93,16 +93,16 @@ export function ConexaoRedesMoveis() {
 
   useFocusEffect(
     useCallback(() => {
-      if (bluetoothContextData.values.length > 0) {
+      if (context.values.length > 0) {
         onValueChange();
       }
-    }, [bluetoothContextData.values]),
+    }, [context.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        bluetoothContextData.removeValues();
+        context.removeValues();
         return false;
       };
 
