@@ -164,7 +164,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
 
   useEffect(() => {
     const startMonitoring = async () => {
-      if (state.connectedDevice) {
+      if (state.device) {
         const subscription = await bluetoothManager.monitorCharacteristic(
           SERVICE_UUID,
           MONITORED_FEATURE_UUID,
@@ -178,7 +178,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     };
 
     startMonitoring();
-  }, [state.connectedDevice]);
+  }, [state.device]);
 
   useEffect(() => {
     const stateChangeListener = bluetoothManager.monitorBluetoothState(
@@ -199,7 +199,7 @@ const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
     <BluetoothContext.Provider
       value={{
         devices: state.devices,
-        connectedDevice: state.connectedDevice,
+        device: state.device,
 
         bluetoothState: state.bluetoothState,
         bluetoothEnabled: state.bluetoothEnabled,
