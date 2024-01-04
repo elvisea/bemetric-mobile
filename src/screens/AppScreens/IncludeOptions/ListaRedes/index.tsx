@@ -27,7 +27,7 @@ export function ListaRedes() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const bluetoothContextData = useBluetooth();
+  const context = useBluetooth();
 
   const params = route.params as { chave: string };
 
@@ -42,12 +42,12 @@ export function ListaRedes() {
     });
 
     setState(initialState);
-    bluetoothContextData.removeValues();
+    context.removeValues();
   };
 
   const sendCommand = async () => {
     const COMMAND = { BT_PASSWORD: params.chave, GET_WIFI_LIST: "" };
-    await bluetoothContextData.writeCharacteristic(COMMAND);
+    await context.writeCharacteristic(COMMAND);
   };
 
   const findAvailableNetworks = async () => {
@@ -78,7 +78,7 @@ export function ListaRedes() {
   };
 
   const onValueChange = () => {
-    const response: any = processReceivedValues(bluetoothContextData.values);
+    const response: any = processReceivedValues(context.values);
 
     const temTodasAsPropriedades = checarObjeto(response);
 
@@ -95,10 +95,10 @@ export function ListaRedes() {
 
   useFocusEffect(
     useCallback(() => {
-      if (bluetoothContextData.values.length > 0) {
+      if (context.values.length > 0) {
         onValueChange();
       }
-    }, [bluetoothContextData.values]),
+    }, [context.values]),
   );
 
   useFocusEffect(
@@ -114,7 +114,7 @@ export function ListaRedes() {
   useFocusEffect(
     useCallback(() => {
       return () => {
-        bluetoothContextData.removeValues();
+        context.removeValues();
       };
     }, []),
   );
@@ -122,7 +122,7 @@ export function ListaRedes() {
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        bluetoothContextData.removeValues();
+        context.removeValues();
         return false;
       };
 

@@ -38,7 +38,7 @@ const bluetoothManager = BluetoothManager.getInstance();
 
 export function VincularDispositivo() {
   const navigation = useNavigation();
-  const bluetoothContextData = useBluetooth();
+  const context = useBluetooth();
 
   const route = useRoute();
   const params = route.params as TypeParams;
@@ -62,7 +62,7 @@ export function VincularDispositivo() {
 
   const sendCommand = async (chave: string) => {
     const COMMAND = { BT_PASSWORD: chave.trim(), GET_SERIAL_KEY: "" };
-    await bluetoothContextData.writeCharacteristic(COMMAND);
+    await context.writeCharacteristic(COMMAND);
   };
 
   const handleAdvance = async ({ chave, serial }: TypeForm) => {
@@ -76,9 +76,9 @@ export function VincularDispositivo() {
       );
 
       if (device) {
-        await bluetoothContextData.connectToDevice(device.id);
+        await context.connectToDevice(device.id);
 
-        const isConnected = await bluetoothContextData.isDeviceConnected(
+        const isConnected = await context.isDeviceConnected(
           device.id,
         );
 
@@ -146,7 +146,7 @@ export function VincularDispositivo() {
   };
 
   const clearReturnedValues = () => {
-    bluetoothContextData.removeValues();
+    context.removeValues();
   };
 
   const requestUsagePermissions = async () => {
@@ -172,16 +172,16 @@ export function VincularDispositivo() {
   };
 
   const onValueChange = () => {
-    const response = processReceivedValues(bluetoothContextData.values);
+    const response = processReceivedValues(context.values);
     checkObjectProperties(response);
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (bluetoothContextData.values.length > 0) {
+      if (context.values.length > 0) {
         onValueChange();
       }
-    }, [bluetoothContextData.values]),
+    }, [context.values]),
   );
 
   useFocusEffect(
@@ -189,7 +189,7 @@ export function VincularDispositivo() {
       requestUsagePermissions();
 
       const allowed =
-        state.permissionsGranted && bluetoothContextData.bluetoothEnabled;
+        state.permissionsGranted && context.bluetoothEnabled;
 
       if (allowed) {
         bluetoothManager.scanForDevices((scannedDevices) => {
@@ -200,13 +200,13 @@ export function VincularDispositivo() {
       return () => {
         bluetoothManager.stopScan();
       };
-    }, [state.permissionsGranted, bluetoothContextData.bluetoothEnabled]),
+    }, [state.permissionsGranted, context.bluetoothEnabled]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        bluetoothContextData.removeValues();
+        context.removeValues();
         return false;
       };
 
