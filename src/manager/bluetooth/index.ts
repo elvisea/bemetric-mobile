@@ -2,7 +2,6 @@ import {
   CHARACTERISTIC_UUID,
   MONITORED_FEATURE_UUID,
   SERVICE_UUID,
-  TRANSACTION_ID,
 } from "@hooks/uuid";
 
 import { Buffer } from "buffer";
@@ -10,7 +9,6 @@ import { Buffer } from "buffer";
 import {
   BleManager,
   Device,
-  BleError,
   State,
   Subscription,
   Service,
@@ -90,39 +88,31 @@ class BluetoothManager {
     return false;
   };
 
-  connectToDevice = async (
-    deviceIdentifier: string,
-  ): Promise<Device | BleError | null | undefined> => {
+  connectToDevice = async (id: string): Promise<Device | null> => {
     try {
       if (this.device) {
-        const deviceIsConnected = await this.device.isConnected();
-
-        if (deviceIsConnected) {
+        const isConnected = await this.device.isConnected();
+        if (isConnected) {
           return this.device;
         } else {
-          await this.device.cancelConnection();
           this.device = null;
         }
+      }
+
+      const device = await this.manager.connectToDevice(id, {
+        requestMTU: 500,
+      });
+
+      const isConnected = await device.isConnected();
+      if (isConnected) {
+        this.device = device;
+        return device;
       } else {
-        const device = await this.manager.connectToDevice(deviceIdentifier, {
-          requestMTU: 500,
-        });
-
-        const isConnected = await device.isConnected();
-
-        if (isConnected) {
-          this.device = device;
-          return device;
-        } else {
-          this.device = null;
-          return null;
-        }
+        return null;
       }
     } catch (error) {
-      if (error instanceof BleError) {
-        return error;
-      }
-      return undefined;
+      console.error("Erro durante a conexão ao dispositivo:", error);
+      return null;
     }
   };
 
@@ -178,8 +168,10 @@ class BluetoothManager {
     }
   };
 
-  canceltransaction = () => {
-    this.manager.cancelTransaction(TRANSACTION_ID);
+  cancelTransaction = () => {
+    if (this.device) {
+      this.manager.cancelTransaction(this.device.id);
+    }
   };
 
   discoverService = async (
@@ -246,7 +238,7 @@ class BluetoothManager {
 
         const valueBase64 = concatenatedBuffer.toString("base64");
 
-        await characteristic.writeWithResponse(valueBase64, TRANSACTION_ID);
+        await characteristic.writeWithResponse(valueBase64, this.device.id);
       }
     } catch (error) {
       console.error("Error writing characteristic:", error);

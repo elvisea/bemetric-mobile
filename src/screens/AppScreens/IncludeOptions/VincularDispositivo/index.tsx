@@ -76,16 +76,20 @@ export function VincularDispositivo() {
       );
 
       if (device) {
-        await context.connectToDevice(device.id);
+        const result = await bluetoothManager.connectToDevice(device.id);
 
-        const isConnected = await bluetoothManager.isDeviceConnected(device.id);
+        if (result) {
+          const isConnected = await result.isConnected();
 
-        if (isConnected) {
-          setState((previousState) => ({
-            ...previousState,
-            isConnected: isConnected,
-          }));
-          await sendCommand(chave);
+          if (isConnected) {
+            context.setDevice(result);
+            await sendCommand(chave);
+          }
+        } else {
+          setState((previousState) => ({ ...previousState, isLoading: false }));
+          Alert.alert(responses[7].title, responses[7].subtitle, [
+            { text: "Tentar novamente" },
+          ]);
         }
       } else {
         setState((previousState) => ({ ...previousState, isLoading: false }));
@@ -119,7 +123,6 @@ export function VincularDispositivo() {
       });
 
       if (data === 0) {
-
         Alert.alert(responses[5].title, responses[5].subtitle, [
           {
             text: "Continuar",
@@ -146,7 +149,10 @@ export function VincularDispositivo() {
   };
 
   const resetState = () => setState(initialState);
-  const clearValues = () => setState(previousState => ({ ...previousState, values: [] }));
+
+  const clearValues = () => {
+    setState((previousState) => ({ ...previousState, values: [] }));
+  };
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
@@ -225,6 +231,7 @@ export function VincularDispositivo() {
 
           return () => {
             subscription?.remove();
+            resetState();
           };
         }
       };
@@ -258,7 +265,7 @@ export function VincularDispositivo() {
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        setState(initialState);
+        resetState();
         return false;
       };
 

@@ -49,9 +49,9 @@ export function TelemetryDevice() {
   const handleConnect = async () => {
     if (typeof telemetry === "object" && telemetry) {
       const name = telemetry.serial.trim().toUpperCase();
-      const deviceFound = state.devices.find((device) => device.name === name);
+      const device = state.devices.find((device) => device.name === name);
 
-      if (deviceFound) {
+      if (device) {
         try {
           setState((previousState) => ({
             ...previousState,
@@ -64,14 +64,22 @@ export function TelemetryDevice() {
           };
 
           const isConnected = await bluetoothManager.isDeviceConnected(
-            deviceFound.id,
+            device.id,
           );
 
           if (isConnected) {
             await bluetoothManager.writeCharacteristic(COMMAND);
           } else {
-            await context.connectToDevice(deviceFound.id);
-            await bluetoothManager.writeCharacteristic(COMMAND);
+            const result = await bluetoothManager.connectToDevice(device.id);
+
+            if (result) {
+              const isConnected = await result.isConnected();
+
+              if (isConnected) {
+                context.setDevice(result);
+                await bluetoothManager.writeCharacteristic(COMMAND);
+              }
+            }
           }
         } catch (error) {
           setState((previousState) => ({ ...previousState, isLoading: false }));

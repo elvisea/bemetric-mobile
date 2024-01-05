@@ -50,7 +50,7 @@ export function ConexaoManual() {
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const clearState = () => setState(initialState);
+  const resetState = () => setState(initialState);
 
   const sendCommand = async (data: { nome: string; senha: string }) => {
     setState((previousState) => ({ ...previousState, isLoading: true }));
@@ -85,14 +85,14 @@ export function ConexaoManual() {
       chave: params.chave,
     });
 
-    clearState();
+    resetState();
   };
 
   const checarObjeto = (retorno: object) => {
     if (Object.entries(retorno).length > 0) {
       if ("SET_TRANSM_MODE" in retorno) {
         if (retorno.SET_TRANSM_MODE === "WIFI") {
-          clearState();
+          resetState();
           getStatusConnection();
         }
       }
@@ -103,7 +103,7 @@ export function ConexaoManual() {
           Alert.alert(resposta[0].title, resposta[0].subtitle, [
             {
               text: resposta[0].text,
-              onPress: () => clearState(),
+              onPress: () => resetState(),
             },
           ]);
         }
@@ -142,6 +142,7 @@ export function ConexaoManual() {
 
           return () => {
             subscription?.remove();
+            resetState();
           };
         }
       };
@@ -159,7 +160,7 @@ export function ConexaoManual() {
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        setState(initialState);
+        resetState();
         return false;
       };
 

@@ -4,7 +4,8 @@ import { Device } from "react-native-ble-plx";
 
 type BluetoothContextData = {
   device: Device | null;
-  connectToDevice(id: string): Promise<void>;
+  setDevice(device: Device): void;
+  removeDevice(): void;
 };
 
 type BluetoothProviderProps = {

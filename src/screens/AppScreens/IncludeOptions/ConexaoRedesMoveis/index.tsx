@@ -110,6 +110,7 @@ export function ConexaoRedesMoveis() {
 
           return () => {
             subscription?.remove();
+            setState(initialState);
           };
         }
       };
