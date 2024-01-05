@@ -1,4 +1,9 @@
-import { TRANSACTION_ID } from "@hooks/uuid";
+import {
+  CHARACTERISTIC_UUID,
+  MONITORED_FEATURE_UUID,
+  SERVICE_UUID,
+  TRANSACTION_ID,
+} from "@hooks/uuid";
 
 import { Buffer } from "buffer";
 
@@ -122,8 +127,6 @@ class BluetoothManager {
   };
 
   monitorCharacteristic = async (
-    serviceUUID: string,
-    characteristicUUID: string,
     callback: (value: string) => void,
   ): Promise<Subscription | undefined> => {
     try {
@@ -133,22 +136,22 @@ class BluetoothManager {
 
         const services = await device.services();
         const service = services.find(
-          (service) => service.uuid === serviceUUID,
+          (service) => service.uuid === SERVICE_UUID,
         );
 
         if (!service) {
-          console.error(`Service with UUID ${serviceUUID} not found.`);
+          console.error(`Service with UUID ${SERVICE_UUID} not found.`);
           return;
         }
 
         const characteristics = await service.characteristics();
         const characteristic = characteristics.find(
-          (item) => item.uuid === characteristicUUID,
+          (item) => item.uuid === MONITORED_FEATURE_UUID,
         );
 
         if (!characteristic) {
           console.error(
-            `Characteristic with UUID ${characteristicUUID} not found.`,
+            `Characteristic with UUID ${MONITORED_FEATURE_UUID} not found.`,
           );
           return;
         }
@@ -206,28 +209,24 @@ class BluetoothManager {
     }
   };
 
-  writeCharacteristic = async (
-    serviceUUID: string,
-    characteristicUUID: string,
-    command: object,
-  ): Promise<void> => {
+  writeCharacteristic = async (command: object): Promise<void> => {
     try {
       if (this.device) {
-        const service = await this.discoverService(this.device, serviceUUID);
+        const service = await this.discoverService(this.device, SERVICE_UUID);
 
         if (!service) {
-          console.error(`Service with UUID ${serviceUUID} not found.`);
+          console.error(`Service with UUID ${SERVICE_UUID} not found.`);
           return;
         }
 
         const characteristic = await this.discoverCharacteristic(
           service,
-          characteristicUUID,
+          CHARACTERISTIC_UUID,
         );
 
         if (!characteristic) {
           console.error(
-            `Characteristic with UUID ${characteristicUUID} not found.`,
+            `Characteristic with UUID ${CHARACTERISTIC_UUID} not found.`,
           );
           return;
         }

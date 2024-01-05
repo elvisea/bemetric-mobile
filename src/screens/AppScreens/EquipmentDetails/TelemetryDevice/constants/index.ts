@@ -1,3 +1,5 @@
+import { TypeInitialState } from "../types";
+
 const response: { [key: number]: { title: string; subtitle: string } } = {
   0: {
     title: "Dispositivo não encontrado.",
@@ -18,4 +20,13 @@ const response: { [key: number]: { title: string; subtitle: string } } = {
   },
 };
 
-export { response };
+const initialState: TypeInitialState = {
+  values: [],
+  devices: [],
+  isLoading: false,
+  isConnecting: false,
+  bluetoothEnabled: false,
+  permissionsGranted: false,
+};
+
+export { response, initialState };

@@ -9,6 +9,10 @@ type IInput = {
   keyboardType: KeyboardTypeOptions;
 };
 
+type TypeForm = { ponto: string; usuario: string; senha: string };
+
+type TypeInitialState = { values: string[]; isLoading: boolean };
+
 type TypeResponse = { [index: number]: { title: string; subtitle: string } };
 
-export { IName, IInput, TypeResponse };
+export { IName, IInput, TypeResponse, TypeInitialState, TypeForm };

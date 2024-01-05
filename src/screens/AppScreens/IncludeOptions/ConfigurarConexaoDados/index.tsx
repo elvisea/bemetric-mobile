@@ -1,17 +1,14 @@
-import { useCallback } from "react";
-import { FlatList, BackHandler } from "react-native";
+import { FlatList } from "react-native";
 
 import {
   useNavigation,
   DrawerActions,
   useRoute,
-  useFocusEffect,
 } from "@react-navigation/native";
 
 import { VStack } from "native-base";
 
 import { THEME } from "@theme/theme";
-import { useBluetooth } from "@hooks/bluetooth";
 
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
@@ -24,37 +21,9 @@ export function ConfigurarConexaoDados() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const { removeValues } = useBluetooth();
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const params = route.params as { chave: string };
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        removeValues();
-      };
-    }, []),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const handleBackPress = () => {
-        removeValues();
-        return false;
-      };
-
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress,
-      );
-
-      return () => {
-        backHandler.remove();
-      };
-    }, []),
-  );
 
   return (
     <LayoutDefault

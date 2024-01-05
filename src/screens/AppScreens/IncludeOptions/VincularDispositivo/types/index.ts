@@ -1,5 +1,5 @@
 import { KeyboardTypeOptions } from "react-native";
-import { Device } from "react-native-ble-plx";
+import { Device, State } from "react-native-ble-plx";
 
 type TypeForm = {
   chave: string;
@@ -29,8 +29,11 @@ type TypeInput = {
 };
 
 type TypeInitialState = {
+  values: string[];
   devices: Device[];
   isLoading: boolean;
+  bluetoothState: State;
+  bluetoothEnabled: boolean;
   permissionsGranted: boolean;
 };
 

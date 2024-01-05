@@ -11,13 +11,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Device, State } from "react-native-ble-plx";
 
 import { THEME } from "@theme/theme";
-import { useBluetooth } from "@hooks/bluetooth";
 
 import BluetoothManager from "@manager/bluetooth";
 import { requestPermissions } from "@manager/permissions";
 
+import { removeDuplicateDevices } from "@utils/bluetooth";
+
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 import { DeviceBluetooth } from "@components/DeviceBluetooth";
 
 import { initialState } from "./constants";
@@ -26,7 +28,6 @@ import { Content, TitleHeader, Warning, Status } from "./styles";
 const bluetoothManager = BluetoothManager.getInstance();
 
 export function Bluetooth() {
-  const { removeValues } = useBluetooth();
   const { navigate, dispatch } = useNavigation();
 
   const [state, setState] = useState(initialState);
@@ -55,9 +56,15 @@ export function Bluetooth() {
     useCallback(() => {
       requestUsagePermissions();
 
-      if (state.permissionsGranted && state.bluetoothEnabled) {
+      const canScan = state.permissionsGranted && state.bluetoothEnabled;
+
+      if (canScan) {
         bluetoothManager.scanForDevices((scannedDevices) => {
-          setState((oldState) => ({ ...oldState, devices: scannedDevices }));
+          const devices = removeDuplicateDevices([
+            ...state.devices,
+            ...scannedDevices,
+          ]);
+          setState((oldState) => ({ ...oldState, devices: devices }));
         });
       }
 
@@ -84,7 +91,7 @@ export function Bluetooth() {
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        removeValues();
+        setState(initialState);
         return false;
       };
 
@@ -105,7 +112,11 @@ export function Bluetooth() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      <HeaderDefault title="Bluetooth" />
+      {state.devices.length > 0 && <HeaderDefault title="Bluetooth" />}
+
+      {state.devices.length === 0 && state.bluetoothEnabled && (
+        <LoadingSpinner color={THEME.colors.blue[700]} />
+      )}
 
       {!state.bluetoothEnabled && (
         <Content>

@@ -14,7 +14,8 @@ import {
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
 
-import { processReceivedValues } from "@utils/processReceivedValues";
+import { generateResponse } from "@utils/bluetooth";
+import BluetoothManager from "@manager/bluetooth";
 
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
@@ -22,6 +23,8 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { initialState } from "./constants";
 import { Icon, Network, TitleList, TitleNetwork } from "./styles";
+
+const bluetoothManager = BluetoothManager.getInstance();
 
 export function ListaRedes() {
   const route = useRoute();
@@ -42,12 +45,11 @@ export function ListaRedes() {
     });
 
     setState(initialState);
-    context.removeValues();
   };
 
   const sendCommand = async () => {
     const COMMAND = { BT_PASSWORD: params.chave, GET_WIFI_LIST: "" };
-    await context.writeCharacteristic(COMMAND);
+    await bluetoothManager.writeCharacteristic(COMMAND);
   };
 
   const findAvailableNetworks = async () => {
@@ -78,7 +80,7 @@ export function ListaRedes() {
   };
 
   const onValueChange = () => {
-    const response: any = processReceivedValues(context.values);
+    const response: any = generateResponse(state.values);
 
     const temTodasAsPropriedades = checarObjeto(response);
 
@@ -89,22 +91,52 @@ export function ListaRedes() {
       }));
 
       const network = { ...response, WIFI_AP_LIST: redesComChave };
-      setState({ network: network, isLoading: false });
+      setState((oldState) => ({
+        ...oldState,
+        network: network,
+        isLoading: false,
+      }));
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (context.values.length > 0) {
-        onValueChange();
-      }
-    }, [context.values]),
+      if (state.values.length > 0) onValueChange();
+    }, [state.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
       findAvailableNetworks();
+    }, []),
+  );
 
+  const addValueReceived = (value: string) => {
+    setState((oldState) => ({
+      ...oldState,
+      values: [...oldState.values, value],
+    }));
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const startMonitoring = async () => {
+        if (context.device) {
+          const subscription =
+            await bluetoothManager.monitorCharacteristic(addValueReceived);
+
+          return () => {
+            subscription?.remove();
+          };
+        }
+      };
+
+      startMonitoring();
+    }, [context.device]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
       return () => {
         setState(initialState);
       };
@@ -113,16 +145,8 @@ export function ListaRedes() {
 
   useFocusEffect(
     useCallback(() => {
-      return () => {
-        context.removeValues();
-      };
-    }, []),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
       const handleBackPress = () => {
-        context.removeValues();
+        setState(initialState);
         return false;
       };
 

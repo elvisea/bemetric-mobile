@@ -16,7 +16,8 @@ import { useForm, Controller } from "react-hook-form";
 
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
-import { processReceivedValues } from "@utils/processReceivedValues";
+
+import BluetoothManager from "@manager/bluetooth";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
@@ -24,10 +25,14 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { inputs, resposta, schema } from "./constants";
+import { initialState, inputs, resposta, schema } from "./constants";
+import { generateResponse } from "@utils/bluetooth";
+
+const bluetoothManager = BluetoothManager.getInstance();
 
 export function ConexaoManual() {
   const route = useRoute();
+  const context = useBluetooth();
   const navigation = useNavigation();
 
   const params = route.params as { chave: string; nomeRede: string };
@@ -41,18 +46,14 @@ export function ConexaoManual() {
     resolver: yupResolver(schema),
   });
 
-  const context = useBluetooth();
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState(initialState);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const clearReturnedValues = () => {
-    context.removeValues();
-  };
+  const clearState = () => setState(initialState);
 
   const sendCommand = async (data: { nome: string; senha: string }) => {
-    setIsLoading(true);
+    setState((previousState) => ({ ...previousState, isLoading: true }));
 
     const CONFIGURE_COMMAND = {
       BT_PASSWORD: params.chave,
@@ -60,7 +61,7 @@ export function ConexaoManual() {
       SET_WIFI_PWD: data.senha,
     };
 
-    await context.writeCharacteristic(CONFIGURE_COMMAND);
+    await bluetoothManager.writeCharacteristic(CONFIGURE_COMMAND);
   };
 
   const handleNextPage = async (data: { nome: string; senha: string }) => {
@@ -68,15 +69,15 @@ export function ConexaoManual() {
   };
 
   const getStatusConnection = async () => {
-    setIsLoading(true);
+    setState((previousState) => ({ ...previousState, isLoading: true }));
 
     const STATUS_COMMAND = {
       BT_PASSWORD: params.chave,
       GET_WIFI_STATUS: "",
     };
 
-    await context.writeCharacteristic(STATUS_COMMAND);
-    setIsLoading(false);
+    await bluetoothManager.writeCharacteristic(STATUS_COMMAND);
+    setState((previousState) => ({ ...previousState, isLoading: false }));
   };
 
   const handleGoToNextScreen = () => {
@@ -84,31 +85,31 @@ export function ConexaoManual() {
       chave: params.chave,
     });
 
-    context.removeValues();
+    clearState();
   };
 
   const checarObjeto = (retorno: object) => {
     if (Object.entries(retorno).length > 0) {
       if ("SET_TRANSM_MODE" in retorno) {
         if (retorno.SET_TRANSM_MODE === "WIFI") {
-          clearReturnedValues();
+          clearState();
           getStatusConnection();
         }
       }
 
       if ("WIFI_STATUS_CONNECTION" in retorno) {
         if (retorno.WIFI_STATUS_CONNECTION === "0") {
-          setIsLoading(false);
+          setState((previousState) => ({ ...previousState, isLoading: false }));
           Alert.alert(resposta[0].title, resposta[0].subtitle, [
             {
               text: resposta[0].text,
-              onPress: () => clearReturnedValues(),
+              onPress: () => clearState(),
             },
           ]);
         }
 
         if (retorno.WIFI_STATUS_CONNECTION === "1") {
-          setIsLoading(false);
+          setState((previousState) => ({ ...previousState, isLoading: false }));
           Alert.alert(resposta[1].title, resposta[1].subtitle, [
             {
               text: resposta[1].text,
@@ -121,22 +122,44 @@ export function ConexaoManual() {
   };
 
   const onValueChange = () => {
-    const retorno = processReceivedValues(context.values);
-    checarObjeto(retorno);
+    const response = generateResponse(state.values);
+    checarObjeto(response);
+  };
+
+  const addValueReceived = (value: string) => {
+    setState((previousState) => ({
+      ...previousState,
+      values: [...previousState.values, value],
+    }));
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (context.values.length > 0) {
-        onValueChange();
-      }
-    }, [context.values]),
+      const startMonitoring = async () => {
+        if (context.device) {
+          const subscription =
+            await bluetoothManager.monitorCharacteristic(addValueReceived);
+
+          return () => {
+            subscription?.remove();
+          };
+        }
+      };
+
+      startMonitoring();
+    }, [context.device]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (state.values.length > 0) onValueChange();
+    }, [state.values]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        context.removeValues();
+        setState(initialState);
         return false;
       };
 
@@ -159,9 +182,9 @@ export function ConexaoManual() {
     >
       <HeaderDefault title="Conexão WIFI" />
 
-      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <VStack flex={1} w="full" px={`${RFValue(16)}px`}>
           <FlatList
             data={inputs}
@@ -205,7 +228,7 @@ export function ConexaoManual() {
         </VStack>
       )}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
       )}
     </LayoutDefault>

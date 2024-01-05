@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { State } from "react-native-ble-plx";
 
 import { TypeInitialState, TypeInput, TypeResponses } from "../types";
 
@@ -55,9 +56,12 @@ const responses: TypeResponses = {
 };
 
 const initialState: TypeInitialState = {
+  values: [],
   devices: [],
   isLoading: false,
+  bluetoothEnabled: false,
   permissionsGranted: false,
+  bluetoothState: State.Unknown,
 };
 
 export { schema, inputs, responses, initialState };
