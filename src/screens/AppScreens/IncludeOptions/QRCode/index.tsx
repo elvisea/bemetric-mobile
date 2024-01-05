@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Text, StyleSheet, Alert } from "react-native";
 
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import {
+  useNavigation,
+  DrawerActions,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
 
@@ -52,10 +56,20 @@ export function QRCode() {
     );
   };
 
-  useEffect(() => {
-    !state.permissionsGranted && requestUsagePermissions();
-    state.permissionsGranted && getBarCodeScannerPermissions();
-  }, [state.permissionsGranted]);
+  useFocusEffect(
+    useCallback(() => {
+      !state.permissionsGranted && requestUsagePermissions();
+      state.permissionsGranted && getBarCodeScannerPermissions();
+    }, [state.permissionsGranted]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setState(initialState);
+      };
+    }, []),
+  );
 
   if (state.hasPermission === false) {
     return <Text>No access to camera</Text>;

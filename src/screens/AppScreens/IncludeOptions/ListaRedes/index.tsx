@@ -38,13 +38,15 @@ export function ListaRedes() {
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
+  const resetState = () => setState(initialState);
+
   const handleChooseNetwork = (nameNetwork: string) => {
     navigation.navigate("ConexaoManual", {
       chave: params.chave,
       nomeRede: nameNetwork,
     });
 
-    setState(initialState);
+    resetState();
   };
 
   const sendCommand = async () => {
@@ -127,6 +129,7 @@ export function ListaRedes() {
 
           return () => {
             subscription?.remove();
+            resetState();
           };
         }
       };
@@ -137,16 +140,8 @@ export function ListaRedes() {
 
   useFocusEffect(
     useCallback(() => {
-      return () => {
-        setState(initialState);
-      };
-    }, []),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
       const handleBackPress = () => {
-        setState(initialState);
+        resetState();
         return false;
       };
 

@@ -49,13 +49,13 @@ const decodeAndCleanReceivedValues = (values: string[]): object => {
     return {};
   }
 
-  const stringsDecodificadas = values.map((value) =>
+  const arrayComItensUnicos = arraySemItensDuplicados(values);
+
+  const stringsDecodificadas = arrayComItensUnicos.map((value) =>
     Buffer.from(value, "base64").toString("utf8"),
   );
 
-  const arrayComItensUnicos = arraySemItensDuplicados(stringsDecodificadas);
-
-  const stringsLimpas = limparStrings(arrayComItensUnicos);
+  const stringsLimpas = limparStrings(stringsDecodificadas);
 
   try {
     const isValidJSON = JSON.parse(stringsLimpas.join(""));

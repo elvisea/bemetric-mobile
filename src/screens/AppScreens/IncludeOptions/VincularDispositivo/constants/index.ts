@@ -53,6 +53,10 @@ const responses: TypeResponses = {
     title: "Credenciais inválidas.",
     subtitle: "Verifique se as credenciais de acesso estão corretas.",
   },
+  7: {
+    title: "Não foi possível conectar com o dispositivo",
+    subtitle: "Não foi possível conectar com o dispositivo",
+  },
 };
 
 const initialState: TypeInitialState = {
