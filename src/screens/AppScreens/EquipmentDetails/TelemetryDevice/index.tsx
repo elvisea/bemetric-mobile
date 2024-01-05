@@ -20,15 +20,16 @@ import BluetoothManager from "@manager/bluetooth";
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
 
-import { ITelemetry } from "@interfaces/ITelemetry";
+import { removeDuplicateDevices } from "@utils/bluetooth";
+import { requestPermissions } from "@manager/permissions";
 
 import { StatusButton } from "@components/StatusButton";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { RowInformation } from "@components/RowInformation";
 
-import { response } from "./constants";
-import { IParams } from "../interfaces/IEquipamentDetails";
+import { ITypeParams, TypeTelemetry } from "./types";
+import { initialState, response } from "./constants";
 
 const bluetoothManager = BluetoothManager.getInstance();
 
@@ -36,61 +37,56 @@ export function TelemetryDevice() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const {
-    isDeviceConnected,
-    requestPermissions,
-    changeGrantedPermissions,
-    connectToDevice,
-    removeValues,
-    writeCharacteristic,
-    setDevices,
-    devices,
-    bluetoothEnabled,
-    deviceIsConnected,
-    permissionsGranted,
-  } = useBluetooth();
+  const context = useBluetooth();
 
   const { colors } = THEME;
-  const { params } = route.params as IParams;
+  const { params } = route.params as ITypeParams;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const [state, setState] = useState(initialState);
 
-  const [telemetry, setTelemetry] = useState<ITelemetry | null>(null);
+  const [telemetry, setTelemetry] = useState<TypeTelemetry | null>(null);
 
   const handleConnect = async () => {
     if (typeof telemetry === "object" && telemetry) {
       const name = telemetry.serial.trim().toUpperCase();
-      const deviceFound = devices.find((device) => device.name === name);
+      const deviceFound = state.devices.find((device) => device.name === name);
 
       if (deviceFound) {
         try {
-          setIsConnecting(true);
+          setState((previousState) => ({
+            ...previousState,
+            isConnecting: true,
+          }));
 
           const COMMAND = {
             BT_PASSWORD: telemetry.chave.trim(),
             GET_SERIAL_KEY: "",
           };
 
-          const isConnected = await isDeviceConnected(deviceFound.id);
+          const isConnected = await bluetoothManager.isDeviceConnected(
+            deviceFound.id,
+          );
 
           if (isConnected) {
-            await writeCharacteristic(COMMAND);
+            await bluetoothManager.writeCharacteristic(COMMAND);
           } else {
-            await connectToDevice(deviceFound.id);
-            await writeCharacteristic(COMMAND);
+            await context.connectToDevice(deviceFound.id);
+            await bluetoothManager.writeCharacteristic(COMMAND);
           }
         } catch (error) {
-          setIsLoading(false);
+          setState((previousState) => ({ ...previousState, isLoading: false }));
 
           if (error instanceof BleError) {
             Alert.alert(error.message, error.message);
           }
         } finally {
-          setIsLoading(false);
+          setState((previousState) => ({ ...previousState, isLoading: false }));
         }
       } else {
-        setIsConnecting(false);
+        setState((previousState) => ({
+          ...previousState,
+          isConnecting: false,
+        }));
 
         Alert.alert(response[0].title, response[0].subtitle);
       }
@@ -100,9 +96,9 @@ export function TelemetryDevice() {
   };
 
   const configureDataConnection = async () => {
-    if (deviceIsConnected) {
+    if (context.device) {
       if (typeof telemetry === "object" && telemetry) {
-        removeValues();
+        setState((previousState) => ({ ...previousState, values: [] }));
 
         navigation.navigate("IncludeStackRoutes", {
           screen: "ConfigurarConexaoDados",
@@ -117,7 +113,7 @@ export function TelemetryDevice() {
   };
 
   const handleTestDevice = async () => {
-    if (deviceIsConnected) {
+    if (context.device) {
       if (typeof telemetry === "object" && telemetry) {
         console.log("Você pode testar o Dispositivo.");
       }
@@ -128,7 +124,10 @@ export function TelemetryDevice() {
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
-    changeGrantedPermissions(isGranted);
+    setState((previousState) => ({
+      ...previousState,
+      permissionsGranted: isGranted,
+    }));
   };
 
   useFocusEffect(
@@ -137,7 +136,7 @@ export function TelemetryDevice() {
 
       async function fetchData() {
         try {
-          setIsLoading(true);
+          setState((previousState) => ({ ...previousState, isLoading: true }));
 
           const response = await api.post(
             "/Equipamento/DetalhamentoDispositivoTelemetria",
@@ -150,7 +149,7 @@ export function TelemetryDevice() {
         } catch (error) {
           if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
         } finally {
-          setIsLoading(false);
+          setState((previousState) => ({ ...previousState, isLoading: false }));
         }
       }
 
@@ -166,25 +165,31 @@ export function TelemetryDevice() {
     useCallback(() => {
       requestUsagePermissions();
 
-      if (permissionsGranted && bluetoothEnabled) {
+      const canScan = state.permissionsGranted && state.bluetoothEnabled;
+
+      if (canScan) {
         bluetoothManager.scanForDevices((scannedDevices) => {
-          setDevices(scannedDevices);
+          const devices = removeDuplicateDevices([
+            ...state.devices,
+            ...scannedDevices,
+          ]);
+          setState((previousState) => ({ ...previousState, devices: devices }));
         });
       }
 
       return () => {
         bluetoothManager.stopScan();
       };
-    }, [permissionsGranted, bluetoothEnabled]),
+    }, [state.permissionsGranted, state.bluetoothEnabled]),
   );
 
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
       <HeaderDefault title="Dispositivo de Telemetria" />
 
-      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <ScrollView
           bg={colors.shape}
           flex={1}
@@ -229,9 +234,9 @@ export function TelemetryDevice() {
             <StatusButton
               onPress={handleConnect}
               title={
-                isConnecting
+                state.isConnecting
                   ? "Conectando..."
-                  : deviceIsConnected
+                  : context.device
                     ? "Conectado"
                     : "Desconectado"
               }

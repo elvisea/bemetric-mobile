@@ -1,13 +1,8 @@
-import { useCallback } from "react";
-import { BackHandler, FlatList } from "react-native";
-import {
-  useNavigation,
-  DrawerActions,
-  useFocusEffect,
-} from "@react-navigation/native";
+import { FlatList } from "react-native";
+
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import { THEME } from "@theme/theme";
-import { useBluetooth } from "@hooks/bluetooth";
 
 import { options } from "./constants";
 
@@ -17,27 +12,8 @@ import { ConnectionOption } from "@components/Include/ConnectionOption";
 
 export function ConfigurarConexaoBluetooth() {
   const navigation = useNavigation();
-  const { removeValues } = useBluetooth();
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
-
-  useFocusEffect(
-    useCallback(() => {
-      const handleBackPress = () => {
-        removeValues();
-        return false;
-      };
-
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress,
-      );
-
-      return () => {
-        backHandler.remove();
-      };
-    }, []),
-  );
 
   return (
     <LayoutDefault

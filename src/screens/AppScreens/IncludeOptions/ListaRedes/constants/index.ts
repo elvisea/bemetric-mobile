@@ -1,8 +1,9 @@
 import { TypeInitialState, TypeNetwork } from "../types";
 
 const initialState: TypeInitialState = {
-  network: {} as TypeNetwork,
+  values: [],
   isLoading: false,
+  network: {} as TypeNetwork,
 };
 
 export { initialState };

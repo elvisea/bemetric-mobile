@@ -12,8 +12,9 @@ type TypeNetwork = {
 };
 
 type TypeInitialState = {
-  network: TypeNetwork;
+  values: string[];
   isLoading: boolean;
+  network: TypeNetwork;
 };
 
 export { TypeNetwork, WIFI_AP_LIST, TypeInitialState };

@@ -15,6 +15,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 
 import { THEME } from "@theme/theme";
+import { generateResponse } from "@utils/bluetooth";
+
+import { useBluetooth } from "@hooks/bluetooth";
+import BluetoothManager from "@manager/bluetooth";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
@@ -22,16 +26,10 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { useBluetooth } from "@hooks/bluetooth";
-import { processReceivedValues } from "@utils/processReceivedValues";
+import { TypeForm } from "./types";
+import { initialState, inputs, schema } from "./constants";
 
-import { inputs, schema } from "./constants";
-
-interface IForm {
-  ponto: string;
-  usuario: string;
-  senha: string;
-}
+const bluetoothManager = BluetoothManager.getInstance();
 
 export function ConexaoRedesMoveis() {
   const route = useRoute();
@@ -41,7 +39,7 @@ export function ConexaoRedesMoveis() {
 
   const params = route.params as { chave: string };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState(initialState);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -49,13 +47,13 @@ export function ConexaoRedesMoveis() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<IForm>({
+  } = useForm<TypeForm>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async (data: IForm) => {
+  const handleNextPage = async (data: TypeForm) => {
     if (context.device) {
-      setIsLoading(true);
+      setState((previousState) => ({ ...previousState, isLoading: true }));
 
       const COMMAND = {
         BT_PASSWORD: params.chave,
@@ -64,7 +62,7 @@ export function ConexaoRedesMoveis() {
         SET_MODEM_PWD: data.senha,
       };
 
-      await context.writeCharacteristic(COMMAND);
+      await bluetoothManager.writeCharacteristic(COMMAND);
     }
   };
 
@@ -73,15 +71,14 @@ export function ConexaoRedesMoveis() {
       chave: params.chave,
     });
 
-    context.removeValues();
+    setState(initialState);
   };
 
   const onValueChange = () => {
-    const response = processReceivedValues(context.values);
-    console.log("OBJETO RESPOSTA:", response);
+    const response = generateResponse(state.values);
 
     if (Object.entries(response).length > 0) {
-      setIsLoading(false);
+      setState((previousState) => ({ ...previousState, isLoading: false }));
       Alert.alert("Conectado com Sucesso.", "Conectado com Sucesso.", [
         {
           text: "Continuar cadastro.",
@@ -93,16 +90,38 @@ export function ConexaoRedesMoveis() {
 
   useFocusEffect(
     useCallback(() => {
-      if (context.values.length > 0) {
-        onValueChange();
-      }
-    }, [context.values]),
+      if (state.values.length > 0) onValueChange();
+    }, [state.values]),
+  );
+
+  const addValueReceived = (value: string) => {
+    setState((previousState) => ({
+      ...previousState,
+      values: [...previousState.values, value],
+    }));
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const startMonitoring = async () => {
+        if (context.device) {
+          const subscription =
+            await bluetoothManager.monitorCharacteristic(addValueReceived);
+
+          return () => {
+            subscription?.remove();
+          };
+        }
+      };
+
+      startMonitoring();
+    }, [context.device]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        context.removeValues();
+        setState(initialState);
         return false;
       };
 
@@ -123,11 +142,11 @@ export function ConexaoRedesMoveis() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      {isLoading && <HeaderDefault title="Conexão Redes Móveis" />}
+      {state.isLoading && <HeaderDefault title="Conexão Redes Móveis" />}
 
-      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <VStack flex={1} w="full" px={`${RFValue(16)}px`}>
           <FlatList
             data={inputs}
@@ -171,7 +190,7 @@ export function ConexaoRedesMoveis() {
         </VStack>
       )}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <ButtonFull title="Salvar" onPress={handleSubmit(handleNextPage)} />
       )}
     </LayoutDefault>

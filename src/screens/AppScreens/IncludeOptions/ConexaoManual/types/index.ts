@@ -9,4 +9,9 @@ type IInput = {
   keyboardType: KeyboardTypeOptions;
 };
 
-export { IName, IInput };
+type TypeInitialState = {
+  values: string[];
+  isLoading: boolean;
+};
+
+export { IName, IInput, TypeInitialState };

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Alert, BackHandler, FlatList } from "react-native";
+import { Alert, FlatList } from "react-native";
 
 import {
   useRoute,
@@ -31,7 +31,7 @@ export function EquipamentosDisponiveis() {
   const { customer } = useCustomer();
   const { navigate, dispatch } = useNavigation();
 
-  const { device, removeValues } = useBluetooth();
+  const context = useBluetooth();
 
   const route = useRoute();
   const params = route.params as { chave: string };
@@ -55,7 +55,7 @@ export function EquipamentosDisponiveis() {
     } else {
       navigate("AddEquipment", {
         chave: params.chave,
-        serial: device?.name || "",
+        serial: context.device?.name || "",
       });
     }
   };
@@ -74,7 +74,7 @@ export function EquipamentosDisponiveis() {
         modeloEquipamento: selected?.modelo,
         placaEquipamento: selected?.placa,
         anoEquipamento: selected?.ano,
-        serialDispositivo: device && device.name,
+        serialDispositivo: context.device && context.device.name,
         chaveDispositivo: params.chave,
         horimetroIncialEquipamento: selected?.horimetroIncial,
         hodometroIncialEquipamento: selected?.hodometroIncial,
@@ -120,24 +120,6 @@ export function EquipamentosDisponiveis() {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      const handleBackPress = () => {
-        removeValues();
-        return false;
-      };
-
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress,
-      );
-
-      return () => {
-        backHandler.remove();
-      };
-    }, []),
-  );
 
   useFocusEffect(
     useCallback(() => {

@@ -1,16 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
-import { Text, StyleSheet, Alert, BackHandler } from "react-native";
+import { useEffect, useState } from "react";
+import { Text, StyleSheet, Alert } from "react-native";
 
-import {
-  useNavigation,
-  DrawerActions,
-  useFocusEffect,
-} from "@react-navigation/native";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
 
 import { THEME } from "@theme/theme";
-import { useBluetooth } from "@hooks/bluetooth";
+import { requestPermissions } from "@manager/permissions";
+
+import { initialState } from "./constants";
 
 import { LayoutDefault } from "@components/LayoutDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
@@ -19,28 +17,26 @@ export function QRCode() {
   const { navigate, dispatch } = useNavigation();
   const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
-  const {
-    removeValues,
-    permissionsGranted,
-    requestPermissions,
-    changeGrantedPermissions,
-  } = useBluetooth();
-
-  const [scanned, setScanned] = useState(false);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [state, setState] = useState(initialState);
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
-    changeGrantedPermissions(isGranted);
+    setState((previousState) => ({
+      ...previousState,
+      permissionsGranted: isGranted,
+    }));
   };
 
   const getBarCodeScannerPermissions = async () => {
     const { status } = await BarCodeScanner.requestPermissionsAsync();
-    setHasPermission(status === "granted");
+    setState((previousState) => ({
+      ...previousState,
+      hasPermission: status === "granted",
+    }));
   };
 
   const handleBarCodeScanned = ({ data }: BarCodeScannerResult) => {
-    setScanned(true);
+    setState((previousState) => ({ ...previousState, scanned: true }));
 
     const [serial, chave] = data.split(":");
 
@@ -56,30 +52,12 @@ export function QRCode() {
     );
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const handleBackPress = () => {
-        removeValues();
-        return false;
-      };
-
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress,
-      );
-
-      return () => {
-        backHandler.remove();
-      };
-    }, []),
-  );
-
   useEffect(() => {
-    !permissionsGranted && requestUsagePermissions();
-    permissionsGranted && getBarCodeScannerPermissions();
-  }, [permissionsGranted]);
+    !state.permissionsGranted && requestUsagePermissions();
+    state.permissionsGranted && getBarCodeScannerPermissions();
+  }, [state.permissionsGranted]);
 
-  if (hasPermission === false) {
+  if (state.hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
 
@@ -89,13 +67,13 @@ export function QRCode() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      {hasPermission === null && (
+      {state.hasPermission === null && (
         <LoadingSpinner color={THEME.colors.blue[700]} />
       )}
 
-      {hasPermission && (
+      {state.hasPermission && (
         <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          onBarCodeScanned={state.scanned ? undefined : handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}
         />
       )}
