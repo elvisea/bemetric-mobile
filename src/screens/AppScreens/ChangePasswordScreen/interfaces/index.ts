@@ -1,7 +1,7 @@
-interface FormProps {
+type TypeForm = {
   current: string;
   newPassword: string;
   confirmNewPassword: string;
-}
+};
 
-export { FormProps };
+export { TypeForm };

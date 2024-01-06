@@ -191,8 +191,10 @@ export function TelemetryDevice() {
 
   useFocusEffect(
     useCallback(() => {
-      const startMonitoring = async () => {
-        if (deviceIsSame()) {
+
+      if (deviceIsSame()) {
+        const startMonitoring = async () => {
+
           const subscription =
             await bluetoothManager.monitorCharacteristic(addValueReceived);
 
@@ -200,10 +202,12 @@ export function TelemetryDevice() {
             subscription?.remove();
             resetState();
           };
-        }
-      };
 
-      startMonitoring();
+        };
+
+        startMonitoring();
+      }
+
     }, [deviceIsSame()]),
   );
 

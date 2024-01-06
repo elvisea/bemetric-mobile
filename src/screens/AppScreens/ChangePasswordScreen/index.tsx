@@ -19,7 +19,7 @@ import { THEME } from "@theme/theme";
 
 import { useAuth } from "@hooks/authentication";
 
-import { FormProps } from "./interfaces";
+import { TypeForm } from "./interfaces";
 import { schema, responses } from "./constants";
 
 function ChangePasswordScreen() {
@@ -37,11 +37,11 @@ function ChangePasswordScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormProps>({
+  } = useForm<TypeForm>({
     resolver: yupResolver(schema),
   });
 
-  const handleUpdatePassword = async ({ current, newPassword }: FormProps) => {
+  const handleUpdatePassword = async ({ current, newPassword }: TypeForm) => {
     try {
       setIsLoading(true);
 

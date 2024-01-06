@@ -1,7 +1,8 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 
-import AuthStackRoutes from "./auth.stack.routes";
+import AuthStackRoutes from "./Stacks/AuthStackRoutes";
+
 import AppDrawerRoutes from "./app.drawer.routes";
 import ClientsStackRoutes from "./clients.stack.routes";
 
