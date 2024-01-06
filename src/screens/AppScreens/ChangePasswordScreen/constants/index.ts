@@ -1,5 +1,13 @@
 import * as yup from "yup";
 
+const responses: { [index: number]: string } = {
+  0: "Senha Alterada com sucesso",
+  1: "Senha ou Nova Senha não informados",
+  2: "Senha e Nova senha são iguais",
+  3: "Senha Atual informada é inválida",
+  4: "Erro na alteração da senha atual",
+};
+
 const schema = yup.object({
   newPassword: yup
     .string()
@@ -18,4 +26,4 @@ const schema = yup.object({
     ),
 });
 
-export { schema };
+export { responses, schema };

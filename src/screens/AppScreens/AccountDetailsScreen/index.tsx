@@ -16,10 +16,9 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 
 import { FormProps } from "./interfaces";
-import { schema } from "./constants/schema";
-import { responses } from "./constants/responses";
+import { responses, schema } from "./constants";
 
-export function AccountDetails() {
+export function AccountDetailsScreen() {
   const { user, fetchDataUser } = useAuth();
   const { colors } = THEME;
   const navigation = useNavigation();

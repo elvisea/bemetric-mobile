@@ -15,7 +15,8 @@ import { IconMenuDrawer } from "@components/IconMenuDrawer";
 import { THEME } from "@theme/theme";
 
 import HomeStackRoutes from "./home.stack.routes";
-import AccountDetailsStackRoutes from "./account.details.stack.routes";
+
+import AccountDetailsStackRoutes from "./Stacks/AccountDetailsStackRoutes";
 
 const { Navigator, Screen } = createDrawerNavigator();
 

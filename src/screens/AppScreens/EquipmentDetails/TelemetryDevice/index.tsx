@@ -70,7 +70,10 @@ export function TelemetryDevice() {
 
       if (device) {
         try {
-          setState((previousState) => ({ ...previousState, isConnecting: true }));
+          setState((previousState) => ({
+            ...previousState,
+            isConnecting: true,
+          }));
 
           const result = await bluetoothManager.connectToDevice(device.id);
 
@@ -83,14 +86,20 @@ export function TelemetryDevice() {
             }
           }
         } catch (error) {
-          setState((previousState) => ({ ...previousState, isConnecting: false }));
+          setState((previousState) => ({
+            ...previousState,
+            isConnecting: false,
+          }));
 
           if (error instanceof BleError) {
             Alert.alert(error.message, error.message);
           }
         }
       } else {
-        setState((previousState) => ({ ...previousState, isConnecting: false }));
+        setState((previousState) => ({
+          ...previousState,
+          isConnecting: false,
+        }));
 
         Alert.alert(response[0].title, response[0].subtitle);
       }
@@ -161,7 +170,8 @@ export function TelemetryDevice() {
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
     setState((previousState) => ({
-      ...previousState, permissionsGranted: isGranted,
+      ...previousState,
+      permissionsGranted: isGranted,
     }));
   };
 
@@ -214,7 +224,8 @@ export function TelemetryDevice() {
 
           if (isActive) {
             setState((previousState) => ({
-              ...previousState, data: response.data,
+              ...previousState,
+              data: response.data,
             }));
           }
         } catch (error) {

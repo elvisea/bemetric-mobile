@@ -20,10 +20,9 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 
 import { FormProps } from "./interfaces";
-import { schema } from "./constants/schema";
-import { responses } from "./constants/responses";
+import { schema, responses } from "./constants";
 
-function ChangePassword() {
+function ChangePasswordScreen() {
   const { colors } = THEME;
 
   const { user } = useAuth();
@@ -220,4 +219,4 @@ function ChangePassword() {
   );
 }
 
-export { ChangePassword };
+export { ChangePasswordScreen };
