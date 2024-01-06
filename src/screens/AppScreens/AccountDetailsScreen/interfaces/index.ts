@@ -1,8 +1,8 @@
-interface FormProps {
+type TypeForm = {
   name: string;
   email?: string;
   celular?: string;
   telefone?: string;
-}
+};
 
-export { FormProps };
+export { TypeForm };

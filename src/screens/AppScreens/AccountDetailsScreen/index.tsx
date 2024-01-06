@@ -15,7 +15,7 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 
-import { FormProps } from "./interfaces";
+import { TypeForm } from "./interfaces";
 import { responses, schema } from "./constants";
 
 export function AccountDetailsScreen() {
@@ -31,7 +31,7 @@ export function AccountDetailsScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormProps>({
+  } = useForm<TypeForm>({
     defaultValues: {
       name: user?.nomeUsuario,
       email: user?.email,
@@ -41,7 +41,7 @@ export function AccountDetailsScreen() {
     resolver: yupResolver(schema),
   });
 
-  const handleUpdateUser = async ({ name, celular, telefone }: FormProps) => {
+  const handleUpdateUser = async ({ name, celular, telefone }: TypeForm) => {
     try {
       setIsLoading(true);
 
@@ -169,7 +169,7 @@ export function AccountDetailsScreen() {
           <ButtonNativeBase
             mt={6}
             variant="link"
-            onPress={() => navigation.navigate("ChangePassword")}
+            onPress={() => navigation.navigate("ChangePasswordScreen")}
           >
             <Text color="cyan.100" fontSize="md">
               Alterar Senha

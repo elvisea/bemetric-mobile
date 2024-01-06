@@ -111,6 +111,18 @@ export function VincularDispositivo() {
     });
   };
 
+  const tryAgain = async () => {
+
+    navigation.goBack();
+
+    bluetoothManager.cancelWriteCharacteristic();
+    bluetoothManager.cancelMonitorCharacteristic();
+    await bluetoothManager.disconnectToDevice();
+    context.removeDevice();
+    clearValues();
+
+  }
+
   const checkDeviceAvailability = async () => {
     try {
       setState((previousState) => ({ ...previousState, isLoading: true }));
@@ -137,7 +149,7 @@ export function VincularDispositivo() {
         Alert.alert(responses[data].title, responses[data].subtitle, [
           {
             text: "Tente outro dispositivo",
-            onPress: () => clearValues(),
+            onPress: () => tryAgain(),
           },
         ]);
       }

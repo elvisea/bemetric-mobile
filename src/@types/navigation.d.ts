@@ -1,33 +1,33 @@
 export declare global {
   namespace ReactNavigation {
     interface RootParamList {
-      SignIn: undefined;
+      SignInScreen: undefined;
 
-      NameAndEmail: undefined;
+      NameAndEmailScreen: undefined;
 
-      AcceptTerms: {
+      AcceptTermsScreen: {
         name: string;
         email: string;
       };
 
-      Choose: {
+      ChooseScreen: {
         name: string;
         email: string;
       };
 
-      CreateAccount: {
-        name: string;
-        email: string;
-        type: number;
-      };
-
-      ClientCode: {
+      CreateAccountScreen: {
         name: string;
         email: string;
         type: number;
       };
 
-      CreatePassword: {
+      ClientCodeScreen: {
+        name: string;
+        email: string;
+        type: number;
+      };
+
+      CreatePasswordScreen: {
         name: string;
         email: string;
         client?: string;
@@ -37,7 +37,7 @@ export declare global {
         tipoCNPJCPF: number;
       };
 
-      VerifyToken: {
+      VerifyTokenScreen: {
         name: string;
         email: string;
         password: string;
@@ -48,18 +48,18 @@ export declare global {
         tipoCNPJCPF: number;
       };
 
-      TemporaryPassword: {
+      TemporaryPasswordScreen: {
         email: string;
         password: string;
       };
 
-      SendEmail: undefined;
+      SendEmailScreen: undefined;
 
-      ValidateCode: {
+      ValidateCodeScreen: {
         email: string;
       };
 
-      EnterNewPassword: {
+      EnterNewPasswordScreen: {
         email: string;
         codigoAtivacao: string;
       };
@@ -154,7 +154,7 @@ export declare global {
 
       AddGrouping: undefined;
 
-      ChangePassword: undefined;
+      ChangePasswordScreen: undefined;
 
       UpdateGeofences: {
         codigoGeocerca: number;
