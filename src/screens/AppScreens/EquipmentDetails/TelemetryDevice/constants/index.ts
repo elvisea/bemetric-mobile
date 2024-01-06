@@ -22,6 +22,7 @@ const response: { [key: number]: { title: string; subtitle: string } } = {
 
 const initialState: TypeInitialState = {
   values: [],
+  data: null,
   devices: [],
   isLoading: false,
   isConnecting: false,

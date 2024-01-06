@@ -157,7 +157,7 @@ class BluetoothManager {
               callback(characteristic.value);
             }
           }
-        });
+        }, MONITORED_FEATURE_UUID);
 
         return subscription;
       } else {
@@ -168,10 +168,16 @@ class BluetoothManager {
     }
   };
 
-  cancelTransaction = () => {
-    if (this.device) {
-      this.manager.cancelTransaction(this.device.id);
-    }
+  cancelTransaction = (transactionId: string) => {
+    this.manager.cancelTransaction(transactionId);
+  };
+
+  cancelWriteCharacteristic = () => {
+    this.manager.cancelTransaction(CHARACTERISTIC_UUID);
+  };
+
+  cancelMonitorCharacteristic = () => {
+    this.manager.cancelTransaction(MONITORED_FEATURE_UUID);
   };
 
   discoverService = async (
@@ -238,7 +244,7 @@ class BluetoothManager {
 
         const valueBase64 = concatenatedBuffer.toString("base64");
 
-        await characteristic.writeWithResponse(valueBase64, this.device.id);
+        await characteristic.writeWithResponse(valueBase64, CHARACTERISTIC_UUID);
       }
     } catch (error) {
       console.error("Error writing characteristic:", error);

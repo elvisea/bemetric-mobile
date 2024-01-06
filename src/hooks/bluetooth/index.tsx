@@ -13,8 +13,6 @@ export const BluetoothContext = createContext<BluetoothContextData>(
 const BluetoothProvider = ({ children }: BluetoothProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("STATE CONTEXT:", state.device?.id);
-
   const setDevice = (device: Device) => {
     dispatch({ type: "SET_DEVICE", payload: device });
   };

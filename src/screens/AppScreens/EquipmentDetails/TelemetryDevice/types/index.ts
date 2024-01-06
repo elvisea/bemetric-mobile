@@ -6,7 +6,7 @@ type ITypeParams = {
   };
 };
 
-type TypeTelemetry = {
+type TypeData = {
   bat: number;
   chave: string;
   codigoEquipamento: number;
@@ -22,6 +22,7 @@ type TypeTelemetry = {
 
 type TypeInitialState = {
   values: string[];
+  data: TypeData | null;
   devices: Device[];
   isLoading: boolean;
   bluetoothEnabled: boolean;
@@ -29,4 +30,4 @@ type TypeInitialState = {
   permissionsGranted: boolean;
 };
 
-export { TypeInitialState, ITypeParams, TypeTelemetry };
+export { TypeInitialState, ITypeParams, TypeData };
