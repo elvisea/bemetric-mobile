@@ -1,16 +1,14 @@
-import { IEquipment } from "../types";
+import uuid from "react-native-uuid";
 
-const removerEquipamentosDuplicados = (equipamentos: IEquipment[]) => {
-  const uniqueEquipmentArray = Array.from(
-    new Set(equipamentos.map((equipment) => equipment.codigoEquipamento)),
-  ).map(
-    (codigoEquipamento) =>
-      equipamentos.find(
-        (equipment) => equipment.codigoEquipamento === codigoEquipamento,
-      )!,
-  );
+import { TypeEquipment } from "../types";
 
-  return uniqueEquipmentArray;
+const adicionarChaveParaCadaEquipamento = (equipamentos: TypeEquipment[]) => {
+  const equipamentosComChave = equipamentos.map((equipamento) => ({
+    ...equipamento,
+    key: uuid.v4().toString(),
+  }));
+
+  return equipamentosComChave;
 };
 
-export { removerEquipamentosDuplicados };
+export { adicionarChaveParaCadaEquipamento };

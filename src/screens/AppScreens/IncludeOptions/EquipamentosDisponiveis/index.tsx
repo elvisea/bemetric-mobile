@@ -18,9 +18,10 @@ import { useBluetooth } from "@hooks/bluetooth";
 
 import { ListTitle } from "./styles";
 
-import { IEquipment } from "./types";
 import { response } from "./constants";
-import { removerEquipamentosDuplicados } from "./utils";
+import { TypeEquipment } from "./types";
+
+import { adicionarChaveParaCadaEquipamento } from "./utils";
 
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
@@ -36,21 +37,21 @@ export function EquipamentosDisponiveis() {
   const route = useRoute();
   const params = route.params as { chave: string };
 
-  const [equipment, setEquipment] = useState<IEquipment[]>([]);
-  const [selected, setSelected] = useState<IEquipment | null>(null);
+  const [equipmentList, setEquipmentList] = useState<TypeEquipment[]>([]);
+  const [selectedEquipment, setSelectedEquipment] = useState<TypeEquipment | null>(null);
 
   const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
-  const handleSelectedEquipment = (item: IEquipment) => {
-    if (item.codigoEquipamento === selected?.codigoEquipamento) {
-      setSelected(null);
+  const handleSelectedEquipment = (item: TypeEquipment) => {
+    if (item.codigoEquipamento === selectedEquipment?.codigoEquipamento) {
+      setSelectedEquipment(null);
     } else {
-      setSelected(item);
+      setSelectedEquipment(item);
     }
   };
 
   const handleAdvance = () => {
-    if (selected) {
+    if (selectedEquipment) {
       navigate("ChooseGrouping");
     } else {
       navigate("AddEquipment", {
@@ -61,48 +62,50 @@ export function EquipamentosDisponiveis() {
   };
 
   async function handleSaveEquipment() {
-    try {
-      const { data } = await api.post("/AppMobile/Gravar", {
-        codigoCliente: customer?.codigoCliente,
-        incluirAgrupamento: false,
+    if (selectedEquipment) {
+      try {
+        const { data } = await api.post("/AppMobile/Gravar", {
+          codigoCliente: customer?.codigoCliente,
+          incluirAgrupamento: false,
 
-        incluirEquipamento: false,
-        codigoEquipamento: selected?.codigoEquipamento,
-        tipoEquipamento: selected?.tipoEquipamento,
-        nomeEquipamento: selected?.nomeEquipamento,
-        identificadorEquipamento: selected?.identificador,
-        modeloEquipamento: selected?.modelo,
-        placaEquipamento: selected?.placa,
-        anoEquipamento: selected?.ano,
-        serialDispositivo: context.device && context.device.name,
-        chaveDispositivo: params.chave,
-        horimetroIncialEquipamento: selected?.horimetroIncial,
-        hodometroIncialEquipamento: selected?.hodometroIncial,
-        dataAquisicaoEquipamento: selected?.dataAquisicao,
+          incluirEquipamento: false,
+          codigoEquipamento: selectedEquipment.codigoEquipamento,
+          tipoEquipamento: selectedEquipment.tipoEquipamento,
+          nomeEquipamento: selectedEquipment.nomeEquipamento,
+          identificadorEquipamento: selectedEquipment.identificador,
+          modeloEquipamento: selectedEquipment.modelo,
+          placaEquipamento: selectedEquipment.placa,
+          anoEquipamento: selectedEquipment.ano,
+          serialDispositivo: context.device && context.device.name,
+          chaveDispositivo: params.chave,
+          horimetroIncialEquipamento: selectedEquipment.horimetroIncial,
+          hodometroIncialEquipamento: selectedEquipment.hodometroIncial,
+          dataAquisicaoEquipamento: selectedEquipment.dataAquisicao,
 
-        codigoAgrupamento: 0, // APENAS se estiver SELECIONANDO o Agrupamento. Se nao 0
-        nomeAgrupamento: "", // APENAS na INCLUSÃO de Agrupamento.
-      });
+          codigoAgrupamento: 0, // APENAS se estiver SELECIONANDO o Agrupamento. Se nao 0
+          nomeAgrupamento: "", // APENAS na INCLUSÃO de Agrupamento.
+        });
 
-      if (data.erro === 0) {
-        Alert.alert(
-          `${response[data.erro].title}`,
-          `${response[data.erro].subtitle}`,
-          [
-            {
-              text: "Mostrar Agrupamentos",
-              onPress: () => navigate("Equipments"),
-            },
-          ],
-        );
-      } else {
-        Alert.alert(
-          `${response[data.erro].title}`,
-          `${response[data.erro].subtitle}`,
-        );
+        if (data.erro === 0) {
+          Alert.alert(
+            `${response[data.erro].title}`,
+            `${response[data.erro].subtitle}`,
+            [
+              {
+                text: "Mostrar Agrupamentos",
+                onPress: () => navigate("Equipments"),
+              },
+            ],
+          );
+        } else {
+          Alert.alert(
+            `${response[data.erro].title}`,
+            `${response[data.erro].subtitle}`,
+          );
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
   }
 
@@ -115,7 +118,7 @@ export function EquipamentosDisponiveis() {
         },
       );
 
-      setEquipment(removerEquipamentosDuplicados(response.data));
+      setEquipmentList(adicionarChaveParaCadaEquipamento(response.data));
     } catch (error) {
       if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
     }
@@ -142,15 +145,15 @@ export function EquipamentosDisponiveis() {
       <HeaderDefault title="Equipamentos disponíveis" />
 
       <FlatList
-        data={equipment}
+        data={equipmentList}
         contentContainerStyle={{ padding: 16, width: "100%" }}
         ListHeaderComponent={<ListTitle>Selecione um Equipamento</ListTitle>}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item.codigoEquipamento.toString()}
+        keyExtractor={(item) => item.key}
         style={{ width: "100%" }}
         renderItem={({ item }) => (
           <EquipmentCard
-            isSelected={item.codigoEquipamento === selected?.codigoEquipamento}
+            isSelected={item.codigoEquipamento === selectedEquipment?.codigoEquipamento}
             placa={item.placa}
             identificador={item.identificador}
             nomeEquipamento={item.nomeEquipamento}
@@ -161,8 +164,8 @@ export function EquipamentosDisponiveis() {
       />
 
       <ButtonFull
-        title={selected ? "Avançar" : "Adicionar equipamento"}
-        onPress={selected ? handleSaveEquipment : handleAdvance}
+        title={selectedEquipment ? "Avançar" : "Adicionar equipamento"}
+        onPress={selectedEquipment ? handleSaveEquipment : handleAdvance}
       />
     </LayoutDefault>
   );
