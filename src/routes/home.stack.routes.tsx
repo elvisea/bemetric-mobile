@@ -11,11 +11,12 @@ import { Cabecalho } from "@components/Cabecalho";
 import { DetailsTopTabs } from "./details.top.tabs.routes";
 import { NotificationsTopTabs } from "./notifications.top.tabs.routes";
 import MessagesStackRoutes from "./messages.stack.routes";
-import IncludeStackRoutes from "./include.stack.routes";
 
 import { ChartTelemetryData } from "@screens/AppScreens/EquipmentDetails/ChartTelemetryData";
 import SyncDataStackRoutes from "./sync.data.stack.routes";
 import NotificationDetailingStackRoutes from "./detailing.stack.routes";
+
+import IncludeStackRoutes from "./Stacks/IncludeStackRoutes";
 
 const Stack = createNativeStackNavigator();
 
