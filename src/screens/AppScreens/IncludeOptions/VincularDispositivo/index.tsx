@@ -112,7 +112,6 @@ export function VincularDispositivo() {
   };
 
   const tryAgain = async () => {
-
     navigation.goBack();
 
     bluetoothManager.cancelWriteCharacteristic();
@@ -120,8 +119,7 @@ export function VincularDispositivo() {
     await bluetoothManager.disconnectToDevice();
     context.removeDevice();
     clearValues();
-
-  }
+  };
 
   const checkDeviceAvailability = async () => {
     try {

@@ -5,7 +5,7 @@ function formatDate(date: Date) {
 
   return {
     show: `${day}/${month}/${year}`,
-    send: `${year}/${month}/${day}T00:00`,
+    send: `${year}-${month}-${day}`,
   };
 }
 

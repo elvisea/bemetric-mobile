@@ -153,7 +153,9 @@ export function EquipamentosDisponiveis() {
         style={{ width: "100%" }}
         renderItem={({ item }) => (
           <EquipmentCard
-            isSelected={item.codigoEquipamento === selectedEquipment?.codigoEquipamento}
+            isSelected={
+              item.codigoEquipamento === selectedEquipment?.codigoEquipamento
+            }
             placa={item.placa}
             identificador={item.identificador}
             nomeEquipamento={item.nomeEquipamento}

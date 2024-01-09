@@ -20,7 +20,7 @@ type Agrupamento = {
   key: string;
 };
 
-type ListaAgrupamento = {
+type TypeGrouping = {
   nomeAgrupamento: string;
   codigoAgrupamento: number;
 };
@@ -62,7 +62,7 @@ type IInput = {
 export {
   TypeForm,
   Agrupamento,
-  ListaAgrupamento,
+  TypeGrouping,
   ListaEquipamento,
   Data,
   Equipamento,

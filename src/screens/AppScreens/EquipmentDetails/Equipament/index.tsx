@@ -231,7 +231,7 @@ export function Equipament() {
               fontFamily="Roboto_400Regular"
               isTruncated
             >
-              {data ? `${data.hodometro} kms` : ""}
+              {data ? `${data.hodometro} km` : ""}
             </Text>
           </Item>
         </ScrollView>
