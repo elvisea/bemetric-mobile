@@ -1,6 +1,5 @@
-import { Alert, TouchableOpacity, View } from "react-native";
-
 import { useCallback, useState } from "react";
+import { Alert, TouchableOpacity, View } from "react-native";
 
 import uuid from "react-native-uuid";
 
@@ -41,12 +40,17 @@ import {
   Agrupamento,
   TypeForm,
   Typeparams,
-  ListaAgrupamento,
+  TypeGrouping,
   Data,
   ListaEquipamento,
 } from "./types";
 
 import { formatDate } from "@utils/formatDate";
+
+import {
+  adicionarChaveParaCadaAgrupamento,
+  adicionarChaveParaCadaEquipamento,
+} from "./utils";
 
 export function AddEquipment() {
   const { user } = useAuth();
@@ -69,7 +73,7 @@ export function AddEquipment() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectDate, setSelectDate] = useState(false);
 
-  const [acquisitionDate, setAcquisitionDate] = useState<Date>(new Date());
+  const [acquisitionDate, setDataAquisicao] = useState<Date>(new Date());
 
   const [data, setData] = useState<Data>({
     agrupamentos: [],
@@ -82,19 +86,17 @@ export function AddEquipment() {
   const [agrupamentoSelecionado, setAgrupamentoSelecionado] =
     useState<Agrupamento>({} as Agrupamento);
 
-  console.log("Agrupamento Selecionado:", agrupamentoSelecionado);
-
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
   const handleSelectAcquisitionDate = (date: Date) => {
     setSelectDate(false);
-    setAcquisitionDate(date);
+    setDataAquisicao(date);
   };
 
   const fetchData = async () => {
     try {
       const response = await Promise.all([
-        api.post<ListaAgrupamento[]>("/Agrupamento/ObterLista", {
+        api.post<TypeGrouping[]>("/Agrupamento/ObterLista", {
           localDashboard: 3,
           codigoUsuario: user?.codigoUsuario,
           codigoCliente: customer?.codigoCliente,
@@ -105,17 +107,8 @@ export function AddEquipment() {
         }),
       ]);
 
-      const agrupamentos = response[0].data.map((item) => ({
-        nome: item.nomeAgrupamento,
-        novo: false,
-        codigo: item.codigoAgrupamento,
-        key: uuid.v4().toString(),
-      }));
-
-      const equipamentos = response[1].data.map((item) => ({
-        tipo: item.tipoEquipamento,
-        key: uuid.v4().toString(),
-      }));
+      const agrupamentos = adicionarChaveParaCadaAgrupamento(response[0].data);
+      const equipamentos = adicionarChaveParaCadaEquipamento(response[1].data);
 
       setData({ agrupamentos, equipamentos });
     } catch (error) {
@@ -172,47 +165,10 @@ export function AddEquipment() {
   };
 
   async function handleSaveEquipment(form: TypeForm) {
-    const enviado = {
-      codigoCliente: customer?.codigoCliente,
-      incluirAgrupamento: agrupamentoSelecionado.novo === true ? true : false,
-
-      // nomeAgrupamento:
-      //   agrupamentoSelecionado.novo === true
-      //     ? agrupamentoSelecionado.nome.trim()
-      //     : "",
-
-      nomeAgrupamento: agrupamentoSelecionado.nome.trim(),
-
-      codigoAgrupamento:
-        agrupamentoSelecionado.novo === true
-          ? 0
-          : agrupamentoSelecionado.codigo,
-
-      incluirEquipamento: true,
-      tipoEquipamento: typeSelected.trim(),
-      nomeEquipamento: form.equipmentName.trim(),
-      identificadorEquipamento: form.equipmentIdentifier.trim(),
-      modeloEquipamento: form.equipmentModel.trim(),
-      placaEquipamento: form.equipmentPlate.trim(),
-      anoEquipamento: form.equipmentYear.trim(),
-      serialDispositivo: form.deviceSerial.trim(),
-      chaveDispositivo: form.devicekey.trim(),
-      horimetroIncialEquipamento: Number(form.initialHourMeter),
-      hodometroIncialEquipamento: Number(form.initialOdometer),
-      // dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
-      dataAquisicaoEquipamento: "2023-12-28T02:49:10.411Z",
-    };
-
-    console.log("ENVIADO", enviado);
     try {
       const { data } = await api.post("/AppMobile/Gravar", {
         codigoCliente: customer?.codigoCliente,
         incluirAgrupamento: agrupamentoSelecionado.novo === true ? true : false,
-
-        // nomeAgrupamento:
-        //   agrupamentoSelecionado.novo === true
-        //     ? agrupamentoSelecionado.nome.trim()
-        //     : "",
 
         nomeAgrupamento: agrupamentoSelecionado.nome.trim(),
 
@@ -232,11 +188,8 @@ export function AddEquipment() {
         chaveDispositivo: form.devicekey.trim(),
         horimetroIncialEquipamento: Number(form.initialHourMeter),
         hodometroIncialEquipamento: Number(form.initialOdometer),
-        // dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
-        dataAquisicaoEquipamento: "2023-12-28T02:49:10.411Z",
+        dataAquisicaoEquipamento: formatDate(acquisitionDate).send,
       });
-
-      console.log("DATA:", data);
 
       if (data.erro === 0) {
         Alert.alert(
@@ -257,8 +210,7 @@ export function AddEquipment() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log("CATCH", error.message);
-        Alert.alert(`${error}`, `${error}`);
+        Alert.alert(`${error.message}`, `${error.message}`);
       }
     }
   }
@@ -431,9 +383,8 @@ export function AddEquipment() {
             </Select>
 
             {inputs.map((input) => (
-              <>
+              <VStack width={"full"} key={input.id}>
                 <Text
-                  key={input.id}
                   mt={`${RFValue(16)}px`}
                   color="blue.700"
                   fontSize={`${RFValue(14)}px`}
@@ -462,7 +413,7 @@ export function AddEquipment() {
                     />
                   )}
                 />
-              </>
+              </VStack>
             ))}
 
             <Text
