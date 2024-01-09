@@ -1,4 +1,5 @@
-type IEquipment = {
+type TypeEquipment = {
+  key: string;
   placa: string;
   identificador: string;
   tipoEquipamento: string;
@@ -11,4 +12,4 @@ type IEquipment = {
   codigoEquipamento: number;
 };
 
-export { IEquipment };
+export { TypeEquipment };
