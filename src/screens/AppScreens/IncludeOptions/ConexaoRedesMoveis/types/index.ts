@@ -13,6 +13,8 @@ type TypeForm = { ponto: string; usuario: string; senha: string };
 
 type TypeInitialState = { values: string[]; isLoading: boolean };
 
-type TypeResponse = { [index: number]: { title: string; subtitle: string } };
+type TypeResponse = {
+  [index: number]: { title: string; subtitle: string; text: string };
+};
 
 export { IName, IInput, TypeResponse, TypeInitialState, TypeForm };
