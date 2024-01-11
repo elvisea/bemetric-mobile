@@ -55,13 +55,12 @@ export function ConexaoRedesMoveis() {
 
   const sendCommand = async (command: object, time?: number) => {
     try {
-      if (context.device) {
-        setState({ isLoading: true, values: [] });
 
-        setTimeout(async () => {
-          await bluetoothManager.writeCharacteristic(command);
-        }, time);
-      }
+      setTimeout(async () => {
+        setState({ isLoading: true, values: [] });
+        await bluetoothManager.writeCharacteristic(command);
+      }, time);
+
     } catch (error) {
       resetState();
       console.error("Error when trying to write features.", error);
