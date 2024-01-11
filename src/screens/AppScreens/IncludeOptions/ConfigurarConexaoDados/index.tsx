@@ -15,7 +15,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { ConnectionOption } from "@components/Include/ConnectionOption";
 
-import { options } from "./contants/options";
+import { options } from "./constants/options";
 
 export function ConfigurarConexaoDados() {
   const route = useRoute();

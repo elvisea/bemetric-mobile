@@ -1,10 +1,6 @@
 type TypeScreen = "ListaRedes" | "ConexaoRedesMoveis" | "ConexaoManual";
 
-type Option = {
-  mt: number;
-  title: string;
-  screen: TypeScreen;
-};
+type Option = { mt: number; title: string; screen: TypeScreen };
 
 const options: Option[] = [
   {
