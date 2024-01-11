@@ -27,7 +27,7 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { TypeForm } from "./types";
-import { initialState, inputs, schema } from "./constants";
+import { initialState, inputs, responses, schema } from "./constants";
 
 const bluetoothManager = BluetoothManager.getInstance();
 
@@ -51,18 +51,43 @@ export function ConexaoRedesMoveis() {
     resolver: yupResolver(schema),
   });
 
+  const resetState = () => setState(initialState);
+
+  const resetValues = () => {
+    setState((previousState) => ({ ...previousState, values: [] }));
+  };
+
   const handleNextPage = async (data: TypeForm) => {
+    try {
+      if (context.device) {
+        setState((previousState) => ({ ...previousState, isLoading: true }));
+
+        const COMMAND = {
+          BT_PASSWORD: params.chave,
+          SET_MODEM_APN: data.ponto,
+          SET_MODEM_USER: data.usuario,
+          SET_MODEM_PWD: data.senha,
+        };
+
+        await bluetoothManager.writeCharacteristic(COMMAND);
+      }
+    } catch (error) {
+      console.error("Error when trying to write features.", error);
+    }
+  };
+
+  const getStatusConnection = async () => {
     if (context.device) {
-      setState((previousState) => ({ ...previousState, isLoading: true }));
+      setTimeout(async () => {
+        resetValues();
 
-      const COMMAND = {
-        BT_PASSWORD: params.chave,
-        SET_MODEM_APN: data.ponto,
-        SET_MODEM_USER: data.usuario,
-        SET_MODEM_PWD: data.senha,
-      };
+        const COMMAND = {
+          BT_PASSWORD: params.chave.trim(),
+          GET_MODEM_SIGNAL: "",
+        };
 
-      await bluetoothManager.writeCharacteristic(COMMAND);
+        await bluetoothManager.writeCharacteristic(COMMAND);
+      }, 4000);
     }
   };
 
@@ -70,21 +95,48 @@ export function ConexaoRedesMoveis() {
     navigation.navigate("EquipamentosDisponiveis", {
       chave: params.chave,
     });
+  };
 
-    setState(initialState);
+  const handleResponse = (responseConfig: (typeof responses)[number]) => {
+    resetState();
+    Alert.alert(responseConfig.title, responseConfig.subtitle, [
+      {
+        text: responseConfig.text,
+        onPress: () => handleGoToNextScreen(),
+      },
+    ]);
+  };
+
+  const unableToConfigure = () => {
+    resetState();
+    Alert.alert(responses[4].title, responses[4].subtitle, [
+      {
+        text: responses[4].text,
+      },
+    ]);
   };
 
   const onValueChange = () => {
-    const response = generateResponse(state.values);
+    const response = generateResponse<{ [key: string]: string }>(state.values);
 
-    if (Object.entries(response).length > 0) {
-      setState((previousState) => ({ ...previousState, isLoading: false }));
-      Alert.alert("Conectado com Sucesso.", "Conectado com Sucesso.", [
-        {
-          text: "Continuar cadastro.",
-          onPress: () => handleGoToNextScreen(),
-        },
-      ]);
+    switch (response.SET_TRANSM_MODE) {
+      case "MODEM":
+        getStatusConnection();
+        break;
+    }
+
+    switch (response.GET_MODEM_SIGNAL) {
+      case "OK":
+        handleResponse(responses[0]);
+        break;
+
+      case "BUSY":
+        unableToConfigure();
+        break;
+
+      case "NOK":
+        unableToConfigure();
+        break;
     }
   };
 

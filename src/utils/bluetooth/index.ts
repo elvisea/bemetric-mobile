@@ -65,7 +65,7 @@ const decodeAndCleanReceivedValues = (values: string[]): object => {
   }
 };
 
-const generateResponse = (values: string[]): object => {
+const generateResponse = <T = {}>(values: string[]): T => {
   const valuesWithoutSpecificBytes = values.map((value) =>
     removeSpecificBytes(value),
   );
@@ -74,7 +74,7 @@ const generateResponse = (values: string[]): object => {
     valuesWithoutSpecificBytes,
   );
 
-  return decodedAndCleanedData;
+  return decodedAndCleanedData as T;
 };
 
 export { removeDuplicateDevices, generateResponse };

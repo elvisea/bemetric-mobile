@@ -152,19 +152,17 @@ class BluetoothManager {
             return;
           }
 
-          if (characteristic) {
-            if (characteristic.value) {
-              callback(characteristic.value);
-            }
+          if (characteristic && characteristic.value) {
+            callback(characteristic.value);
           }
-        }, MONITORED_FEATURE_UUID);
+        });
 
         return subscription;
       } else {
         console.error("Device is not connected");
       }
     } catch (error) {
-      console.error("Error monitoring characteristic:", error);
+      console.error("Error when trying to monitor feature:", error);
     }
   };
 
@@ -209,7 +207,7 @@ class BluetoothManager {
 
   writeCharacteristic = async (command: object): Promise<void> => {
     try {
-      if (this.device) {
+      if (this.device && (await this.device.isConnected())) {
         const service = await this.discoverService(this.device, SERVICE_UUID);
 
         if (!service) {
@@ -248,6 +246,8 @@ class BluetoothManager {
           valueBase64,
           CHARACTERISTIC_UUID,
         );
+      } else {
+        console.error("Device is not connected");
       }
     } catch (error) {
       console.error("Error writing characteristic:", error);

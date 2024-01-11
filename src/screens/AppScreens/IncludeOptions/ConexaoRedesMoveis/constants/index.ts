@@ -23,22 +23,35 @@ const inputs: IInput[] = [
   },
 ];
 
-const response: TypeResponse = {
+const responses: TypeResponse = {
   0: {
-    title: "Dispositivo liberado para ser associado.",
-    subtitle: "Continue o processo de cadastro.",
+    title: "Configuração Concluída",
+    subtitle: "A configuração de dados móveis foi realizada com sucesso.",
+    text: "Continuar",
   },
   1: {
-    title: "Dispositivo não localizado",
-    subtitle: "Dispositivo não localizado",
+    title: "Dispositivo Não Encontrado",
+    subtitle:
+      "O dispositivo BLE não pôde ser localizado. Certifique-se de que está próximo e pronto para emparelhamento.",
+    text: "Tentar Novamente",
   },
   2: {
-    title: "Dispositivo não disponível",
-    subtitle: "Dispositivo não liberado para ser associado",
+    title: "Erro na Configuração",
+    subtitle:
+      "Houve um problema ao tentar configurar os dados móveis no dispositivo BLE. Verifique as configurações e tente novamente.",
+    text: "Tentar Novamente",
   },
   3: {
-    title: "Falha na verificação",
-    subtitle: "Falha na verificação",
+    title: "Operação Cancelada",
+    subtitle:
+      "A operação de configuração foi cancelada pelo usuário ou devido a um problema inesperado.",
+    text: "Tentar Novamente",
+  },
+  4: {
+    title: "Credenciais Inválidas",
+    subtitle:
+      "As credenciais fornecidas são inválidas. Verifique as  credencias fornecidas e tente novamente.",
+    text: "Tentar Novamente",
   },
 };
 
@@ -53,4 +66,4 @@ const initialState: TypeInitialState = {
   isLoading: false,
 };
 
-export { inputs, response, schema, initialState };
+export { inputs, responses, schema, initialState };
