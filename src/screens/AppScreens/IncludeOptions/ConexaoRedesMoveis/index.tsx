@@ -26,7 +26,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { TypeForm } from "./types";
+import { TypeAction, TypeForm } from "./types";
 import { initialState, inputs, responses, schema } from "./constants";
 
 const bluetoothManager = BluetoothManager.getInstance();
@@ -53,42 +53,37 @@ export function ConexaoRedesMoveis() {
 
   const resetState = () => setState(initialState);
 
-  const resetValues = () => {
-    setState((previousState) => ({ ...previousState, values: [] }));
-  };
-
-  const handleNextPage = async (data: TypeForm) => {
+  const sendCommand = async (command: object, time?: number) => {
     try {
       if (context.device) {
-        setState((previousState) => ({ ...previousState, isLoading: true }));
+        setState({ isLoading: true, values: [] });
 
-        const COMMAND = {
-          BT_PASSWORD: params.chave,
-          SET_MODEM_APN: data.ponto,
-          SET_MODEM_USER: data.usuario,
-          SET_MODEM_PWD: data.senha,
-        };
-
-        await bluetoothManager.writeCharacteristic(COMMAND);
+        setTimeout(async () => {
+          await bluetoothManager.writeCharacteristic(command);
+        }, time);
       }
     } catch (error) {
+      resetState();
       console.error("Error when trying to write features.", error);
     }
   };
 
+  const handleNextPage = async (data: TypeForm) => {
+    const COMMAND = {
+      BT_PASSWORD: params.chave,
+      SET_MODEM_APN: data.ponto,
+      SET_MODEM_USER: data.usuario,
+      SET_MODEM_PWD: data.senha,
+    };
+    await sendCommand(COMMAND);
+  };
+
   const getStatusConnection = async () => {
-    if (context.device) {
-      setTimeout(async () => {
-        resetValues();
-
-        const COMMAND = {
-          BT_PASSWORD: params.chave.trim(),
-          GET_MODEM_SIGNAL: "",
-        };
-
-        await bluetoothManager.writeCharacteristic(COMMAND);
-      }, 4000);
-    }
+    const COMMAND = {
+      BT_PASSWORD: params.chave.trim(),
+      GET_MODEM_SIGNAL: "",
+    };
+    await sendCommand(COMMAND, 4000);
   };
 
   const handleGoToNextScreen = () => {
@@ -97,21 +92,12 @@ export function ConexaoRedesMoveis() {
     });
   };
 
-  const handleResponse = (responseConfig: (typeof responses)[number]) => {
+  const handleAction = ({ response, action }: TypeAction) => {
     resetState();
-    Alert.alert(responseConfig.title, responseConfig.subtitle, [
+    Alert.alert(response.title, response.subtitle, [
       {
-        text: responseConfig.text,
-        onPress: () => handleGoToNextScreen(),
-      },
-    ]);
-  };
-
-  const unableToConfigure = () => {
-    resetState();
-    Alert.alert(responses[4].title, responses[4].subtitle, [
-      {
-        text: responses[4].text,
+        text: response.text,
+        onPress: () => (action ? action() : {}),
       },
     ]);
   };
@@ -127,15 +113,18 @@ export function ConexaoRedesMoveis() {
 
     switch (response.GET_MODEM_SIGNAL) {
       case "OK":
-        handleResponse(responses[0]);
-        break;
-
-      case "BUSY":
-        unableToConfigure();
+        handleAction({
+          response: responses[0],
+          action: () => handleGoToNextScreen(),
+        });
         break;
 
       case "NOK":
-        unableToConfigure();
+        handleAction({ response: responses[4] });
+        break;
+
+      case "BUSY":
+        handleAction({ response: responses[5] });
         break;
     }
   };
@@ -162,7 +151,7 @@ export function ConexaoRedesMoveis() {
 
           return () => {
             subscription?.remove();
-            setState(initialState);
+            resetState();
           };
         }
       };
@@ -174,7 +163,7 @@ export function ConexaoRedesMoveis() {
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        setState(initialState);
+        resetState();
         return false;
       };
 

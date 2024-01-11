@@ -53,6 +53,12 @@ const responses: TypeResponse = {
       "As credenciais fornecidas são inválidas. Verifique as  credencias fornecidas e tente novamente.",
     text: "Tentar Novamente",
   },
+  5: {
+    title: "Operação Cancelada",
+    subtitle:
+      "No momento não é possível executar a configuração. Aguarde um momento e tente novamente.",
+    text: "Tentar Novamente",
+  },
 };
 
 const schema = yup.object({
