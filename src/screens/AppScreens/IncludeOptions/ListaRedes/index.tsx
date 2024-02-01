@@ -14,17 +14,14 @@ import {
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
 
-import { generateResponse } from "@utils/bluetooth";
-import BluetoothManager from "@manager/bluetooth";
-
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
+import { WIFI_AP_LIST } from "./types";
 import { initialState } from "./constants";
-import { Icon, Network, TitleList, TitleNetwork } from "./styles";
 
-const bluetoothManager = BluetoothManager.getInstance();
+import { Icon, Network, TitleList, TitleNetwork } from "./styles";
 
 export function ListaRedes() {
   const route = useRoute();
@@ -47,17 +44,14 @@ export function ListaRedes() {
     });
 
     resetState();
-  };
-
-  const sendCommand = async () => {
-    const COMMAND = { BT_PASSWORD: params.chave, GET_WIFI_LIST: "" };
-    await bluetoothManager.writeCharacteristic(COMMAND);
+    context.clearReceivedValues();
   };
 
   const findAvailableNetworks = async () => {
     try {
       setState((oldState) => ({ ...oldState, isLoading: true }));
-      await sendCommand();
+      const COMMAND = { BT_PASSWORD: params.chave, GET_WIFI_LIST: "" };
+      await context.sendCommand(COMMAND, 2);
     } catch (error) {
       setState((oldState) => ({ ...oldState, isLoading: false }));
 
@@ -81,30 +75,33 @@ export function ListaRedes() {
     );
   };
 
-  const onValueChange = () => {
-    const response: any = generateResponse(state.values);
-
-    const temTodasAsPropriedades = checarObjeto(response);
+  const verificarResposta = () => {
+    const temTodasAsPropriedades = checarObjeto(context.response);
 
     if (temTodasAsPropriedades) {
-      const redesComChave = response.WIFI_AP_LIST.map((item: any) => ({
-        ...item,
-        KEY: uuid.v4(),
-      }));
+      if (Array.isArray(context.response.WIFI_AP_LIST)) {
+        const redesComChave = context.response.WIFI_AP_LIST.map(
+          (item: WIFI_AP_LIST) => ({
+            ...item,
+            KEY: uuid.v4().toString(),
+          }),
+        );
 
-      const network = { ...response, WIFI_AP_LIST: redesComChave };
-      setState((oldState) => ({
-        ...oldState,
-        network: network,
-        isLoading: false,
-      }));
+        setState((oldState) => ({
+          ...oldState,
+          network: redesComChave,
+          isLoading: false,
+        }));
+      }
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (state.values.length > 0) onValueChange();
-    }, [state.values]),
+      if (Object.values(context.response).length > 0) {
+        verificarResposta();
+      }
+    }, [context.response]),
   );
 
   useFocusEffect(
@@ -113,34 +110,10 @@ export function ListaRedes() {
     }, []),
   );
 
-  const addValueReceived = (value: string) => {
-    setState((oldState) => ({
-      ...oldState,
-      values: [...oldState.values, value],
-    }));
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const startMonitoring = async () => {
-        if (context.device) {
-          const subscription =
-            await bluetoothManager.monitorCharacteristic(addValueReceived);
-
-          return () => {
-            subscription?.remove();
-            resetState();
-          };
-        }
-      };
-
-      startMonitoring();
-    }, [context.device]),
-  );
-
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
+        context.clearReceivedValues();
         resetState();
         return false;
       };
@@ -168,7 +141,7 @@ export function ListaRedes() {
 
       {!state.isLoading && (
         <FlatList
-          data={state.network.WIFI_AP_LIST}
+          data={state.network}
           style={styles.constainer}
           keyExtractor={(item) => item.KEY}
           ListHeaderComponent={<TitleList>Redes Disponíveis</TitleList>}

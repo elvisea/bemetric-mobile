@@ -11,12 +11,10 @@ type IInput = {
 
 type TypeForm = { ponto: string; usuario: string; senha: string };
 
-type TypeInitialState = { values: string[]; isLoading: boolean };
-
 type TypeAction = { action?: () => void; response: TypeResponse[number] };
 
 type TypeResponse = {
   [index: number]: { title: string; subtitle: string; text: string };
 };
 
-export { IName, IInput, TypeResponse, TypeInitialState, TypeForm, TypeAction };
+export { IName, IInput, TypeResponse, TypeForm, TypeAction };

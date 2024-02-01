@@ -1,9 +1,8 @@
-import { TypeInitialState, TypeNetwork } from "../types";
+import { TypeInitialState, WIFI_AP_LIST } from "../types";
 
 const initialState: TypeInitialState = {
-  values: [],
   isLoading: false,
-  network: {} as TypeNetwork,
+  network: [] as WIFI_AP_LIST[],
 };
 
 export { initialState };

@@ -3,8 +3,7 @@ import { TypeInitialState } from "../types";
 const response: { [key: number]: { title: string; subtitle: string } } = {
   0: {
     title: "Dispositivo não encontrado.",
-    subtitle:
-      "Verifique se o Dispositivo está ligado ou se o Serial está correto e tente novamente.",
+    subtitle: "Verifique se o dispositivo está ligado.",
   },
   1: {
     title: "Informações para conexão não estão disponíveis.",
@@ -18,16 +17,18 @@ const response: { [key: number]: { title: string; subtitle: string } } = {
     title: "Dispositivo Desconectado.",
     subtitle: "Você precisa estar conectado para testar Dispositivo.",
   },
+  4: {
+    title: "Não foi possível conectar com o dispositivo",
+    subtitle: "Não foi possível conectar com o dispositivo",
+  },
 };
 
 const initialState: TypeInitialState = {
-  values: [],
   data: null,
-  devices: [],
+  signals: {},
+  title: "Desconectado",
   isLoading: false,
   isConnecting: false,
-  bluetoothEnabled: false,
-  permissionsGranted: false,
 };
 
 export { response, initialState };

@@ -17,18 +17,14 @@ import { useForm, Controller } from "react-hook-form";
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
 
-import BluetoothManager from "@manager/bluetooth";
-
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { initialState, inputs, resposta, schema } from "./constants";
-import { generateResponse } from "@utils/bluetooth";
-
-const bluetoothManager = BluetoothManager.getInstance();
+import { TypeAction } from "./types";
+import { inputs, response, schema } from "./constants";
 
 export function ConexaoManual() {
   const route = useRoute();
@@ -46,121 +42,85 @@ export function ConexaoManual() {
     resolver: yupResolver(schema),
   });
 
-  const [state, setState] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const resetState = () => setState(initialState);
+  const handleNextPage = async (data: { nome: string; senha: string }) => {
+    setIsLoading(true);
+    context.clearReceivedValues();
 
-  const sendCommand = async (data: { nome: string; senha: string }) => {
-    setState((previousState) => ({ ...previousState, isLoading: true }));
-
-    const CONFIGURE_COMMAND = {
+    const command = {
       BT_PASSWORD: params.chave,
       SET_WIFI_SSID: data.nome,
       SET_WIFI_PWD: data.senha,
     };
 
-    await bluetoothManager.writeCharacteristic(CONFIGURE_COMMAND);
-  };
-
-  const handleNextPage = async (data: { nome: string; senha: string }) => {
-    await sendCommand(data);
+    await context.sendCommand(command, 2);
   };
 
   const getStatusConnection = async () => {
-    setState((previousState) => ({ ...previousState, isLoading: true }));
-
-    const STATUS_COMMAND = {
-      BT_PASSWORD: params.chave,
-      GET_WIFI_STATUS: "",
-    };
-
-    await bluetoothManager.writeCharacteristic(STATUS_COMMAND);
-    setState((previousState) => ({ ...previousState, isLoading: false }));
+    context.clearReceivedValues();
+    const GET_WIFI_STATUS = { BT_PASSWORD: params.chave, GET_WIFI_STATUS: "" };
+    await context.sendCommand(GET_WIFI_STATUS, 4);
   };
 
   const handleGoToNextScreen = () => {
+    context.clearReceivedValues();
+
     navigation.navigate("EquipamentosDisponiveis", {
       chave: params.chave,
     });
-
-    resetState();
   };
 
-  const checarObjeto = (retorno: object) => {
-    if (Object.entries(retorno).length > 0) {
-      if ("SET_TRANSM_MODE" in retorno) {
-        if (retorno.SET_TRANSM_MODE === "WIFI") {
-          resetState();
-          getStatusConnection();
-        }
-      }
+  const handleAction = ({ response, action }: TypeAction) => {
+    setIsLoading(false);
 
-      if ("WIFI_STATUS_CONNECTION" in retorno) {
-        if (retorno.WIFI_STATUS_CONNECTION === "0") {
-          setState((previousState) => ({ ...previousState, isLoading: false }));
-          Alert.alert(resposta[0].title, resposta[0].subtitle, [
-            {
-              text: resposta[0].text,
-              onPress: () => resetState(),
-            },
-          ]);
-        }
+    Alert.alert(response.title, response.subtitle, [
+      {
+        text: response.text,
+        onPress: () => (action ? action() : {}),
+      },
+    ]);
+  };
 
-        if (retorno.WIFI_STATUS_CONNECTION === "1") {
-          setState((previousState) => ({ ...previousState, isLoading: false }));
-          Alert.alert(resposta[1].title, resposta[1].subtitle, [
-            {
-              text: resposta[1].text,
-              onPress: () => handleGoToNextScreen(),
-            },
-          ]);
-        }
-      }
+  const verificarResposta = () => {
+    switch (context.response.SET_TRANSM_MODE) {
+      case "WIFI":
+        getStatusConnection();
+        break;
+    }
+
+    switch (context.response.WIFI_STATUS_CONNECTION) {
+      case "0":
+        handleAction({
+          response: response[0],
+          action: () => context.clearReceivedValues(),
+        });
+        break;
+
+      case "1":
+        handleAction({
+          response: response[1],
+          action: () => handleGoToNextScreen(),
+        });
+        break;
     }
   };
 
-  const onValueChange = () => {
-    const response = generateResponse(state.values);
-    checarObjeto(response);
-  };
-
-  const addValueReceived = (value: string) => {
-    setState((previousState) => ({
-      ...previousState,
-      values: [...previousState.values, value],
-    }));
-  };
-
   useFocusEffect(
     useCallback(() => {
-      const startMonitoring = async () => {
-        if (context.device) {
-          const subscription =
-            await bluetoothManager.monitorCharacteristic(addValueReceived);
-
-          return () => {
-            subscription?.remove();
-            resetState();
-          };
-        }
-      };
-
-      startMonitoring();
-    }, [context.device]),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      if (state.values.length > 0) onValueChange();
-    }, [state.values]),
+      if (Object.values(context.response).length > 0) {
+        verificarResposta();
+      }
+    }, [context.response]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        resetState();
+        setIsLoading(false);
+        context.clearReceivedValues();
         return false;
       };
 
@@ -183,9 +143,9 @@ export function ConexaoManual() {
     >
       <HeaderDefault title="Conexão WIFI" />
 
-      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!state.isLoading && (
+      {!isLoading && (
         <VStack flex={1} w="full" px={`${RFValue(16)}px`}>
           <FlatList
             data={inputs}
@@ -229,7 +189,7 @@ export function ConexaoManual() {
         </VStack>
       )}
 
-      {!state.isLoading && (
+      {!isLoading && (
         <ButtonFull title="Avançar" onPress={handleSubmit(handleNextPage)} />
       )}
     </LayoutDefault>

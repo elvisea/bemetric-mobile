@@ -1,5 +1,3 @@
-import { Device } from "react-native-ble-plx";
-
 type ITypeParams = {
   params: {
     codigoEquipamento: number;
@@ -21,13 +19,11 @@ type TypeData = {
 };
 
 type TypeInitialState = {
-  values: string[];
   data: TypeData | null;
-  devices: Device[];
+  signals: object;
+  title: "Conectado" | "Desconectado" | "Conectando...";
   isLoading: boolean;
-  bluetoothEnabled: boolean;
   isConnecting: boolean;
-  permissionsGranted: boolean;
 };
 
 export { TypeInitialState, ITypeParams, TypeData };
