@@ -8,19 +8,17 @@ import {
 } from "@react-navigation/native";
 
 import axios from "axios";
-import { BleError, State } from "react-native-ble-plx";
+import { BleError } from "react-native-ble-plx";
 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { HStack, ScrollView, VStack } from "native-base";
 
 import api from "@services/api";
-import BluetoothManager from "@manager/bluetooth";
 
 import { THEME } from "@theme/theme";
 import { useBluetooth } from "@hooks/bluetooth";
 
-import { removeDuplicateDevices } from "@utils/bluetooth";
 import { requestPermissions } from "@manager/permissions";
 
 import { StatusButton } from "@components/StatusButton";
@@ -30,8 +28,6 @@ import { RowInformation } from "@components/RowInformation";
 
 import { ITypeParams } from "./types";
 import { initialState, response } from "./constants";
-
-const bluetoothManager = BluetoothManager.getInstance();
 
 export function TelemetryDevice() {
   const route = useRoute();
@@ -44,7 +40,7 @@ export function TelemetryDevice() {
 
   const [state, setState] = useState(initialState);
 
-  const deviceIsSame = () => {
+  const isTheDeviceTheSameAndIsItConnected = useCallback(() => {
     if (context.device && state.data) {
       return context.device.name === state.data.serial;
     }
@@ -56,38 +52,50 @@ export function TelemetryDevice() {
     if (!context.device && state.data) {
       return false;
     }
-  };
-
-  const sendCommandToConnect = async (chave: string) => {
-    const COMMAND = { BT_PASSWORD: chave.trim(), GET_SERIAL_KEY: "" };
-    await bluetoothManager.writeCharacteristic(COMMAND);
-  };
+  }, [context.device, state.data]);
 
   const handleConnect = async () => {
     if (typeof state.data === "object" && state.data) {
       const name = state.data.serial.trim().toUpperCase();
-      const device = state.devices.find((device) => device.name === name);
+      const device = context.devices.find((device) => device.name === name);
 
       if (device) {
         try {
           setState((previousState) => ({
             ...previousState,
+            title: "Conectando...",
             isConnecting: true,
           }));
 
-          const result = await bluetoothManager.connectToDevice(device.id);
+          const result = await context.connectToDevice(device.id);
 
           if (result) {
             const isConnected = await result.isConnected();
 
             if (isConnected) {
               context.setDevice(result);
-              sendCommandToConnect(state.data.chave); // Talvez não precise desta etapa
+
+              setState((previousState) => ({
+                ...previousState,
+                title: "Conectado",
+                isConnecting: false,
+              }));
             }
+          } else {
+            setState((previousState) => ({
+              ...previousState,
+              title: "Desconectado",
+              isConnecting: false,
+            }));
+
+            Alert.alert(response[4].title, response[4].subtitle, [
+              { text: "Tentar novamente" },
+            ]);
           }
         } catch (error) {
           setState((previousState) => ({
             ...previousState,
+            title: "Desconectado",
             isConnecting: false,
           }));
 
@@ -98,52 +106,48 @@ export function TelemetryDevice() {
       } else {
         setState((previousState) => ({
           ...previousState,
+          title: "Desconectado",
           isConnecting: false,
         }));
 
         Alert.alert(response[0].title, response[0].subtitle);
       }
     } else {
+      setState((previousState) => ({
+        ...previousState,
+        title: "Desconectado",
+        isConnecting: false,
+      }));
+
       Alert.alert(response[1].title, response[1].subtitle);
     }
   };
 
-  const getWiFiStatus = async (chave: string) => {
-    const COMMAND = { BT_PASSWORD: chave.trim(), GET_WIFI_STATUS: "" };
-    await bluetoothManager.writeCharacteristic(COMMAND);
-  };
-
-  const getModemSignal = async (chave: string) => {
-    const COMMAND = { BT_PASSWORD: chave.trim(), GET_MODEM_SIGNAL: "" };
-    await bluetoothManager.writeCharacteristic(COMMAND);
-  };
-
-  const getBatteryLevel = async (chave: string) => {
-    const COMMAND = { BT_PASSWORD: chave.trim(), GET_VBAT: "" };
-    await bluetoothManager.writeCharacteristic(COMMAND);
-  };
-
-  const takeTest = async (chave: string) => {
-    const COMMAND = {
-      BT_PASSWORD: chave.trim(),
-      CMD_TEST_ALL: "",
-    };
-    await bluetoothManager.writeCharacteristic(COMMAND);
-  };
-
-  const getSignalsFromDevice = async () => {
+  const obterSinaisDoDispositivo = async () => {
     if (state.data) {
-      getWiFiStatus(state.data.chave);
-      getModemSignal(state.data.chave);
-      getBatteryLevel(state.data.chave);
-      // takeTest(state.data.chave);
+      const GET_VBAT = { BT_PASSWORD: state.data.chave.trim(), GET_VBAT: "" };
+      await context.sendCommand(GET_VBAT, 2000);
+
+      const GET_WIFI_STATUS = {
+        BT_PASSWORD: state.data.chave.trim(),
+        GET_WIFI_STATUS: "",
+      };
+      await context.sendCommand(GET_WIFI_STATUS, 4000);
+
+      const GET_MODEM_SIGNAL = {
+        BT_PASSWORD: state.data.chave.trim(),
+        GET_MODEM_SIGNAL: "",
+      };
+      await context.sendCommand(GET_MODEM_SIGNAL, 6000);
     }
   };
 
   const configureDataConnection = async () => {
-    if (deviceIsSame()) {
+    if (isTheDeviceTheSameAndIsItConnected()) {
       if (typeof state.data === "object" && state.data) {
         setState((previousState) => ({ ...previousState, values: [] }));
+
+        context.clearReceivedValues();
 
         navigation.navigate("IncludeStackRoutes", {
           screen: "ConfigurarConexaoDados",
@@ -158,9 +162,17 @@ export function TelemetryDevice() {
   };
 
   const handleTestDevice = async () => {
-    if (deviceIsSame()) {
+    if (isTheDeviceTheSameAndIsItConnected()) {
       if (typeof state.data === "object" && state.data) {
         console.log("Você pode testar o Dispositivo.");
+
+        if (state.data) {
+          const CMD_TEST_ALL = {
+            BT_PASSWORD: state.data.chave.trim(),
+            CMD_TEST_ALL: "",
+          };
+          await context.sendCommand(CMD_TEST_ALL, 4);
+        }
       }
     } else {
       Alert.alert(response[2].title, response[2].subtitle);
@@ -169,42 +181,63 @@ export function TelemetryDevice() {
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
-    setState((previousState) => ({
-      ...previousState,
-      permissionsGranted: isGranted,
-    }));
+    context.setPermissions(isGranted);
   };
 
-  const monitorBluetoothState = (state: State) => {
-    const isPoweredOn = state === State.PoweredOn;
-    setState((oldState) => ({ ...oldState, bluetoothEnabled: isPoweredOn }));
-  };
-
-  const resetState = () => setState(initialState);
-
-  const addValueReceived = (value: string) => {
+  const setSignals = () => {
     setState((previousState) => ({
       ...previousState,
-      values: [...previousState.values, value],
+      signals: { ...previousState.signals, ...context.response },
     }));
+
+    context.clearReceivedValues();
+  };
+
+  const verificarResposta = () => {
+    switch (context.response.GET_MODEM_SIGNAL) {
+      case "OK":
+        setSignals();
+        break;
+
+      case "NOK":
+        setSignals();
+        break;
+
+      case "BUSY":
+        setSignals();
+        break;
+    }
+
+    switch (context.response.WIFI_STATUS_CONNECTION) {
+      case "0":
+        setSignals();
+        break;
+
+      case "1":
+        setSignals();
+        break;
+    }
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (deviceIsSame()) {
-        const startMonitoring = async () => {
-          const subscription =
-            await bluetoothManager.monitorCharacteristic(addValueReceived);
-
-          return () => {
-            subscription?.remove();
-            resetState();
-          };
-        };
-
-        startMonitoring();
+      if (Object.values(context.response).length > 0) {
+        verificarResposta();
       }
-    }, [deviceIsSame()]),
+    }, [context.response]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isTheDeviceTheSameAndIsItConnected()) {
+        setState((previousState) => ({
+          ...previousState,
+          title: "Conectado",
+        }));
+
+        obterSinaisDoDispositivo();
+      }
+    }, [isTheDeviceTheSameAndIsItConnected]),
   );
 
   useFocusEffect(
@@ -214,6 +247,19 @@ export function TelemetryDevice() {
       async function fetchData() {
         try {
           setState((previousState) => ({ ...previousState, isLoading: true }));
+
+          const [resposta1, resposta2] = await Promise.all([
+            api.post("/Dashboard/ObterListaDadosEquipamento", {
+              codigoEquipamento: params.codigoEquipamento,
+            }),
+
+            api.post("/Equipamento/DetalhamentoDispositivoTelemetria", {
+              codigoEquipamento: params.codigoEquipamento,
+            }),
+          ]);
+
+          console.log("RESPOSTA 1", resposta1.data);
+          console.log("RESPOSTA 2", resposta2.data);
 
           const response = await api.post(
             "/Equipamento/DetalhamentoDispositivoTelemetria",
@@ -246,36 +292,6 @@ export function TelemetryDevice() {
   useFocusEffect(
     useCallback(() => {
       requestUsagePermissions();
-
-      const canScan = state.permissionsGranted && state.bluetoothEnabled;
-
-      if (canScan) {
-        bluetoothManager.scanForDevices((scannedDevices) => {
-          const devices = removeDuplicateDevices([
-            ...state.devices,
-            ...scannedDevices,
-          ]);
-          setState((previousState) => ({ ...previousState, devices: devices }));
-        });
-      }
-
-      return () => {
-        bluetoothManager.stopScan();
-      };
-    }, [state.permissionsGranted, state.bluetoothEnabled]),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const stateChangeListener = bluetoothManager.monitorBluetoothState(
-        (state) => {
-          monitorBluetoothState(state);
-        },
-      );
-
-      return () => {
-        stateChangeListener.remove();
-      };
     }, []),
   );
 
@@ -329,13 +345,7 @@ export function TelemetryDevice() {
           >
             <StatusButton
               onPress={handleConnect}
-              title={
-                state.isConnecting
-                  ? "Conectando..."
-                  : deviceIsSame()
-                    ? "Conectado"
-                    : "Desconectado"
-              }
+              title={state.title}
               width="49"
               icon={
                 <FontAwesome5

@@ -9,9 +9,10 @@ type IInput = {
   keyboardType: KeyboardTypeOptions;
 };
 
-type TypeInitialState = {
-  values: string[];
-  isLoading: boolean;
+type TypeResponse = {
+  [key: number]: { title: string; subtitle: string; text: string };
 };
 
-export { IName, IInput, TypeInitialState };
+type TypeAction = { action?: () => void; response: TypeResponse[number] };
+
+export { IName, IInput, TypeResponse, TypeAction };

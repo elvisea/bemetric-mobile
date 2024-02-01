@@ -15,10 +15,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 
 import { THEME } from "@theme/theme";
-import { generateResponse } from "@utils/bluetooth";
-
 import { useBluetooth } from "@hooks/bluetooth";
-import BluetoothManager from "@manager/bluetooth";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
@@ -27,19 +24,16 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { TypeAction, TypeForm } from "./types";
-import { initialState, inputs, responses, schema } from "./constants";
-
-const bluetoothManager = BluetoothManager.getInstance();
+import { inputs, responses, schema } from "./constants";
 
 export function ConexaoRedesMoveis() {
   const route = useRoute();
-  const navigation = useNavigation();
-
   const context = useBluetooth();
+  const navigation = useNavigation();
 
   const params = route.params as { chave: string };
 
-  const [state, setState] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
@@ -51,48 +45,47 @@ export function ConexaoRedesMoveis() {
     resolver: yupResolver(schema),
   });
 
-  const resetState = () => setState(initialState);
-
-  const sendCommand = async (command: object, time?: number) => {
+  const handleNextPage = async (data: TypeForm) => {
     try {
+      setIsLoading(true);
 
-      setTimeout(async () => {
-        setState({ isLoading: true, values: [] });
-        await bluetoothManager.writeCharacteristic(command);
-      }, time);
+      const command = {
+        BT_PASSWORD: params.chave,
+        SET_MODEM_APN: data.ponto,
+        SET_MODEM_USER: data.usuario,
+        SET_MODEM_PWD: data.senha,
+      };
 
+      await context.sendCommand(command, 2);
     } catch (error) {
-      resetState();
+      setIsLoading(false);
       console.error("Error when trying to write features.", error);
     }
   };
 
-  const handleNextPage = async (data: TypeForm) => {
-    const COMMAND = {
-      BT_PASSWORD: params.chave,
-      SET_MODEM_APN: data.ponto,
-      SET_MODEM_USER: data.usuario,
-      SET_MODEM_PWD: data.senha,
-    };
-    await sendCommand(COMMAND);
-  };
-
   const getStatusConnection = async () => {
-    const COMMAND = {
-      BT_PASSWORD: params.chave.trim(),
-      GET_MODEM_SIGNAL: "",
-    };
-    await sendCommand(COMMAND, 4000);
+    try {
+      const COMMAND = {
+        BT_PASSWORD: params.chave.trim(),
+        GET_MODEM_SIGNAL: "",
+      };
+      await context.sendCommand(COMMAND, 4000);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error when trying to write features.", error);
+    }
   };
 
   const handleGoToNextScreen = () => {
+    context.clearReceivedValues();
     navigation.navigate("EquipamentosDisponiveis", {
       chave: params.chave,
     });
   };
 
   const handleAction = ({ response, action }: TypeAction) => {
-    resetState();
+    context.clearReceivedValues();
+    setIsLoading(false);
     Alert.alert(response.title, response.subtitle, [
       {
         text: response.text,
@@ -101,16 +94,15 @@ export function ConexaoRedesMoveis() {
     ]);
   };
 
-  const onValueChange = () => {
-    const response = generateResponse<{ [key: string]: string }>(state.values);
-
-    switch (response.SET_TRANSM_MODE) {
+  const verificarResposta = () => {
+    switch (context.response.SET_TRANSM_MODE) {
       case "MODEM":
+        context.clearReceivedValues();
         getStatusConnection();
         break;
     }
 
-    switch (response.GET_MODEM_SIGNAL) {
+    switch (context.response.GET_MODEM_SIGNAL) {
       case "OK":
         handleAction({
           response: responses[0],
@@ -130,39 +122,16 @@ export function ConexaoRedesMoveis() {
 
   useFocusEffect(
     useCallback(() => {
-      if (state.values.length > 0) onValueChange();
-    }, [state.values]),
-  );
-
-  const addValueReceived = (value: string) => {
-    setState((previousState) => ({
-      ...previousState,
-      values: [...previousState.values, value],
-    }));
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const startMonitoring = async () => {
-        if (context.device) {
-          const subscription =
-            await bluetoothManager.monitorCharacteristic(addValueReceived);
-
-          return () => {
-            subscription?.remove();
-            resetState();
-          };
-        }
-      };
-
-      startMonitoring();
-    }, [context.device]),
+      if (Object.values(context.response).length > 0) {
+        verificarResposta();
+      }
+    }, [context.response]),
   );
 
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        resetState();
+        setIsLoading(false);
         return false;
       };
 
@@ -183,11 +152,11 @@ export function ConexaoRedesMoveis() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      {state.isLoading && <HeaderDefault title="Conexão Redes Móveis" />}
+      {isLoading && <HeaderDefault title="Conexão Redes Móveis" />}
 
-      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!state.isLoading && (
+      {!isLoading && (
         <VStack flex={1} w="full" px={`${RFValue(16)}px`}>
           <FlatList
             data={inputs}
@@ -231,7 +200,7 @@ export function ConexaoRedesMoveis() {
         </VStack>
       )}
 
-      {!state.isLoading && (
+      {!isLoading && (
         <ButtonFull title="Salvar" onPress={handleSubmit(handleNextPage)} />
       )}
     </LayoutDefault>

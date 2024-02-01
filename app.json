@@ -42,7 +42,8 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
         }
-      ]
+      ],
+      "react-native-ble-plx"
     ],
     "ios": {
       "supportsTablet": true,

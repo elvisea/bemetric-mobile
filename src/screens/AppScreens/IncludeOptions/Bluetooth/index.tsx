@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { BackHandler, FlatList, StyleSheet } from "react-native";
+import { useCallback } from "react";
+import { FlatList, StyleSheet } from "react-native";
 
 import {
   useNavigation,
@@ -8,37 +8,32 @@ import {
 } from "@react-navigation/native";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { Device, State } from "react-native-ble-plx";
+import { Device } from "react-native-ble-plx";
 
 import { THEME } from "@theme/theme";
 
-import BluetoothManager from "@manager/bluetooth";
-import { requestPermissions } from "@manager/permissions";
+import { useBluetooth } from "@hooks/bluetooth";
 
-import { removeDuplicateDevices } from "@utils/bluetooth";
+import { requestPermissions } from "@manager/permissions";
 
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { DeviceBluetooth } from "@components/DeviceBluetooth";
 
-import { initialState } from "./constants";
 import { Content, TitleHeader, Warning, Status } from "./styles";
 
-const bluetoothManager = BluetoothManager.getInstance();
-
 export function Bluetooth() {
+  const context = useBluetooth();
   const { navigate, dispatch } = useNavigation();
 
-  const [state, setState] = useState(initialState);
-
-  const canDisplay = () => state.bluetoothEnabled && state.devices.length > 0;
+  const canDisplay = () => context.isEnabled && context.devices.length > 0;
 
   const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
   const requestUsagePermissions = async () => {
     const isGranted = await requestPermissions();
-    setState((oldState) => ({ ...oldState, permissionsGranted: isGranted }));
+    context.setPermissions(isGranted);
   };
 
   const handleChooseDevice = (device: Device) => {
@@ -47,62 +42,9 @@ export function Bluetooth() {
     }
   };
 
-  const monitorBluetoothState = (state: State) => {
-    const isPoweredOn = state === State.PoweredOn;
-    setState((oldState) => ({ ...oldState, bluetoothEnabled: isPoweredOn }));
-  };
-
   useFocusEffect(
     useCallback(() => {
       requestUsagePermissions();
-
-      const canScan = state.permissionsGranted && state.bluetoothEnabled;
-
-      if (canScan) {
-        bluetoothManager.scanForDevices((scannedDevices) => {
-          const devices = removeDuplicateDevices([
-            ...state.devices,
-            ...scannedDevices,
-          ]);
-          setState((oldState) => ({ ...oldState, devices: devices }));
-        });
-      }
-
-      return () => {
-        bluetoothManager.stopScan();
-      };
-    }, [state.permissionsGranted, state.bluetoothEnabled]),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const stateChangeListener = bluetoothManager.monitorBluetoothState(
-        (state) => {
-          monitorBluetoothState(state);
-        },
-      );
-
-      return () => {
-        stateChangeListener.remove();
-      };
-    }, []),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const handleBackPress = () => {
-        setState(initialState);
-        return false;
-      };
-
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress,
-      );
-
-      return () => {
-        backHandler.remove();
-      };
     }, []),
   );
 
@@ -112,13 +54,13 @@ export function Bluetooth() {
       firstIcon="menu"
       handleFirstIcon={handleMenu}
     >
-      {state.devices.length > 0 && <HeaderDefault title="Bluetooth" />}
+      {context.devices.length > 0 && <HeaderDefault title="Bluetooth" />}
 
-      {state.devices.length === 0 && state.bluetoothEnabled && (
+      {context.devices.length === 0 && context.isEnabled && (
         <LoadingSpinner color={THEME.colors.blue[700]} />
       )}
 
-      {!state.bluetoothEnabled && (
+      {!context.isEnabled && (
         <Content>
           <Warning>
             Ative o Bluetooth nas configurações do seu celular. Após ativar o
@@ -137,7 +79,7 @@ export function Bluetooth() {
 
       {canDisplay() && (
         <FlatList
-          data={state.devices}
+          data={context.devices}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             <TitleHeader>Selecione um dispositivo</TitleHeader>

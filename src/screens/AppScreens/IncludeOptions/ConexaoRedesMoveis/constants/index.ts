@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { IInput, TypeInitialState, TypeResponse } from "../types";
+import { IInput, TypeResponse } from "../types";
 
 const inputs: IInput[] = [
   {
@@ -67,9 +67,4 @@ const schema = yup.object({
   senha: yup.string().required("Informe a senha."),
 });
 
-const initialState: TypeInitialState = {
-  values: [],
-  isLoading: false,
-};
-
-export { inputs, responses, schema, initialState };
+export { inputs, responses, schema };
