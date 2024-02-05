@@ -9,4 +9,17 @@ const schema = yup.object({
   "6": yup.string().required("Inválido"),
 });
 
-export { schema };
+const resposta = {
+  0: {
+    title: "Token Inválido",
+    subtitle: "Verifique o token inserido e tente novamente",
+    text: "Tentar Novamente",
+  },
+  1: {
+    title: "Falha na Conexão",
+    subtitle: "Não foi possível conectar com o servidor",
+    text: "Tentar Novamente",
+  },
+};
+
+export { schema, resposta };

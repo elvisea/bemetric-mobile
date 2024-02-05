@@ -36,7 +36,7 @@ export function ValidateCodeScreen() {
   });
 
   const handleNextPage = async (props: TypeForm) => {
-    const token = `${props[1]}${props[2]}${props[3]}${props[4]}${props[5]}${props[6]}`;
+    const token = Object.values(props).join("");
 
     try {
       setIsSending(true);

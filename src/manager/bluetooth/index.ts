@@ -234,8 +234,6 @@ class BluetoothManager {
         const valueBase64 = concatenatedBuffer.toString("base64");
 
         await characteristic.writeWithResponse(valueBase64);
-
-
       } else {
         console.error("Device is not connected");
       }
