@@ -1,4 +1,6 @@
-const responses: { [key: number]: { title: string; subtitle: string } } = {
+import { Message, State } from "../types";
+
+const messages: Message = {
   0: {
     title: "Equipamento Desvinculado do Dispositivo",
     subtitle: "Equipamento Desvinculado do Dispositivo",
@@ -11,6 +13,20 @@ const responses: { [key: number]: { title: string; subtitle: string } } = {
     title: "Falha Ao Tentar Desvincular Equipamento",
     subtitle: "Falha Ao Tentar Desvincular Equipamento",
   },
+  3: {
+    title: "Erro de Comunicação",
+    subtitle:
+      "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+  },
 };
 
-export { responses };
+const initialState: State = {
+  isLoading: false,
+  isOpenModal: false,
+  equipments: [],
+  action: "desvincular",
+  selected: null,
+  messages,
+};
+
+export { initialState };
