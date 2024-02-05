@@ -185,7 +185,7 @@ export function VincularDispositivo() {
   useFocusEffect(
     useCallback(() => {
       const handleBackPress = () => {
-        setIsLoading(false)
+        setIsLoading(false);
         context.disconnectToDevice();
         context.clearReceivedValues();
         return false;

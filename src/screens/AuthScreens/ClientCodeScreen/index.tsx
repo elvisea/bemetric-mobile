@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
+
 import { Box, Heading, HStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
-
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-import { schema } from "./constants";
-import { TypeForm, TypeParams } from "./types";
+import { Form, Params } from "./types";
+import { resposta, schema } from "./constants";
 
 import { ButtonFull } from "@components/ButtonFull";
 import { InputToken } from "@components/InputToken";
@@ -24,38 +23,52 @@ export function ClientCodeScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const route = useRoute();
-  const { name, email, type } = route.params as TypeParams;
+  const params = route.params as Params;
 
   const {
+    reset,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<TypeForm>({
+  } = useForm<Form>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async (props: TypeForm) => {
-    const token = `${props[1]}${props[2]}${props[3]}${props[4]}${props[5]}${props[6]}`;
+  const advanceNextStep = (token: string) => {
+    navigation.navigate("CreatePasswordScreen", {
+      type: params.type,
+      name: params.name,
+      email: params.email,
+      tokenCliente: token,
+    });
 
+    reset();
+  };
+
+  const verificarToken = async (props: Form) => {
     try {
       setIsLoading(true);
+      const token = Object.values(props).join("");
 
       const response = await api.get(`/Cliente/ValidarToken?token=${token}`);
 
       if (response.data === 0) {
-        Alert.alert("Token inválido!", "Token inválido. Tente novamente.");
+        Alert.alert(resposta[0].title, resposta[0].subtitle, [
+          {
+            text: resposta[0].text,
+            onPress: () => reset(),
+          },
+        ]);
       }
 
-      if (response.data === 1) {
-        navigation.navigate("CreatePasswordScreen", {
-          name,
-          email,
-          type,
-          tokenCliente: token,
-        });
-      }
+      if (response.data === 1) advanceNextStep(token);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(resposta[1].title, resposta[1].subtitle, [
+        {
+          text: resposta[1].text,
+          onPress: () => reset(),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +118,7 @@ export function ClientCodeScreen() {
       <ButtonFull
         title="Avançar"
         isLoading={isLoading}
-        onPress={handleSubmit(handleNextPage)}
+        onPress={handleSubmit(verificarToken)}
       />
     </LayoutDefault>
   );

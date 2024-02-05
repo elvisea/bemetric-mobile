@@ -40,7 +40,7 @@ export function VerifyTokenScreen() {
   });
 
   const handleNextPage = async (props: TypeForm) => {
-    const token = `${props[1]}${props[2]}${props[3]}${props[4]}${props[5]}${props[6]}`;
+    const token = Object.values(props).join("");
 
     const data = {
       nomeUsuario: params.name,
@@ -66,7 +66,7 @@ export function VerifyTokenScreen() {
           [
             {
               text: "Login",
-              onPress: () => navigation.navigate("SignIn"),
+              onPress: () => navigation.navigate("SignInScreen"),
             },
           ],
         );
