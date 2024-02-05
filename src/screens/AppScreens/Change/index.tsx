@@ -21,8 +21,7 @@ import { useCustomer } from "@hooks/customer";
 import { Button } from "@components/Button";
 import { GenericModal } from "@components/GenericModal";
 
-import { IEquipamento } from "./types";
-import { responses } from "./constants";
+import { initialState } from "./constants";
 
 import { LayoutDefault } from "@components/LayoutDefault";
 import { HeaderDefault } from "@components/HeaderDefault";
@@ -35,60 +34,55 @@ export function Change() {
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [state, setState] = useState(initialState);
 
-  const [equipments, setEquipments] = useState<IEquipamento[] | null>(null);
-
-  const [selectedEquipment, setSelectedEquipment] =
-    useState<IEquipamento | null>(null);
-
-  const [action, setAction] = useState<"vincular" | "desvincular">(
-    "desvincular",
-  );
-
-  const handleSelectEquipment = (equipment: IEquipamento) => {
-    setSelectedEquipment(equipment);
-    setIsOpenModal(true);
+  const handleSelectEquipment = (equipment: typeof state.selected) => {
+    setState((prevState) => ({
+      ...prevState,
+      selected: equipment,
+      isOpenModal: true,
+    }));
   };
 
-  const desvincular = async () => {
+  const closeModal = () => {
+    setState((prevState) => ({ ...prevState, isOpenModal: false }))
+  }
+
+  const unlinkEquipment = async () => {
     try {
-      setIsLoading(true);
+      setState((prevState) => ({ ...prevState, isLoading: true }));
       const response = await api.put(
         "/AppMobile/DesvincularDispositivoEquipamento",
         {
-          codigoEquipamento: selectedEquipment?.codigoEquipamento,
+          codigoEquipamento: state.selected?.codigoEquipamento,
         },
       );
 
       if (response.data === 0) {
-        setAction("vincular");
+        setState((prevState) => ({ ...prevState, action: "vincular" }));
       }
 
       if (response.data === 1) {
         Alert.alert(
-          responses[response.data].title,
-          responses[response.data].subtitle,
+          state.messages[response.data].title,
+          state.messages[response.data].subtitle,
         );
       }
 
       if (response.data === 2) {
         Alert.alert(
-          responses[response.data].title,
-          responses[response.data].subtitle,
+          state.messages[response.data].title,
+          state.messages[response.data].subtitle,
         );
       }
     } catch (error) {
-      console.log(error);
-
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(state.messages[3].title, state.messages[3].subtitle);
     } finally {
-      setIsLoading(false);
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
   };
 
-  const vincular = () => {
+  const linkEquipment = () => {
     navigation.navigate("ConfigurarConexaoBluetooth");
   };
 
@@ -99,7 +93,7 @@ export function Change() {
       async function fetchData() {
         try {
           if (customer) {
-            setIsLoading(true);
+            setState((prevState) => ({ ...prevState, isLoading: true }));
             const response = await api.post(
               "/AppMobile/ObterListaEquipamentosAssociados",
               {
@@ -107,12 +101,16 @@ export function Change() {
               },
             );
 
-            isActive && setEquipments(response.data);
+            isActive &&
+              setState((prevState) => ({
+                ...prevState,
+                equipments: response.data,
+              }));
           }
         } catch (error) {
-          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+          Alert.alert(state.messages[3].title, state.messages[3].subtitle);
         } finally {
-          setIsLoading(false);
+          setState((prevState) => ({ ...prevState, isLoading: false }));
         }
       }
 
@@ -128,12 +126,12 @@ export function Change() {
     <>
       <GenericModal
         title={
-          action === "desvincular"
+          state.action === "desvincular"
             ? "Desvincular Equipamento"
             : "Vincular Equipamento"
         }
-        isOpen={isOpenModal}
-        closeModal={() => setIsOpenModal(false)}
+        isOpen={state.isOpenModal}
+        closeModal={closeModal}
       >
         <Center w="full">
           <Text
@@ -141,8 +139,8 @@ export function Change() {
             fontSize={`${RFValue(14)}px`}
             fontFamily={THEME.fonts.Roboto_400Regular}
           >
-            {action === "desvincular"
-              ? `O dispositivo ${selectedEquipment?.dispositivoSerial.toUpperCase()} está vinculado ao equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}`
+            {state.action === "desvincular"
+              ? `O dispositivo ${state.selected?.dispositivoSerial.toUpperCase()} está vinculado ao equipamento ${state.selected?.nomeEquipamento.toUpperCase()}`
               : "Equipamento desvinculado com sucesso!"}
           </Text>
 
@@ -150,9 +148,9 @@ export function Change() {
             fontSize={`${RFValue(14)}px`}
             fontFamily={THEME.fonts.Roboto_400Regular}
           >
-            {action === "desvincular"
+            {state.action === "desvincular"
               ? "Deseja Desvincular?"
-              : `Deseja vincular um novo dispositivo para o equipamento ${selectedEquipment?.nomeEquipamento.toUpperCase()}?`}
+              : `Deseja vincular um novo dispositivo para o equipamento ${state.selected?.nomeEquipamento.toUpperCase()}?`}
           </Text>
         </Center>
 
@@ -160,9 +158,11 @@ export function Change() {
           <Button
             title="SIM"
             width="48%"
-            isLoading={isLoading}
-            isDisabled={isLoading}
-            onPress={action === "desvincular" ? desvincular : vincular}
+            isLoading={state.isLoading}
+            isDisabled={state.isLoading}
+            onPress={
+              state.action === "desvincular" ? unlinkEquipment : linkEquipment
+            }
             h={`${RFValue(50)}px`}
             _pressed={{
               background: THEME.colors.blue[700],
@@ -172,12 +172,12 @@ export function Change() {
           <Button
             title="NÃO"
             width="48%"
-            isDisabled={isLoading}
+            isDisabled={state.isLoading}
             bg={THEME.colors.white}
             borderWidth={`${RFValue(1)}px`}
             borderColor={THEME.colors.blue[700]}
             color={THEME.colors.blue[700]}
-            onPress={() => setIsOpenModal(false)}
+            onPress={closeModal}
             h={`${RFValue(50)}px`}
             _pressed={{
               background: "white",
@@ -193,12 +193,12 @@ export function Change() {
       >
         <HeaderDefault title="Selecione o equipamento" />
 
-        {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+        {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-        {!isLoading && (
+        {!state.isLoading && (
           <VStack py={`${RFValue(16)}px`} px={`${RFValue(16)}px`} width="full">
             <FlatList
-              data={equipments}
+              data={state.equipments}
               style={{ width: "100%" }}
               keyExtractor={(item) => item.codigoEquipamento.toString()}
               showsVerticalScrollIndicator={false}

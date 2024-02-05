@@ -20,8 +20,9 @@ const card: { [key: number]: { icon: JSX.Element; title: string } } = {
 
 const resposta = {
   0: {
-    title: "Falha na Conexão",
-    subtitle: "Não foi possível conectar com o servidor",
+    title: "Erro de Comunicação",
+    subtitle:
+      "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
     text: "Tentar Novamente",
   },
 };
