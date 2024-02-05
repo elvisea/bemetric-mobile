@@ -2,25 +2,14 @@ import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 import { HStack, IconButton, ScrollView, Text, VStack } from "native-base";
 
+import { RFValue } from "react-native-responsive-fontsize";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { Entypo, FontAwesome5 } from "@expo/vector-icons";
-
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
-import axios from "axios";
-import { RFValue } from "react-native-responsive-fontsize";
-
-import {
-  subDays,
-  startOfDay,
-  endOfDay,
-  differenceInDays,
-  addDays,
-  format,
-} from "date-fns";
+import { endOfDay, differenceInDays, addDays, format } from "date-fns";
 
 import api from "@services/api";
+import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
 import { ButtonDate } from "@components/ButtonDate";
@@ -28,17 +17,17 @@ import { GenericModal } from "@components/GenericModal";
 import { PeriodOption } from "@components/PeriodOption";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
+import { PermanenceCard } from "../components/PermanenceCard";
 
-import { Permanencia } from "../components/Permanencia";
 import { IParams } from "../interfaces/IEquipamentDetails";
-
-import { Icon } from "./styles";
-import { THEME } from "@theme/theme";
-
-import { IPeriodStay } from "@interfaces/IPeriodStay";
 
 import { date } from "@constants/date";
 import { dateOptions } from "@constants/dateOptions";
+
+import { Icon } from "./styles";
+import { DatePickerSelection } from "./types";
+import { formatHours, transformData } from "./functions";
+import { card, initialState, resposta } from "./constants";
 
 export function PeriodoPermanencia() {
   const { colors } = THEME;
@@ -46,83 +35,86 @@ export function PeriodoPermanencia() {
   const route = useRoute();
   const { params } = route.params as IParams;
 
-  const [data, setData] = useState<IPeriodStay | null>(null);
-
-  const [isOpenModal, setIsOpenModal] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [end, setEnd] = useState(endOfDay(new Date()));
-  const [start, setStart] = useState(startOfDay(subDays(new Date(), 1)));
-
-  const [selectStartDate, setSelectStartDate] = useState(false);
-  const [selectFinalDate, setSelectFinalDate] = useState(false);
-
-  const [useData, setUseData] = useState(false);
-  const [selectedRange, setSelectedRange] = useState(1);
-
-  const formatHours = (time: number) => {
-    const hour = Math.floor(time);
-    const decimal = (time - hour).toFixed(2);
-    const minutes = parseInt(decimal.replace(".", ""));
-
-    if (minutes === 0) {
-      return `${hour}h`;
-    } else {
-      return `${hour}h e ${minutes}min`;
-    }
-  };
+  const [state, setState] = useState(initialState);
 
   const handleSelectPeriod = (value: number) => {
-    setSelectedRange(value);
-    setStart(date[value]);
-    setEnd(endOfDay(new Date()));
-    setUseData(false);
+    setState((prevState) => ({
+      ...prevState,
+      period: value,
+      useData: false,
+      date: { final: endOfDay(new Date()), start: date[value] },
+    }));
   };
 
-  const handleSetStartDate = (date: Date) => {
-    setSelectStartDate(false);
-    setSelectedRange(5);
-    setUseData(true);
-    setStart(date);
-  };
-
-  const handleSetFinalDate = (date: Date) => {
-    setSelectFinalDate(false);
-    setSelectedRange(5);
-    setUseData(true);
-    setEnd(endOfDay(date));
-  };
+  const onConfirm = useCallback((date: Date) => {
+    setState((prevState) => ({
+      ...prevState,
+      period: 5,
+      useData: true,
+      datePicker: { ...prevState.datePicker, isVisible: false },
+      date: {
+        ...prevState.date,
+        [prevState.datePicker.selected]:
+          prevState.datePicker.selected === "final" ? endOfDay(date) : date,
+      },
+    }));
+  }, []);
 
   const maximumDate = () => {
-    const difference = differenceInDays(new Date(), start);
+    const difference = differenceInDays(new Date(), state.date.start);
     if (difference < 30) return new Date();
-    if (difference >= 30) return addDays(start, 30);
+    if (difference >= 30) return addDays(state.date.start, 30);
     return new Date();
   };
 
-  async function fetchData() {
+  const toggleModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isOpenModal: !state.isOpenModal,
+    }));
+  };
+
+  const toggleDateModal = (selected: DatePickerSelection) => {
+    setState((prevState) => ({
+      ...prevState,
+      datePicker: { selected: selected, isVisible: true },
+    }));
+  };
+
+  const fetchData = async () => {
     const data = {
-      dataDe: end?.toISOString(),
-      dataAte: start?.toISOString(),
-      usaData: useData,
-      tipoIntervalo: selectedRange ? selectedRange : 0,
+      dataDe: state.date.final?.toISOString(),
+      dataAte: state.date.start?.toISOString(),
+      usaData: state.useData,
+      tipoIntervalo: state.period ? state.period : 0,
       codigoEquipamento: params.codigoEquipamento,
     };
 
     try {
-      setIsLoading(true);
-      setIsOpenModal(false);
+      setState((prevState) => ({
+        ...prevState,
+        isLoading: true,
+        isOpenModal: false,
+      }));
 
       const response = await api.post("/Equipamento/PeriodoPermanencia", data);
 
-      setData(response.data);
+      const transformedResponse = transformData(response.data);
+
+      setState((prevState) => ({
+        ...prevState,
+        data: transformedResponse,
+      }));
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(resposta[0].title, resposta[0].subtitle, [
+        {
+          text: resposta[0].text,
+        },
+      ]);
     } finally {
-      setIsLoading(false);
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
-  }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -139,71 +131,37 @@ export function PeriodoPermanencia() {
   return (
     <VStack flex={1} width="full" bg={colors.shape}>
       <HeaderDefault title="Período de permanência" mb="16px">
-        <IconButton
-          icon={<Icon name="sliders" />}
-          onPress={() => setIsOpenModal(!isOpenModal)}
-        />
+        <IconButton icon={<Icon name="sliders" />} onPress={toggleModal} />
       </HeaderDefault>
 
-      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!isLoading && (
+      {!state.isLoading && state.data && (
         <ScrollView w="full" px="16px" showsVerticalScrollIndicator={false}>
-          <Permanencia
-            icon={<Entypo name="location" size={20} color="#FFF" />}
-            title="Em geocercas"
-            total={data ? formatHours(data.totalHorasGeocerca) : "-"}
-            hours={data ? formatHours(data.horasTrabalhadasGeocerca) : "-"}
-            on={data ? formatHours(data.paradoIgnicaoLigadaGeocerca) : "-"}
-            off={data ? formatHours(data.paradoIgnicaoDesligadaGeocerca) : "-"}
-          />
-
-          <Permanencia
-            icon={<FontAwesome5 name="dot-circle" size={22} color="#FFF" />}
-            title="Em pontos de interesse"
-            total={data ? formatHours(data.totalHorasPontoInteresse) : "-"}
-            hours={
-              data ? formatHours(data.horasTrabalhadasPontoInteresse) : "-"
-            }
-            on={
-              data ? formatHours(data.paradoIgnicaoLigadaPontoInteresse) : "-"
-            }
-            off={
-              data
-                ? formatHours(data.paradoIgnicaoDesligadaPontoInteresse)
-                : "-"
-            }
-          />
-
-          <Permanencia
-            icon={<FontAwesome5 name="map-marked-alt" size={22} color="#FFF" />}
-            title="Outras localizações"
-            total={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
-            hours={data ? formatHours(data.totalHorasOutrasLocalizacoes) : "-"}
-            on={
-              data
-                ? formatHours(data.paradoIgnicaoLigadaOutrasLocalizacoes)
-                : "-"
-            }
-            off={
-              data
-                ? formatHours(data.paradoIgnicaoDesligadaOutrasLocalizacoes)
-                : "-"
-            }
-          />
+          {Object.values(state.data.area).map((item, index) => (
+            <PermanenceCard
+              key={index}
+              icon={card[index].icon}
+              title={card[index].title}
+              total={formatHours(state.data, item.totalHoras)}
+              hours={formatHours(state.data, item.horasTrabalhadas)}
+              on={formatHours(state.data, item.paradoIgnicaoLigada)}
+              off={formatHours(state.data, item.paradoIgnicaoDesligada)}
+            />
+          ))}
         </ScrollView>
       )}
 
       <GenericModal
         title="Período"
-        isOpen={isOpenModal}
-        closeModal={() => setIsOpenModal(!isOpenModal)}
+        isOpen={state.isOpenModal}
+        closeModal={toggleModal}
       >
         {dateOptions.map((period) => (
           <PeriodOption
             key={period.value}
             title={period.title}
-            isActive={selectedRange === period.value}
+            isActive={state.period === period.value}
             onPress={() => handleSelectPeriod(period.value)}
           />
         ))}
@@ -219,13 +177,13 @@ export function PeriodoPermanencia() {
 
         <HStack w="full" justifyContent="space-between">
           <ButtonDate
-            date={format(start, "dd/MM/yyyy")}
-            onPress={() => setSelectStartDate(!selectStartDate)}
+            date={format(state.date.start, "dd/MM/yyyy")}
+            onPress={() => toggleDateModal(DatePickerSelection.Start)}
           />
 
           <ButtonDate
-            date={format(end, "dd/MM/yyyy")}
-            onPress={() => setSelectFinalDate(!selectFinalDate)}
+            date={format(state.date.final, "dd/MM/yyyy")}
+            onPress={() => toggleDateModal(DatePickerSelection.Final)}
           />
         </HStack>
 
@@ -239,22 +197,17 @@ export function PeriodoPermanencia() {
       </GenericModal>
 
       <DateTimePickerModal
-        isVisible={selectStartDate}
+        isVisible={state.datePicker.isVisible}
         mode="date"
-        date={start}
-        maximumDate={new Date()}
-        onCancel={() => setSelectStartDate(false)}
-        onConfirm={handleSetStartDate}
-      />
-
-      <DateTimePickerModal
-        isVisible={selectFinalDate}
-        mode="date"
-        date={end}
-        minimumDate={start}
-        maximumDate={maximumDate()}
-        onCancel={() => setSelectFinalDate(false)}
-        onConfirm={handleSetFinalDate}
+        date={new Date(state.date[state.datePicker.selected])}
+        minimumDate={
+          state.datePicker.selected === "start" ? undefined : state.date.start
+        }
+        maximumDate={
+          state.datePicker.selected === "start" ? new Date() : maximumDate()
+        }
+        onCancel={() => toggleDateModal(state.datePicker.selected)}
+        onConfirm={onConfirm}
       />
     </VStack>
   );
