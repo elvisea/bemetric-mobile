@@ -84,7 +84,10 @@ export function ChangeClient() {
             setCustomers(response.data);
           }
         } catch (error) {
-          Alert.alert("Erro ao tentar listar Clientes!", `${error}`);
+          Alert.alert(
+            "Erro de Comunicação",
+            "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+          );
         }
       };
 
