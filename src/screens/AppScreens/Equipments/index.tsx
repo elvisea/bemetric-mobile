@@ -52,7 +52,7 @@ export function Equipments() {
         const data = {
           localDashboard: 3,
           codigoUsuario: user.codigoUsuario,
-          codigoCliente: user.codigoCliente,
+          codigoCliente: customer.codigoCliente,
         };
 
         const response = await Promise.all([
