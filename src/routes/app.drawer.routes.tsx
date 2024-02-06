@@ -1,24 +1,84 @@
 import * as React from "react";
-import { StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
-import { RFValue } from "react-native-responsive-fontsize";
-import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { ChangeClient } from "@screens/AppScreens/ChangeClient";
-import { SupportService } from "@screens/AppScreens/SupportService";
-
-import { CustomDrawer } from "@components/CustomDrawer";
-import { IconMenuDrawer } from "@components/IconMenuDrawer";
+import * as Linking from "expo-linking";
 
 import { THEME } from "@theme/theme";
 
-import HomeStackRoutes from "./home.stack.routes";
+import { itemsDrawer } from "./constants";
 
-import AccountDetailsStackRoutes from "./Stacks/AccountDetailsStackRoutes";
+import { useCustomer } from "@hooks/customer";
+import { useAuth } from "@hooks/authentication";
+
+import { DrawerItem } from "@components/DrawerItem";
+import { DrawerList } from "@components/DrawerList";
+
+import { DrawerFooter } from "@components/DrawerFooter";
+import { DrawerContainer } from "@components/DrawerContainer";
 
 const { Navigator, Screen } = createDrawerNavigator();
+
+type Props = {
+  navigation: any;
+};
+
+const CustomDrawerContent: React.FC<Props> = ({ navigation }) => {
+  const { signOut } = useAuth();
+  const { resetCustomer, whatsapp } = useCustomer();
+
+  const handleLogout = async () => {
+    signOut();
+    resetCustomer();
+  };
+  return (
+    <DrawerContainer>
+      <DrawerList>
+        {itemsDrawer.map((item, index) => (
+          <DrawerItem
+            key={index}
+            icon={item.icon}
+            title={item.title}
+            onPress={() => navigation.navigate(item.name)}
+          />
+        ))}
+
+        <DrawerItem
+          title="WhatsApp"
+          onPress={() => {
+            Linking.openURL(`http://api.whatsapp.com/send?phone=${whatsapp}`);
+          }}
+          color={THEME.colors.white}
+          circle={THEME.colors.white}
+          background={THEME.colors.cyan[200]}
+          icon={
+            <MaterialCommunityIcons
+              name="whatsapp"
+              size={24}
+              color={THEME.colors.cyan[200]}
+            />
+          }
+        />
+
+        <DrawerItem
+          title="Sair"
+          onPress={handleLogout}
+          icon={
+            <MaterialCommunityIcons
+              name="logout"
+              size={18}
+              color={THEME.colors.white}
+            />
+          }
+        />
+      </DrawerList>
+
+      <DrawerFooter title="Versão 0.0" />
+    </DrawerContainer>
+  );
+};
 
 export default function AppDrawerRoutes() {
   return (
@@ -26,112 +86,16 @@ export default function AppDrawerRoutes() {
       <StatusBar />
 
       <Navigator
-        drawerContent={(props) => <CustomDrawer {...props} />}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={{
           headerShown: false,
           drawerStyle: { width: "90%" },
-          drawerContentStyle: styles.drawerContentStyle,
-          drawerLabelStyle: styles.drawerLabelStyle,
-          drawerItemStyle: styles.drawerItemStyle,
         }}
       >
-        <Screen
-          name="HomeTabRoutes"
-          component={HomeStackRoutes}
-          options={{
-            drawerLabel: "Início",
-            drawerIcon: () => (
-              <IconMenuDrawer
-                icon={
-                  <FontAwesome
-                    name="home"
-                    size={18}
-                    color={THEME.colors.white}
-                  />
-                }
-              />
-            ),
-          }}
-        />
-
-        <Screen
-          name="AccountDetailsStackRoutes"
-          component={AccountDetailsStackRoutes}
-          options={{
-            drawerLabel: "Detalhes da Conta",
-            drawerIcon: () => (
-              <IconMenuDrawer
-                icon={
-                  <FontAwesome
-                    name="user"
-                    size={18}
-                    color={THEME.colors.white}
-                  />
-                }
-              />
-            ),
-          }}
-        />
-
-        <Screen
-          name="ChangeClient"
-          component={ChangeClient}
-          options={{
-            drawerLabel: "Alterar Cliente",
-            drawerIcon: () => (
-              <IconMenuDrawer
-                icon={
-                  <FontAwesome
-                    name="users"
-                    size={18}
-                    color={THEME.colors.white}
-                  />
-                }
-              />
-            ),
-          }}
-        />
-
-        <Screen
-          name="SupportService"
-          component={SupportService}
-          options={{
-            drawerLabel: "Atendimento de Suporte",
-            drawerIcon: () => (
-              <IconMenuDrawer
-                icon={
-                  <MaterialIcons
-                    name="email"
-                    size={18}
-                    color={THEME.colors.white}
-                  />
-                }
-              />
-            ),
-          }}
-        />
+        {itemsDrawer.map((route, index) => (
+          <Screen key={index} name={route.name} component={route.component} />
+        ))}
       </Navigator>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  drawerContentStyle: {
-    backgroundColor: THEME.colors.blue[700],
-    paddingHorizontal: 16,
-  },
-
-  drawerItemStyle: {
-    backgroundColor: THEME.colors.white,
-    marginBottom: 16,
-    height: RFValue(54),
-    borderRadius: 28,
-    paddingHorizontal: 8,
-    justifyContent: "center",
-  },
-
-  drawerLabelStyle: {
-    color: THEME.colors.blue[700],
-    marginLeft: -20,
-  },
-});

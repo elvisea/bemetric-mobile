@@ -7,10 +7,18 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         customer: action.payload,
       };
+
     case "RESET_CUSTOMER":
       return {
         ...state,
         customer: null,
+        whatsapp: "",
+      };
+
+    case "SET_WHATSAPP":
+      return {
+        ...state,
+        whatsapp: action.payload,
       };
 
     default:
