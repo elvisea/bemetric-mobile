@@ -16,8 +16,6 @@ import { AccordionList } from "@components/Accordion/AccordionList";
 import { AccordionItem } from "@components/Accordion/AccordionItem";
 import { AccordionSession } from "@components/Accordion/AccordionSession";
 
-import axios from "axios";
-
 import api from "@services/api";
 
 import { THEME } from "@theme/theme";
@@ -25,12 +23,8 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
-import { IGrouping } from "@interfaces/IGrouping";
-
-type ICount = {
-  contadorEvento: number;
-  contadorMensagem: number;
-};
+import { initialState } from "./constants";
+import { transformCountData, transformGroupingData } from "./functions";
 
 export function Equipments() {
   const navigation = useNavigation();
@@ -38,44 +32,50 @@ export function Equipments() {
   const { user } = useAuth();
   const { customer } = useCustomer();
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [expanded, setExpanded] = useState("");
-
-  const [count, setCount] = useState<ICount>({
-    contadorEvento: 0,
-    contadorMensagem: 0,
-  });
-
-  const [groupings, setGroupings] = useState<IGrouping[]>([]);
+  const [state, setState] = useState(initialState);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 
-  const handleExpanded = (item: string) => {
-    if (item === expanded) setExpanded("");
-
-    if (item !== expanded) setExpanded(item);
+  const handleExpanded = (expand: string) => {
+    if (expand === state.expanded) {
+      setState((prevState) => ({ ...prevState, expanded: "" }));
+    } else {
+      setState((prevState) => ({ ...prevState, expanded: expand }));
+    }
   };
 
-  const fetchGroupings = async () => {
-    setIsLoading(true);
-
+  const fetchData = async () => {
     try {
       if (user && customer) {
-        const response = await api.post("Agrupamento/ObterLista", {
-          codigoUsuario: user.codigoUsuario,
-          codigoCliente: customer.codigoCliente,
-          localDashboard: 3,
-        });
+        setState((prevState) => ({ ...prevState, isLoading: true }));
 
-        if (typeof response.data !== "string") {
-          setGroupings(response.data);
-        }
+        const response = await Promise.all([
+          api.post("Agrupamento/ObterLista", {
+            codigoUsuario: user.codigoUsuario,
+            codigoCliente: customer.codigoCliente,
+            localDashboard: 3,
+          }),
+
+          api.post("/Dashboard/ObterListaIndicadores", {
+            localDashboard: 3,
+            codigoUsuario: user?.codigoUsuario,
+            codigoCliente: user?.codigoCliente,
+          }),
+        ]);
+
+        setState((prevState) => ({
+          ...prevState,
+          count: transformCountData(response[1].data),
+          groupings:
+            typeof response[0].data !== "string"
+              ? transformGroupingData(response[0].data)
+              : [],
+        }));
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(state.messages[0].title, state.messages[0].subtitle);
     } finally {
-      setIsLoading(false);
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
   };
 
@@ -83,38 +83,12 @@ export function Equipments() {
     useCallback(() => {
       let isActive = true;
 
-      if (isActive) fetchGroupings();
+      if (isActive) fetchData();
 
       return () => {
         isActive = false;
       };
     }, [customer]),
-  );
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await api.post("/Dashboard/ObterListaIndicadores", {
-        localDashboard: 3,
-        codigoUsuario: user?.codigoUsuario,
-        codigoCliente: user?.codigoCliente,
-      });
-
-      setCount(response.data);
-    } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      if (isActive) fetchNotifications();
-
-      return () => {
-        isActive = false;
-      };
-    }, []),
   );
 
   return (
@@ -123,7 +97,7 @@ export function Equipments() {
       firstIcon="menu"
       secondIcon="notifications-on"
       thirdIcon="message"
-      count={count}
+      count={state.count}
       handleFirstIcon={handleMenu}
       handleThirdIcon={() => navigation.navigate("Messages")}
       handleSecondIcon={() => navigation.navigate("Notifications")}
@@ -133,35 +107,35 @@ export function Equipments() {
           Grupos
         </Text>
 
-        {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+        {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-        {!isLoading && groupings.length > 0 && (
+        {!state.isLoading && state.groupings.length > 0 && (
           <FlatList
-            data={groupings}
-            keyExtractor={(item) => item.codigoAgrupamento.toString()}
+            data={state.groupings}
+            keyExtractor={(item) => item.key}
             style={{ width: "100%" }}
             showsVerticalScrollIndicator={false}
             renderItem={({ item: grouping }) => (
               <AccordionSession>
                 <AccordionList
-                  expanded={grouping.nomeAgrupamento === expanded}
-                  title={grouping.nomeAgrupamento}
-                  description={grouping.descricao}
-                  onPress={() => handleExpanded(grouping.nomeAgrupamento)}
+                  expanded={grouping.key === state.expanded}
+                  title={grouping.name}
+                  description={grouping.description}
+                  onPress={() => handleExpanded(grouping.key)}
                 />
 
-                {grouping.nomeAgrupamento === expanded &&
-                  grouping.listaEquipamentos.map((equipament) => (
+                {grouping.key === state.expanded &&
+                  grouping.equipments.map((equipament) => (
                     <AccordionItem
-                      key={equipament.codigoEquipamento}
-                      velocity={equipament.velocidade}
-                      title={equipament.nomeEquipamento}
-                      status={equipament.ligado ? "Ligado" : "Desligado"}
+                      key={equipament.key}
+                      velocity={equipament.speed}
+                      title={equipament.name}
+                      status={equipament.online ? "Ligado" : "Desligado"}
                       onPress={() =>
                         navigation.navigate("EquipmentDetails", {
                           screen: "Equipament",
                           params: {
-                            codigoEquipamento: equipament.codigoEquipamento,
+                            codigoEquipamento: equipament.code,
                           },
                         })
                       }

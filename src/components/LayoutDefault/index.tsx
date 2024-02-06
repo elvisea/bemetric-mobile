@@ -9,10 +9,7 @@ import { THEME } from "@theme/theme";
 
 import { BadgeCustom, Icon, ImageLogo } from "./styles";
 
-type ICount = {
-  contadorEvento: number;
-  contadorMensagem: number;
-};
+type Count = { events: number; messages: number };
 
 type Props = {
   bg: ColorSchemeType;
@@ -20,7 +17,7 @@ type Props = {
   secondIcon?: keyof typeof MaterialIcons.glyphMap;
   thirdIcon?: keyof typeof MaterialIcons.glyphMap;
 
-  count?: ICount;
+  count?: Count;
   children?: ReactNode;
   handleFirstIcon: () => void;
   handleSecondIcon?: () => void;
@@ -69,14 +66,14 @@ export function LayoutDefault({
           flexDirection="row"
           alignItems="center"
           justifyContent="center"
-          mr={count?.contadorMensagem !== 0 ? 3 : 0}
+          mr={count?.messages !== 0 ? 3 : 0}
         >
           {secondIcon && (
             <Box>
-              {count?.contadorEvento !== 0 && (
+              {count?.events !== 0 && (
                 <BadgeCustom>
                   <Text textAlign="center" fontSize={12} color="white">
-                    {count?.contadorEvento}
+                    {count?.events}
                   </Text>
                 </BadgeCustom>
               )}
@@ -89,10 +86,10 @@ export function LayoutDefault({
 
           {thirdIcon && (
             <VStack>
-              {count?.contadorMensagem !== 0 && (
+              {count?.messages !== 0 && (
                 <BadgeCustom>
                   <Text textAlign="center" fontSize={12} color="white">
-                    {count?.contadorMensagem}
+                    {count?.messages}
                   </Text>
                 </BadgeCustom>
               )}
