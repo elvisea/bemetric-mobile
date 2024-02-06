@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert } from "react-native";
+import { Alert, ScrollView } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { IconButton, Text, VStack } from "native-base";
@@ -82,7 +82,7 @@ function ChangePasswordScreen() {
       <VStack w="full" flex={1}>
         <HeaderDefault title="Alterar Senha" />
 
-        <VStack w="full" p="16px" flex={1}>
+        <ScrollView style={{ padding: 16 }}>
           <Text color="blue.700" fontSize="12px" fontFamily="Roboto_400Regular">
             Senha atual
           </Text>
@@ -188,7 +188,7 @@ function ChangePasswordScreen() {
               />
             )}
           />
-        </VStack>
+        </ScrollView>
       </VStack>
 
       <VStack

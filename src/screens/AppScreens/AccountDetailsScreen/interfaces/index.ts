@@ -1,8 +1,8 @@
-type TypeForm = {
+type Form = {
   name: string;
   email?: string;
-  celular?: string;
-  telefone?: string;
+  mobile?: string;
+  phone?: string;
 };
 
-export { TypeForm };
+export { Form };
