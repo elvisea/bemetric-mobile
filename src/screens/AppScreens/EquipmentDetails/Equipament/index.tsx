@@ -1,12 +1,11 @@
 import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-
-import axios from "axios";
 
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
+
 import { IconButton, ScrollView, Text, VStack } from "native-base";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
@@ -17,28 +16,49 @@ import IconSpeedometer from "@assets/speedometer.svg";
 
 import { formatHour } from "@utils/formatHours";
 
-import { IData } from "./interfaces/IData";
-import { IParams } from "../interfaces/IEquipamentDetails";
-import { IEquipmentDetails } from "./interfaces/IEquipamentDetails";
-
 import { Item } from "@components/Item";
-
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { RowInformation } from "@components/RowInformation";
 
+import { initialState } from "./constants";
+import { InputData, Params } from "./types";
+import { extractEquipmentData, transformData } from "./functions";
+
 export function Equipament() {
   const route = useRoute();
-  const { params } = route.params as IParams;
+  const { params } = route.params as Params;
 
   const { colors } = THEME;
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState(initialState);
 
-  const [data, setData] = useState<IData | null>(null);
-  const [equipment, setEquipment] = useState<IEquipmentDetails | null>(null);
+  const fetchData = async () => {
+    try {
+      const [resposta1, resposta2] = await Promise.all([
+        await api.post<InputData[]>("/Equipamento/ObterLista", {
+          codigoEquipamento: params.codigoEquipamento,
+        }),
 
-  async function getSnapshotData() {
+        await api.post("/Equipamento/DadosInstantaneosDispositivoTelemetria", {
+          codigoEquipamento: params.codigoEquipamento,
+        }),
+      ]);
+
+      setState((prevState) => ({
+        ...prevState,
+        data: transformData(resposta2.data),
+        equipment: extractEquipmentData(resposta1.data[0]),
+      }));
+
+    } catch (error) {
+      Alert.alert(state.messages[3].title, state.messages[0].subtitle);
+    } finally {
+      setState((prevState) => ({ ...prevState, isLoading: false }));
+    }
+  };
+
+  const getSnapshotData = async () => {
     try {
       const response = await api.post(
         "/Equipamento/DadosInstantaneosDispositivoTelemetria",
@@ -47,46 +67,21 @@ export function Equipament() {
         },
       );
 
-      setData(response.data);
+      setState((prevState) => ({
+        ...prevState,
+        data: transformData(response.data),
+      }));
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(state.messages[3].title, state.messages[0].subtitle);
+    } finally {
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
   }
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-
-      isActive && getSnapshotData();
-
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      async function fetchData() {
-        try {
-          setIsLoading(true);
-
-          const response = await api.post("/Equipamento/ObterLista", {
-            codigoEquipamento: params.codigoEquipamento,
-          });
-
-          if (isActive) setEquipment(response.data[0]);
-        } catch (error) {
-          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      fetchData();
-
+      isActive && fetchData();
       return () => {
         isActive = false;
       };
@@ -97,9 +92,9 @@ export function Equipament() {
     <VStack flex={1} width="full" bg={colors.shape}>
       <HeaderDefault title="Equipamento" />
 
-      {isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {!isLoading && (
+      {!state.isLoading && (
         <ScrollView
           flex={1}
           width="full"
@@ -109,45 +104,47 @@ export function Equipament() {
           <RowInformation
             mt={16}
             primaryTitle="Nome do equipamento"
-            primaryDescription={equipment ? equipment.nomeEquipamento : "-"}
+            primaryDescription={state.equipment ? state.equipment.name : "-"}
           />
 
           <RowInformation
             mt={12}
             primaryTitle="Nome do Cliente"
-            primaryDescription={equipment ? equipment.nomeCliente : "-"}
+            primaryDescription={state.equipment ? state.equipment.client : "-"}
           />
 
           <RowInformation
             mt={12}
             primaryTitle="Agrupamento"
-            primaryDescription={equipment ? equipment.nomeEquipamento : "-"}
+            primaryDescription={state.equipment ? state.equipment.name : "-"}
           />
 
           <RowInformation
             mt={12}
             primaryTitle="Tipo"
-            primaryDescription={equipment ? equipment.tipoEquipamento : "-"}
+            primaryDescription={state.equipment ? state.equipment.type : "-"}
             secondaryTitle="Data de aquisição"
             secondaryDescription={
-              equipment ? equipment.dataAquisicaoFormatado : "-"
+              state.equipment ? state.equipment.acquisition : "-"
             }
           />
 
           <RowInformation
             mt={12}
             primaryTitle="Placa"
-            primaryDescription={equipment ? equipment.placa : "-"}
+            primaryDescription={state.equipment ? state.equipment.plate : "-"}
             secondaryTitle="Identificador"
-            secondaryDescription={equipment ? equipment.identificador : "-"}
+            secondaryDescription={
+              state.equipment ? state.equipment.identifier : "-"
+            }
           />
 
           <RowInformation
             mt={12}
             primaryTitle="Modelo"
-            primaryDescription={equipment ? equipment.modelo : "-"}
+            primaryDescription={state.equipment ? state.equipment.model : "-"}
             secondaryTitle="Ano"
-            secondaryDescription={equipment ? equipment.ano : "-"}
+            secondaryDescription={state.equipment ? state.equipment.year : "-"}
           />
 
           <RowInformation
@@ -155,11 +152,15 @@ export function Equipament() {
             mb={16}
             primaryTitle="Horímetro inicial"
             primaryDescription={
-              equipment ? `${equipment.horimetroIncial.toString()} horas` : "-"
+              state.equipment
+                ? `${state.equipment.initial.hourmeter.toString()} horas`
+                : "-"
             }
             secondaryTitle="Hodômetro inicial"
             secondaryDescription={
-              equipment ? `${equipment.hodometroIncial.toString()} km` : ""
+              state.equipment
+                ? `${state.equipment.initial.odometer.toString()} km`
+                : ""
             }
           />
 
@@ -188,7 +189,7 @@ export function Equipament() {
               fontFamily="Roboto_400Regular"
               isTruncated
             >
-              {data ? `${data.velocimetro} Km/h` : ""}
+              {state.data ? `${state.data.speedometer} Km/h` : ""}
             </Text>
           </Item>
 
@@ -203,7 +204,11 @@ export function Equipament() {
               fontFamily="Roboto_400Regular"
               isTruncated
             >
-              {data ? (data.status === 1 ? "Ligado" : "Desligado") : ""}
+              {state.data
+                ? state.data.status === 1
+                  ? "Ligado"
+                  : "Desligado"
+                : ""}
             </Text>
           </Item>
 
@@ -214,7 +219,7 @@ export function Equipament() {
               fontFamily="Roboto_400Regular"
               isTruncated
             >
-              {data ? formatHour(data.horimetroFormatado) : ""}
+              {state.data ? formatHour(state.data.hourmeterFormatted) : ""}
             </Text>
           </Item>
 
@@ -231,7 +236,7 @@ export function Equipament() {
               fontFamily="Roboto_400Regular"
               isTruncated
             >
-              {data ? `${data.hodometro} km` : ""}
+              {state.data ? `${state.data.hourmeter} km` : ""}
             </Text>
           </Item>
         </ScrollView>
