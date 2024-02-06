@@ -10,7 +10,6 @@ import {
 
 import { FontAwesome } from "@expo/vector-icons";
 
-import axios from "axios";
 import { RFValue } from "react-native-responsive-fontsize";
 
 import api from "@services/api";
@@ -45,8 +44,8 @@ export function Change() {
   };
 
   const closeModal = () => {
-    setState((prevState) => ({ ...prevState, isOpenModal: false }))
-  }
+    setState((prevState) => ({ ...prevState, isOpenModal: false }));
+  };
 
   const unlinkEquipment = async () => {
     try {
