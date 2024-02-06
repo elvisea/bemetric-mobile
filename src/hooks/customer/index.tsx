@@ -1,5 +1,7 @@
+import { Alert } from "react-native";
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 
+import api from "@services/api";
 import { ICustomer } from "@interfaces/ICustomer";
 
 import { reducer } from "./reducer";
@@ -14,6 +16,7 @@ import {
 
 export const CustomerContext = createContext<CustomerContextData>({
   customer: null,
+  whatsapp: "",
   addCustomer: async () => {},
   resetCustomer: async () => {},
 });
@@ -38,6 +41,32 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
     }
   };
 
+  const getWhatsApp = async () => {
+    try {
+      const response = await api.post("/ContatosParceiro/ObterListaSuporte", {
+        codigoCliente: state.customer?.codigoCliente,
+      });
+
+      dispatch({ type: "SET_WHATSAPP", payload: response.data });
+    } catch (error) {
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (isActive) getWhatsApp();
+
+    return () => {
+      isActive = false;
+    };
+  }, [state.customer]);
+
   useEffect(() => {
     loadCustomerFromStorage();
   }, []);
@@ -46,6 +75,7 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
     <CustomerContext.Provider
       value={{
         customer: state.customer,
+        whatsapp: state.whatsapp,
         addCustomer,
         resetCustomer,
       }}
