@@ -50,7 +50,6 @@ export function Equipament() {
         data: transformData(resposta2.data),
         equipment: extractEquipmentData(resposta1.data[0]),
       }));
-
     } catch (error) {
       Alert.alert(state.messages[3].title, state.messages[0].subtitle);
     } finally {
@@ -76,7 +75,7 @@ export function Equipament() {
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }
-  }
+  };
 
   useFocusEffect(
     useCallback(() => {
