@@ -49,18 +49,15 @@ export function Equipments() {
       if (user && customer) {
         setState((prevState) => ({ ...prevState, isLoading: true }));
 
-        const response = await Promise.all([
-          api.post("Agrupamento/ObterLista", {
-            codigoUsuario: user.codigoUsuario,
-            codigoCliente: customer.codigoCliente,
-            localDashboard: 3,
-          }),
+        const data = {
+          localDashboard: 3,
+          codigoUsuario: user.codigoUsuario,
+          codigoCliente: user.codigoCliente,
+        };
 
-          api.post("/Dashboard/ObterListaIndicadores", {
-            localDashboard: 3,
-            codigoUsuario: user?.codigoUsuario,
-            codigoCliente: user?.codigoCliente,
-          }),
+        const response = await Promise.all([
+          api.post("Agrupamento/ObterLista", data),
+          api.post("/Dashboard/ObterListaIndicadores", data),
         ]);
 
         setState((prevState) => ({

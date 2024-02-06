@@ -12,8 +12,8 @@ import Logo from "@assets/logo.svg";
 import api from "@services/api";
 import { useAuth } from "@hooks/authentication";
 
-import { TypeForm } from "./types";
-import { responses, schema } from "./constants";
+import { Form } from "./types";
+import { initialState, schema } from "./constants";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
@@ -22,49 +22,46 @@ import { ButtonFull } from "@components/ButtonFull";
 export function SignInScreen() {
   const navigation = useNavigation();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState(initialState);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<TypeForm>({
+  } = useForm<Form>({
     resolver: yupResolver(schema),
   });
 
   const { signIn } = useAuth();
 
-  const handleLogin = async ({ email, password }: TypeForm) => {
+  const handleLogin = async ({ email, password }: Form) => {
     try {
-      setIsLoading(true);
+      setState((prevState) => ({ ...prevState, isLoading: true }));
 
-      const response = await api.post("/Usuario/ValidarLogin", {
+      const data = {
         email,
         senha: password,
         tipoAplicacao: 1,
-      });
+      };
+
+      const response = await api.post("/Usuario/ValidarLogin", data);
 
       if (response.data.erro === 0) {
         await signIn(response.data);
-      }
-
-      if (response.data.erro === 5) {
+      } else if (response.data.erro === 5) {
         navigation.navigate("TemporaryPasswordScreen", { email, password });
-      }
-
-      if (response.data.erro !== 0 || 5) {
-        Alert.alert(
-          responses[response.data.erro].title,
-          responses[response.data.erro].subtitle,
-        );
+      } else {
+        const message = state.messages[response.data.erro];
+        if (message) {
+          Alert.alert(message.title, message.subtitle);
+        } else {
+          Alert.alert(state.messages[5].title, state.messages[5].subtitle);
+        }
       }
     } catch (error) {
-      Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
-      );
+      Alert.alert(state.messages[6].title, state.messages[6].subtitle);
     } finally {
-      setIsLoading(false);
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
   };
 
@@ -75,10 +72,7 @@ export function SignInScreen() {
       const response = await api.get("setup/DateTime");
       console.log(response.data);
     } catch (error) {
-      Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
-      );
+      Alert.alert(state.messages[6].title, state.messages[6].subtitle);
     }
   }
 
@@ -131,7 +125,7 @@ export function SignInScreen() {
           mt={8}
           w={188}
           h={52}
-          isLoading={isLoading}
+          isLoading={state.isLoading}
           onPress={handleSubmit(handleLogin)}
         />
 
