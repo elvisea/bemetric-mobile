@@ -1,9 +1,15 @@
 import * as yup from "yup";
 
 const schema = yup.object({
-  name: yup.string().required("Informe seu email."),
-  celular: yup.string().optional(),
-  telefone: yup.string().optional(),
+  name: yup
+    .string()
+    .required("O campo 'Nome' é obrigatório. Insira seu nome completo."),
+  mobile: yup
+    .string()
+    .required("O campo 'Celular' é obrigatório. Insira seu Celular."),
+  phone: yup
+    .string()
+    .required("O campo 'Telefone' é obrigatório. Insira seu telefone."),
 });
 
 const messages: { [index: number]: { title: string; subtitle: string } } = {

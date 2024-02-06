@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert } from "react-native";
+import { Alert, ScrollView } from "react-native";
 import { Text, VStack, Button as ButtonNativeBase } from "native-base";
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 
@@ -15,13 +15,21 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 
-import { TypeForm } from "./interfaces";
+import { Form } from "./interfaces";
 import { messages, schema } from "./constants";
 
 export function AccountDetailsScreen() {
-  const { user, fetchDataUser } = useAuth();
   const { colors } = THEME;
+
   const navigation = useNavigation();
+  const { user, fetchDataUser } = useAuth();
+
+  const defaultValues = {
+    name: user?.nomeUsuario ? user?.nomeUsuario : "",
+    email: user?.email ? user?.email : "",
+    mobile: user?.celular ? user?.celular : "",
+    phone: user?.telefone ? user?.telefone : "",
+  };
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,25 +39,20 @@ export function AccountDetailsScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<TypeForm>({
-    defaultValues: {
-      name: user?.nomeUsuario,
-      email: user?.email,
-      celular: user?.celular,
-      telefone: user?.telefone,
-    },
+  } = useForm<Form>({
+    defaultValues: defaultValues,
     resolver: yupResolver(schema),
   });
 
-  const handleUpdateUser = async ({ name, celular, telefone }: TypeForm) => {
+  const handleUpdateUser = async ({ name, mobile, phone }: Form) => {
     try {
       setIsLoading(true);
 
       const data = {
         codigoUsuario: user?.codigoUsuario,
         nomeUsuario: name,
-        telefone: telefone,
-        celular: celular,
+        telefone: phone,
+        celular: mobile,
       };
 
       const response = await api.post("Usuario/AlterarUsuarioApp", data);
@@ -82,7 +85,7 @@ export function AccountDetailsScreen() {
       <VStack w="full" flex={1}>
         <HeaderDefault title="Detalhes da Conta" />
 
-        <VStack w="full" p="16px" flex={1}>
+        <ScrollView style={{ padding: 16 }}>
           <Text color="blue.700" fontSize="12px" fontFamily="Roboto_400Regular">
             Nome
           </Text>
@@ -138,7 +141,7 @@ export function AccountDetailsScreen() {
 
           <Controller
             control={control}
-            name="celular"
+            name="mobile"
             render={({ field: { onChange, value } }) => (
               <Input
                 color="#000"
@@ -146,7 +149,8 @@ export function AccountDetailsScreen() {
                 borderBottomColor={colors.blue[700]}
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.celular?.message}
+                keyboardType="numeric"
+                errorMessage={errors.mobile?.message}
               />
             )}
           />
@@ -162,7 +166,7 @@ export function AccountDetailsScreen() {
 
           <Controller
             control={control}
-            name="telefone"
+            name="phone"
             render={({ field: { onChange, value } }) => (
               <Input
                 color="#000"
@@ -170,7 +174,8 @@ export function AccountDetailsScreen() {
                 borderBottomColor={colors.blue[700]}
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.telefone?.message}
+                keyboardType="numeric"
+                errorMessage={errors.phone?.message}
               />
             )}
           />
@@ -184,7 +189,7 @@ export function AccountDetailsScreen() {
               Alterar Senha
             </Text>
           </ButtonNativeBase>
-        </VStack>
+        </ScrollView>
       </VStack>
 
       <VStack w="full" pb="16px" paddingX="16px">
