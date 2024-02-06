@@ -78,7 +78,10 @@ export function VerifyTokenScreen() {
         );
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar criar conta:", `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsSending(false);
     }

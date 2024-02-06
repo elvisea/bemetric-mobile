@@ -44,7 +44,10 @@ export function SendEmailScreen() {
         Alert.alert(response[data].title, response[data].subtitle);
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar redefinir senha!", `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }

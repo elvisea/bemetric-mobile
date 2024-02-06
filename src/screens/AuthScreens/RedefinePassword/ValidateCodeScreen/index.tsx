@@ -60,7 +60,10 @@ export function ValidateCodeScreen() {
         );
       }
     } catch (error) {
-      Alert.alert("Erro ao tentar criar conta", `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsSending(false);
     }
@@ -83,8 +86,8 @@ export function ValidateCodeScreen() {
       }
     } catch (error) {
       Alert.alert(
-        "Não foi possível reenviar o código!",
-        "Não foi possível reenviar o código. Tente novamente mais tarde.",
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
       );
     } finally {
       setIsResending(false);
