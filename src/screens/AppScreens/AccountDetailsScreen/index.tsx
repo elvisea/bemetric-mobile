@@ -16,7 +16,7 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 
 import { TypeForm } from "./interfaces";
-import { responses, schema } from "./constants";
+import { messages, schema } from "./constants";
 
 export function AccountDetailsScreen() {
   const { user, fetchDataUser } = useAuth();
@@ -56,9 +56,18 @@ export function AccountDetailsScreen() {
 
       if (response.status === 200) fetchDataUser();
 
-      Alert.alert(responses[response.data], responses[response.data]);
+      const message = messages[response.data];
+
+      if (message) {
+        Alert.alert(
+          messages[response.data].title,
+          messages[response.data].subtitle,
+        );
+      } else {
+        Alert.alert(messages[4].title, messages[4].subtitle);
+      }
     } catch (error) {
-      Alert.alert(`${error}`, `${error}`);
+      Alert.alert(messages[3].title, messages[3].subtitle);
     } finally {
       setIsLoading(false);
     }

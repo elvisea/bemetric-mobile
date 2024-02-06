@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { TypeResponses } from "../types";
+import { Messages } from "../types";
 
 const schema = yup.object({
   email: yup.string().required("Informe seu e-mail.").email("E-mail inválido"),
@@ -9,7 +9,7 @@ const schema = yup.object({
     .min(6, "A senha deve ter pelo menos 6 dígitos."),
 });
 
-const responses: TypeResponses = {
+const messages: Messages = {
   1: {
     title: "Erro ao tentar fazer login.",
     subtitle: "Email do login não cadastrado. Tente novamente.",
@@ -26,6 +26,20 @@ const responses: TypeResponses = {
     title: "Erro ao tentar fazer login.",
     subtitle: "Email ou Senha inválida. Tente novamente.",
   },
+  5: {
+    title: "Erro desconhecido",
+    subtitle: "Ocorreu um erro desconhecido. Tente novamente mais tarde.",
+  },
+  6: {
+    title: "Erro de Comunicação",
+    subtitle:
+      "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+  },
 };
 
-export { schema, responses };
+const initialState = {
+  isLoading: false,
+  messages,
+};
+
+export { schema, initialState };

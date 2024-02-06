@@ -1,5 +1,5 @@
-type TypeForm = { email: string; password: string };
+type Form = { email: string; password: string };
 
-type TypeResponses = { [key: number]: { title: string; subtitle: string } };
+type Messages = { [key: number]: { title: string; subtitle: string } };
 
-export { TypeForm, TypeResponses };
+export { Form, Messages };
