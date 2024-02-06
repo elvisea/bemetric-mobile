@@ -1,5 +1,5 @@
-import { Alert, StyleSheet, TextInput, View } from "react-native";
 import React, { useCallback, useState } from "react";
+import { Alert, StyleSheet, TextInput, View } from "react-native";
 
 import {
   useFocusEffect,
@@ -7,7 +7,6 @@ import {
   useRoute,
 } from "@react-navigation/native";
 
-import axios from "axios";
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
 
@@ -71,7 +70,10 @@ export function UpdateGeofences() {
         }
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 
@@ -123,7 +125,10 @@ export function UpdateGeofences() {
         setIsOpenModal(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 
@@ -161,7 +166,10 @@ export function UpdateGeofences() {
       setDelta(calculateDelta(coordinates));
       setInitialRegion(calculateInitialRegion(coordinates));
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }

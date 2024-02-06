@@ -10,8 +10,6 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import axios from "axios";
-
 import * as Linking from "expo-linking";
 
 import api from "@services/api";
@@ -44,7 +42,10 @@ const CustomDrawer = (props: any) => {
 
       setWhatsApp(response.data[0].whatsapp);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
     }
   };

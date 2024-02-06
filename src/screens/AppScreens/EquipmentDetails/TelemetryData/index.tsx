@@ -8,8 +8,6 @@ import {
   useRoute,
 } from "@react-navigation/native";
 
-import axios from "axios";
-
 import {
   subDays,
   format,
@@ -150,7 +148,10 @@ export function TelemetryData() {
       setData(response.data);
       setIsOpenModal(false);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }

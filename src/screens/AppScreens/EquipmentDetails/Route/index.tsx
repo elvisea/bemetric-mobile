@@ -1,7 +1,6 @@
 import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 
-import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { IconButton, VStack } from "native-base";
 import MapView, { Marker } from "react-native-maps";
@@ -68,7 +67,10 @@ export function Route() {
         );
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }

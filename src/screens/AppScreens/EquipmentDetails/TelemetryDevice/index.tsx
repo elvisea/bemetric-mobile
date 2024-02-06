@@ -7,7 +7,6 @@ import {
   useRoute,
 } from "@react-navigation/native";
 
-import axios from "axios";
 import { BleError } from "react-native-ble-plx";
 
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -275,7 +274,10 @@ export function TelemetryDevice() {
             }));
           }
         } catch (error) {
-          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+          Alert.alert(
+            "Erro de Comunicação",
+            "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+          );
         } finally {
           setState((previousState) => ({ ...previousState, isLoading: false }));
         }

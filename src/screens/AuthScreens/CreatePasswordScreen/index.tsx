@@ -2,8 +2,6 @@ import { Alert } from "react-native";
 import React, { useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import axios from "axios";
-
 import { Box } from "native-base";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -62,7 +60,10 @@ export function CreatePasswordScreen() {
         });
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }

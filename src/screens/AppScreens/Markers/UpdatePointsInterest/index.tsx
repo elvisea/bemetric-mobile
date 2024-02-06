@@ -7,7 +7,6 @@ import {
   useRoute,
 } from "@react-navigation/native";
 
-import axios from "axios";
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
@@ -82,7 +81,10 @@ export function UpdatePointsInterest() {
         }
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 
@@ -157,7 +159,10 @@ export function UpdatePointsInterest() {
         setIsOpenModal(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 
@@ -181,7 +186,10 @@ export function UpdatePointsInterest() {
 
       setPointInterest(data[0]);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }

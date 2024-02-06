@@ -4,7 +4,6 @@ import { Feather, Entypo } from "@expo/vector-icons";
 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
-import axios from "axios";
 import { IconButton } from "native-base";
 
 import api from "@services/api";
@@ -52,7 +51,10 @@ export function Geofences() {
             }
           }
         } catch (error) {
-          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+          Alert.alert(
+            "Erro de Comunicação",
+            "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+          );
         } finally {
           setIsLoading(false);
         }

@@ -1,6 +1,5 @@
 import React, { useEffect, useContext, useReducer, createContext } from "react";
 
-import axios from "axios";
 import { Alert } from "react-native";
 
 import api from "@services/api";
@@ -61,7 +60,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
       dispatch({ type: "SIGN_IN", payload: response.data[0] });
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 

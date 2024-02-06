@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 
-import axios from "axios";
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
 import { IconButton, Text, VStack } from "native-base";
@@ -122,7 +121,10 @@ export function CreateGeofence() {
         setIsOpenModal(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 

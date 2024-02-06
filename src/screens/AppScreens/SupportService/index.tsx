@@ -1,7 +1,6 @@
 import { Alert } from "react-native";
 import { useCallback, useState } from "react";
 
-import axios from "axios";
 import { Box, Text, VStack } from "native-base";
 
 import {
@@ -37,7 +36,10 @@ export function SupportService() {
 
       setContact(response.data[0]);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
     }
   };
