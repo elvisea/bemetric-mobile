@@ -2,7 +2,6 @@ import { Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import axios from "axios";
 import { Text, VStack } from "native-base";
 
 import {
@@ -119,7 +118,10 @@ export function ChartTelemetryData() {
 
           isActive && setChart(formatDataForChart(response.data));
         } catch (error) {
-          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+          Alert.alert(
+            "Erro de Comunicação",
+            "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+          );
         }
       };
 

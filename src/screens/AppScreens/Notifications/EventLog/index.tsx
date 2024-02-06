@@ -2,7 +2,6 @@ import { Alert, ScrollView } from "react-native";
 import React, { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 
-import axios from "axios";
 import { HStack, Text } from "native-base";
 
 import {
@@ -181,7 +180,10 @@ export function EventLog() {
 
       setData(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
       setIsOpenPrimaryModal(false);
@@ -200,7 +202,10 @@ export function EventLog() {
       const response = await api.post("/Evento/ObterLista", data);
       setData(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -228,7 +233,10 @@ export function EventLog() {
           equipments: transformEquipmentsData(equipments.data),
         });
       } catch (error) {
-        if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+        Alert.alert(
+          "Erro de Comunicação",
+          "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        );
       }
     }
   };

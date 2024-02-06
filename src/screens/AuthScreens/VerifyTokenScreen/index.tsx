@@ -5,7 +5,6 @@ import { Alert, StyleSheet, ScrollView } from "react-native";
 import { Box, Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import axios from "axios";
 import { RFValue } from "react-native-responsive-fontsize";
 
 import { useForm, Controller } from "react-hook-form";
@@ -100,7 +99,10 @@ export function VerifyTokenScreen() {
         );
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsResending(false);
     }

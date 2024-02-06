@@ -3,8 +3,6 @@ import { Alert, ScrollView, StyleSheet, View, Dimensions } from "react-native";
 
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import axios from "axios";
-
 import { RFValue } from "react-native-responsive-fontsize";
 import MapView, { Marker, Polygon, Circle } from "react-native-maps";
 
@@ -81,7 +79,10 @@ export default function DetailingDoisStackRoutes() {
       const response = await api.post("/Evento/DetalharEvento", data);
       setData(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   }
 

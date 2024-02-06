@@ -10,7 +10,6 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ScrollView, Select, Text, VStack } from "native-base";
@@ -112,9 +111,10 @@ export function AddEquipment() {
 
       setData({ agrupamentos, equipamentos });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        Alert.alert(`${error}`, `${error}`);
-      }
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 
@@ -209,9 +209,10 @@ export function AddEquipment() {
         );
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        Alert.alert(`${error.message}`, `${error.message}`);
-      }
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   }
 

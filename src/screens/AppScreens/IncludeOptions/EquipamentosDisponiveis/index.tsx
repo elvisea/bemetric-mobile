@@ -8,8 +8,6 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import axios from "axios";
-
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
@@ -38,7 +36,8 @@ export function EquipamentosDisponiveis() {
   const params = route.params as { chave: string };
 
   const [equipmentList, setEquipmentList] = useState<TypeEquipment[]>([]);
-  const [selectedEquipment, setSelectedEquipment] = useState<TypeEquipment | null>(null);
+  const [selectedEquipment, setSelectedEquipment] =
+    useState<TypeEquipment | null>(null);
 
   const handleMenu = () => dispatch(DrawerActions.openDrawer());
 
@@ -104,7 +103,10 @@ export function EquipamentosDisponiveis() {
           );
         }
       } catch (error) {
-        if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+        Alert.alert(
+          "Erro de Comunicação",
+          "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        );
       }
     }
   }
@@ -120,7 +122,10 @@ export function EquipamentosDisponiveis() {
 
       setEquipmentList(adicionarChaveParaCadaEquipamento(response.data));
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 

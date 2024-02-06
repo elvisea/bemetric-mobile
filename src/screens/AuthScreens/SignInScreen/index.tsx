@@ -4,7 +4,6 @@ import { Alert, TouchableOpacity } from "react-native";
 import { Box, Heading, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -60,7 +59,10 @@ export function SignInScreen() {
         );
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +75,10 @@ export function SignInScreen() {
       const response = await api.get("setup/DateTime");
       console.log(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   }
 

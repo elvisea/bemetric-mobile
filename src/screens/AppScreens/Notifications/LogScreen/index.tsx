@@ -2,7 +2,6 @@ import React, { useCallback, useState } from "react";
 import { Alert, FlatList, ScrollView } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
-import axios from "axios";
 import { HStack, Text } from "native-base";
 
 import { RFValue } from "react-native-responsive-fontsize";
@@ -189,7 +188,10 @@ export function LogScreen() {
 
       setData(response.data.listaEventos);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
       setIsOpenPrimaryModal(false);
@@ -219,9 +221,10 @@ export function LogScreen() {
           equipments: transformEquipmentsData(equipments.data),
         });
       } catch (error) {
-        console.log(error);
-
-        if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+        Alert.alert(
+          "Erro de Comunicação",
+          "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        );
       }
     }
   };
@@ -238,7 +241,10 @@ export function LogScreen() {
 
       setData(response.data.listaEventos);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 

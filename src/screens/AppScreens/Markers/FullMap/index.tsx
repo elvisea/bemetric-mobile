@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Alert, FlatList } from "react-native";
 
-import axios from "axios";
 import MapView, { Circle, Marker, Polygon } from "react-native-maps";
 
 import { HStack, IconButton, VStack } from "native-base";
@@ -287,7 +286,10 @@ export function FullMap() {
             }
           }
         } catch (error) {
-          if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+          Alert.alert(
+            "Erro de Comunicação",
+            "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+          );
         } finally {
           setIsLoading(false);
         }

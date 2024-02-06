@@ -8,7 +8,6 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import axios from "axios";
 import { Text, VStack } from "native-base";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -126,7 +125,10 @@ export function VincularDispositivo() {
       }
     } catch (error) {
       setIsLoading(false);
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     }
   };
 

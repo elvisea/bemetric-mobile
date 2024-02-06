@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Alert, StyleSheet } from "react-native";
 
-import axios from "axios";
 import WebView from "react-native-webview";
 import { Text, VStack } from "native-base";
 
@@ -43,7 +42,10 @@ export function MessageDetails() {
         codigoCliente: customer?.codigoCliente,
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
     }
   }
@@ -57,7 +59,10 @@ export function MessageDetails() {
 
       setMessage(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
     }
   }

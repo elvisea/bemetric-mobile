@@ -4,7 +4,6 @@ import { Alert } from "react-native";
 import { Box } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
-import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -45,7 +44,10 @@ export function NameAndEmailScreen() {
         Alert.alert("Email já cadastrado!", "Email já cadastrado!");
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(`${error}`, `${error}`);
+      Alert.alert(
+        "Erro de Comunicação",
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+      );
     } finally {
       setIsLoading(false);
     }
