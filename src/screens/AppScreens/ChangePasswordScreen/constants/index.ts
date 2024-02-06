@@ -1,12 +1,5 @@
 import * as yup from "yup";
-
-const responses: { [index: number]: string } = {
-  0: "Senha Alterada com sucesso",
-  1: "Senha ou Nova Senha não informados",
-  2: "Senha e Nova senha são iguais",
-  3: "Senha Atual informada é inválida",
-  4: "Erro na alteração da senha atual",
-};
+import { Message } from "../types";
 
 const schema = yup.object({
   newPassword: yup
@@ -26,4 +19,39 @@ const schema = yup.object({
     ),
 });
 
-export { responses, schema };
+const messages: Message = {
+  0: {
+    title: "Senha Alterada com sucesso",
+    subtitle: "Você pode agora fazer login com a nova senha.",
+  },
+  1: {
+    title: "Senha ou Nova Senha não informados",
+    subtitle: "Por favor, preencha todos os campos obrigatórios.",
+  },
+  2: {
+    title: "Senha e Nova senha são iguais",
+    subtitle: "A nova senha deve ser diferente da senha atual.",
+  },
+  3: {
+    title: "Senha Atual informada é inválida",
+    subtitle: "Verifique se a senha atual está correta e tente novamente.",
+  },
+  4: {
+    title: "Erro na alteração da senha atual",
+    subtitle:
+      "Não foi possível processar a mudança. Tente novamente mais tarde.",
+  },
+  5: {
+    title: "Erro de Comunicação",
+    subtitle:
+      "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+  },
+};
+
+const initialState = {
+  isVisible: false,
+  isLoading: false,
+  messages,
+};
+
+export { schema, initialState };

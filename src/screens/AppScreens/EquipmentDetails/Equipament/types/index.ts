@@ -36,7 +36,7 @@ type Params = {
   params: {
     codigoEquipamento: number;
   };
-}
+};
 
 type DataReceived = {
   hodometro: number;
@@ -61,4 +61,12 @@ type State = {
   messages: Message;
 };
 
-export { Message, State, Equipment, InputData, DataReceived, TransformedData, Params };
+export {
+  Message,
+  State,
+  Equipment,
+  InputData,
+  DataReceived,
+  TransformedData,
+  Params,
+};
