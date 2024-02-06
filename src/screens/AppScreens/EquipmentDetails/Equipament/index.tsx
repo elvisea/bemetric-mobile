@@ -35,7 +35,9 @@ export function Equipament() {
 
   const fetchData = async () => {
     try {
-      const [resposta1, resposta2] = await Promise.all([
+      setState((prevState) => ({ ...prevState, isLoading: true }));
+
+      const response = await Promise.all([
         await api.post<InputData[]>("/Equipamento/ObterLista", {
           codigoEquipamento: params.codigoEquipamento,
         }),
@@ -47,8 +49,8 @@ export function Equipament() {
 
       setState((prevState) => ({
         ...prevState,
-        data: transformData(resposta2.data),
-        equipment: extractEquipmentData(resposta1.data[0]),
+        data: transformData(response[1].data),
+        equipment: extractEquipmentData(response[0].data[0]),
       }));
     } catch (error) {
       Alert.alert(state.messages[3].title, state.messages[0].subtitle);
