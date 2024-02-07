@@ -1,6 +1,8 @@
 import { Alert } from "react-native";
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 
+import { useAuth } from "@hooks/authentication";
+
 import api from "@services/api";
 import { ICustomer } from "@interfaces/ICustomer";
 
@@ -22,11 +24,15 @@ export const CustomerContext = createContext<CustomerContextData>({
 });
 
 const CustomerProvider = ({ children }: CustomerProviderProps) => {
+  const { isAuthenticated } = useAuth();
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const addCustomer = async (customer: ICustomer) => {
     dispatch({ type: "SET_CUSTOMER", payload: customer });
     await storageCustomerSave(customer);
+
+    await getWhatsApp(customer.codigoCliente);
   };
 
   const resetCustomer = async () => {
@@ -38,13 +44,15 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
     const customerFromStorage = await storageCustomerGet();
     if (customerFromStorage) {
       dispatch({ type: "SET_CUSTOMER", payload: customerFromStorage });
+
+      await getWhatsApp(customerFromStorage.codigoCliente);
     }
   };
 
-  const getWhatsApp = async () => {
+  const getWhatsApp = async (code: number) => {
     try {
       const response = await api.post("/ContatosParceiro/ObterListaSuporte", {
-        codigoCliente: state.customer?.codigoCliente,
+        codigoCliente: code,
       });
 
       dispatch({ type: "SET_WHATSAPP", payload: response.data });
@@ -53,23 +61,12 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
         "Erro de Comunicação",
         "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
       );
-    } finally {
     }
   };
 
   useEffect(() => {
-    let isActive = true;
-
-    if (isActive) getWhatsApp();
-
-    return () => {
-      isActive = false;
-    };
-  }, [state.customer]);
-
-  useEffect(() => {
-    loadCustomerFromStorage();
-  }, []);
+    if (isAuthenticated) loadCustomerFromStorage();
+  }, [isAuthenticated]);
 
   return (
     <CustomerContext.Provider
