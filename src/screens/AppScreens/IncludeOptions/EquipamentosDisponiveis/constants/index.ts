@@ -1,6 +1,6 @@
-import { IResponse } from "@interfaces/IResponse";
+import { Messages } from "@typings/index";
 
-const response: IResponse = {
+const response: Messages = {
   0: {
     title: "Equipamento cadastrado com sucesso.",
     subtitle: "Mostrar equipamentos.",

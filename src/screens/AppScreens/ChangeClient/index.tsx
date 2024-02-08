@@ -17,10 +17,10 @@ import { LayoutDefault } from "@components/LayoutDefault";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-import { useAuth } from "@hooks/authentication";
-import { useCustomer } from "@hooks/customer";
+import { Customer } from "@typings/index";
 
-import { ICustomer } from "@interfaces/ICustomer";
+import { useCustomer } from "@hooks/customer";
+import { useAuth } from "@hooks/authentication";
 
 export function ChangeClient() {
   const { user } = useAuth();
@@ -28,8 +28,8 @@ export function ChangeClient() {
 
   const navigation = useNavigation();
 
-  const [selected, setSelected] = useState<ICustomer | null>(null);
-  const [customers, setCustomers] = useState<ICustomer[]>([] as ICustomer[]);
+  const [selected, setSelected] = useState<Customer | null>(null);
+  const [customers, setCustomers] = useState<Customer[]>([] as Customer[]);
 
   const handleMenu = () => navigation.dispatch(DrawerActions.openDrawer());
 

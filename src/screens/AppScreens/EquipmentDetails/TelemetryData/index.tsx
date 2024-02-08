@@ -39,11 +39,11 @@ import { IParams } from "../interfaces/IEquipamentDetails";
 import { IList, ITelemetryData } from "./interfaces/TelemetryData";
 
 import { Icon } from "./styles";
-import { THEME } from "@theme/theme";
+import { url } from "./constants";
 
+import { THEME } from "@theme/theme";
 import { formatHours } from "@utils/formatHours";
 
-import { url } from "@constants/url";
 import { date } from "@constants/date";
 import { dateOptions } from "@constants/dateOptions";
 

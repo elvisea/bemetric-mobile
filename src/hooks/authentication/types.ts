@@ -1,30 +1,29 @@
 import { ReactNode } from "react";
-
-import { IUser } from "@interfaces/IUser";
+import { User } from "@typings/index";
 
 type AuthProviderProps = {
   children: ReactNode;
 };
 
 type AuthContextData = {
-  user: IUser | null;
+  user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
 
-  signIn: (data: IUser) => Promise<void>;
+  signIn: (data: User) => Promise<void>;
   signOut: () => Promise<void>;
 
   fetchDataUser: () => void;
 };
 
 type AuthState = {
-  user: IUser | null;
+  user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
 };
 
 type AuthAction =
-  | { type: "SIGN_IN"; payload: IUser }
+  | { type: "SIGN_IN"; payload: User }
   | { type: "SIGN_OUT" }
   | { type: "LOADING" };
 

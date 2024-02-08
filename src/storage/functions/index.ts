@@ -1,11 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { IUser } from "@interfaces/IUser";
-import { ICustomer } from "@interfaces/ICustomer";
+import { Customer, User } from "@typings/index";
 
 import { CUSTOMER, TOKEN, USER } from "@storage/constants";
 
-export async function storageUserSave(user: IUser) {
+export async function storageUserSave(user: User) {
   try {
     await AsyncStorage.setItem(USER, JSON.stringify(user));
   } catch (error) {
@@ -16,7 +15,7 @@ export async function storageUserSave(user: IUser) {
 export async function storageUserGet() {
   try {
     const storage = await AsyncStorage.getItem(USER);
-    const user: IUser = storage ? JSON.parse(storage) : null;
+    const user: User = storage ? JSON.parse(storage) : null;
     return user;
   } catch (error) {
     console.error("Failed to fetch user from local storage.", error);
@@ -58,7 +57,7 @@ export async function storageTokenRemove() {
   }
 }
 
-export async function storageCustomerSave(customer: ICustomer) {
+export async function storageCustomerSave(customer: Customer) {
   try {
     await AsyncStorage.setItem(CUSTOMER, JSON.stringify(customer));
   } catch (error) {
@@ -69,7 +68,7 @@ export async function storageCustomerSave(customer: ICustomer) {
 export async function storageCustomerGet() {
   try {
     const storage = await AsyncStorage.getItem(CUSTOMER);
-    const customer: ICustomer = storage ? JSON.parse(storage) : null;
+    const customer: Customer = storage ? JSON.parse(storage) : null;
     return customer;
   } catch (error) {
     console.error("Failed to fetch customer from local storage.", error);

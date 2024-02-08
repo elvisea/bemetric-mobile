@@ -100,10 +100,15 @@ const setInitialRegion = (
   };
 };
 
+const checkSize = (arrays: Array<any[]>): boolean => {
+  return arrays.every((arr) => arr.length === 0);
+};
+
 export {
+  checkSize,
   normalizePoints,
+  setInitialRegion,
   normalizeGeofences,
   normalizeEquipments,
   generateListCoordinates,
-  setInitialRegion,
 };
