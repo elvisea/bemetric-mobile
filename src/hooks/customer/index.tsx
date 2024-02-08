@@ -14,7 +14,7 @@ import {
   storageCustomerGet,
   storageCustomerRemove,
   storageCustomerSave,
-} from "@storage/storage-customer";
+} from "@storage/functions";
 
 export const CustomerContext = createContext<CustomerContextData>({
   customer: null,

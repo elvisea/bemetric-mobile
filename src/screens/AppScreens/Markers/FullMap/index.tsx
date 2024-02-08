@@ -175,7 +175,6 @@ export function FullMap() {
               type: "SET_INITIAL_REGION",
               payload: { points, geofences, equipment },
             });
-
           } catch (error) {
             Alert.alert(
               "Erro de Comunicação",
