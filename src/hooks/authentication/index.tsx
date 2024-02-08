@@ -14,13 +14,10 @@ import {
   storageUserGet,
   storageUserRemove,
   storageUserSave,
-} from "@storage/storage-user";
-
-import {
   storageTokenGet,
   storageTokenRemove,
   storageTokenSave,
-} from "@storage/storage-token";
+} from "@storage/functions";
 
 export const AuthContext = createContext<AuthContextData>({
   user: null,
