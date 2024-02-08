@@ -22,13 +22,18 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { calculateInitialRegion } from "../utils";
 
-import { IEquipment, IGeofence } from "../interfaces";
-
 import { reducer } from "./reducer";
-import { Modal, PointReceived } from "./types";
 import { buttons, initialState, url } from "./constants";
 
 import {
+  Modal,
+  PointReceived,
+  GeofenceReceived,
+  EquipmentReceived,
+} from "./types";
+
+import {
+  checkSize,
   normalizePoints,
   normalizeGeofences,
   normalizeEquipments,
@@ -44,10 +49,6 @@ export function FullMap() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const mapRef = useRef<MapView>(null);
-
-  const checkSize = (arrays: Array<any[]>): boolean => {
-    return arrays.every((arr) => arr.length === 0);
-  };
 
   const onPressFilter = () => {
     dispatch({ type: "TOGGLE_MODAL" });
@@ -150,11 +151,11 @@ export function FullMap() {
                 codigoCliente: data.codigoCliente,
               }),
 
-              api.post<IGeofence[]>(url.geofences, {
+              api.post<GeofenceReceived[]>(url.geofences, {
                 codigoCliente: data.codigoCliente,
               }),
 
-              api.post<IEquipment[]>(url.equipments, data),
+              api.post<EquipmentReceived[]>(url.equipments, data),
             ]);
 
             const points = normalizePoints(response[0].data);

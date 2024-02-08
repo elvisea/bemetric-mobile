@@ -59,11 +59,4 @@ type State = {
   messages: Messages;
 };
 
-export {
-  State,
-  Equipment,
-  InputData,
-  DataReceived,
-  TransformedData,
-  Params,
-};
+export { State, Equipment, InputData, DataReceived, TransformedData, Params };

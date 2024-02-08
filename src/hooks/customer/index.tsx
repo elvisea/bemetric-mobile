@@ -1,10 +1,10 @@
 import { Alert } from "react-native";
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 
-import { useAuth } from "@hooks/authentication";
-
 import api from "@services/api";
-import { ICustomer } from "@interfaces/ICustomer";
+
+import { Customer } from "@typings/index";
+import { useAuth } from "@hooks/authentication";
 
 import { reducer } from "./reducer";
 import { initialState } from "./initial-state";
@@ -28,7 +28,7 @@ const CustomerProvider = ({ children }: CustomerProviderProps) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const addCustomer = async (customer: ICustomer) => {
+  const addCustomer = async (customer: Customer) => {
     dispatch({ type: "SET_CUSTOMER", payload: customer });
     await storageCustomerSave(customer);
 

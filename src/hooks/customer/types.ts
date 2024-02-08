@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
-import { ICustomer } from "@interfaces/ICustomer";
+import { Customer } from "@typings/index";
 
 type CustomerContextData = {
-  customer: ICustomer | null;
+  customer: Customer | null;
   whatsapp: string;
-  addCustomer: (customer: ICustomer) => Promise<void>;
+  addCustomer: (customer: Customer) => Promise<void>;
   resetCustomer: () => void;
 };
 
@@ -13,12 +13,12 @@ type CustomerProviderProps = {
 };
 
 type AuthState = {
-  customer: ICustomer | null;
+  customer: Customer | null;
   whatsapp: string;
 };
 
 type AuthAction =
-  | { type: "SET_CUSTOMER"; payload: ICustomer }
+  | { type: "SET_CUSTOMER"; payload: Customer }
   | { type: "SET_WHATSAPP"; payload: string }
   | { type: "RESET_CUSTOMER" };
 

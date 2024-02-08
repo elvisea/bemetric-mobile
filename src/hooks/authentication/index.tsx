@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 
 import api from "@services/api";
 
-import { IUser } from "@interfaces/IUser";
+import { User } from "@typings/index";
 
 import { reducer } from "./reducer";
 import { initialState } from "./initial-state";
@@ -64,7 +64,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const signIn = async (data: IUser) => {
+  const signIn = async (data: User) => {
     dispatch({ type: "LOADING" });
 
     dispatch({ type: "SIGN_IN", payload: data });

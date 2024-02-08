@@ -10,7 +10,7 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
-import { ICustomer } from "@interfaces/ICustomer";
+import { Customer } from "@typings/index";
 
 import { Header } from "@components/Header";
 import { ButtonFull } from "@components/ButtonFull";
@@ -21,8 +21,8 @@ export function Clients() {
   const { signOut } = useAuth();
   const { addCustomer, resetCustomer } = useCustomer();
 
-  const [customer, setCustomer] = useState<ICustomer | null>(null);
-  const [customers, setCustomers] = useState<ICustomer[]>([] as ICustomer[]);
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customers, setCustomers] = useState<Customer[]>([] as Customer[]);
 
   const handleNextPage = async () => {
     if (customer) await addCustomer(customer);
