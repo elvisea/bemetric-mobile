@@ -22,6 +22,7 @@ module.exports = function (api) {
             "@services": "./src/services",
             "@constants": "./src/constants",
             "@manager": "./src/manager",
+            "@typings": "./src/typings",
           },
         },
       ],

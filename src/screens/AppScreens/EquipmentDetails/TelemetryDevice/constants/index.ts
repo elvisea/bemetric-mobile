@@ -1,6 +1,7 @@
+import { Messages } from "@typings/index";
 import { TypeInitialState } from "../types";
 
-const response: { [key: number]: { title: string; subtitle: string } } = {
+const response: Messages = {
   0: {
     title: "Dispositivo não encontrado.",
     subtitle: "Verifique se o dispositivo está ligado.",

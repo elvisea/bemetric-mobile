@@ -1,6 +1,7 @@
 import * as yup from "yup";
+import { Messages } from "@typings/index";
 
-const response: { [key: number]: { title: string; subtitle: string } } = {
+const response: Messages = {
   1: {
     title: "Erro ao tentar redefinir senha.",
     subtitle: "Email não foi encontrado. Tente novamente.",

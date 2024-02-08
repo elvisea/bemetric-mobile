@@ -1,6 +1,7 @@
-import { Message, State } from "../types";
+import { Messages } from "@typings/index";
+import { State } from "../types";
 
-const messages: Message = {
+const messages: Messages = {
   0: {
     title: "Erro de Comunicação",
     subtitle:

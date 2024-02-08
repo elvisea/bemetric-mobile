@@ -1,5 +1,5 @@
+import { Messages } from "@typings/index";
 import * as yup from "yup";
-import { TypeResponses } from "../types";
 
 const schema = yup.object({
   password: yup
@@ -12,7 +12,7 @@ const schema = yup.object({
     .oneOf([yup.ref("password"), null], "A confirmação da senha não confere"),
 });
 
-const responses: TypeResponses = {
+const responses: Messages = {
   0: {
     title: "Senha redefinida com sucesso.",
     subtitle: "Senha redefinida com sucesso.",

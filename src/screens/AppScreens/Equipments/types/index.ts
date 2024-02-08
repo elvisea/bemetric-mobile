@@ -1,6 +1,4 @@
-type Message = {
-  [key: number]: { title: string; subtitle: string; text?: string };
-};
+import { Messages } from "@typings/index";
 
 type Group = {
   key: string;
@@ -45,11 +43,10 @@ type State = {
   expanded: string;
   count: Count;
   groupings: Group[];
-  messages: Message;
+  messages: Messages;
 };
 
 export {
-  Message,
   Group,
   Equipment,
   GroupingReceived,

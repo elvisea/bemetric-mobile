@@ -1,6 +1,7 @@
 import * as yup from "yup";
 
-import { IInput, TypeResponse } from "../types";
+import { IInput } from "../types";
+import { Messages } from "@typings/index";
 
 const inputs: IInput[] = [
   {
@@ -17,7 +18,7 @@ const inputs: IInput[] = [
   },
 ];
 
-const response: TypeResponse = {
+const response: Messages = {
   0: {
     title: "Credenciais inválidas.",
     subtitle: "Verifique se as credenciais de acesso estão corretas.",

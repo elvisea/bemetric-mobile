@@ -8,8 +8,4 @@ type TypeParams = {
   codigoAtivacao: string;
 };
 
-type TypeResponses = {
-  [key: number]: { title: string; subtitle: string; text?: string };
-};
-
-export { TypeForm, TypeParams, TypeResponses };
+export { TypeForm, TypeParams };

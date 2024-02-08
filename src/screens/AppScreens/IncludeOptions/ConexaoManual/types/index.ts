@@ -1,3 +1,4 @@
+import { Messages } from "@typings/index";
 import { KeyboardTypeOptions } from "react-native";
 
 type IName = "nome" | "senha";
@@ -9,10 +10,6 @@ type IInput = {
   keyboardType: KeyboardTypeOptions;
 };
 
-type TypeResponse = {
-  [key: number]: { title: string; subtitle: string; text: string };
-};
+type TypeAction = { action?: () => void; response: Messages[number] };
 
-type TypeAction = { action?: () => void; response: TypeResponse[number] };
-
-export { IName, IInput, TypeResponse, TypeAction };
+export { IName, IInput, TypeAction };
