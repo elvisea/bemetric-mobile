@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { Message } from "../types";
+import { Messages } from "@typings/index";
 
 const schema = yup.object({
   newPassword: yup
@@ -19,7 +19,7 @@ const schema = yup.object({
     ),
 });
 
-const messages: Message = {
+const messages: Messages = {
   0: {
     title: "Senha Alterada com sucesso",
     subtitle: "Você pode agora fazer login com a nova senha.",

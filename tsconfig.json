@@ -42,6 +42,9 @@
       "@manager/*": [
         "./src/manager/*"
       ],
+      "@typings/*": [
+        "./src/typings/*"
+      ],
     }
   },
   "include": [

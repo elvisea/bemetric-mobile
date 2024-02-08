@@ -1,6 +1,7 @@
 import * as yup from "yup";
 
-import { TypeInput, TypeResponses } from "../types";
+import { TypeInput } from "../types";
+import { Messages } from "@typings/index";
 
 const schema = yup.object({
   serial: yup.string().required("Informe o serial"),
@@ -22,7 +23,7 @@ const inputs: TypeInput[] = [
   },
 ];
 
-const responses: TypeResponses = {
+const responses: Messages = {
   0: {
     title: "Dispositivo liberado para ser associado",
     subtitle: "Continue o processo de cadastro",

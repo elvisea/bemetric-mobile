@@ -1,5 +1,6 @@
 import * as yup from "yup";
-import { Messages } from "../types";
+
+import { Messages } from "@typings/index";
 
 const schema = yup.object({
   email: yup.string().required("Informe seu e-mail.").email("E-mail inválido"),

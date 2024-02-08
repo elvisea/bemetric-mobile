@@ -1,6 +1,4 @@
-type Message = {
-  [key: number]: { title: string; subtitle: string; text?: string };
-};
+import { Messages } from "@typings/index";
 
 type Action = "vincular" | "desvincular";
 
@@ -16,7 +14,7 @@ type State = {
   equipments: Equipment[];
   action: Action;
   selected: Equipment | null;
-  messages: Message;
+  messages: Messages;
 };
 
-export { Message, State, Action, Equipment };
+export { State, Action, Equipment };

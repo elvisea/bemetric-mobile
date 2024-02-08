@@ -1,6 +1,4 @@
-type Message = {
-  [key: number]: { title: string; subtitle: string; text?: string };
-};
+import { Messages } from "@typings/index";
 
 type InputData = {
   incluir: boolean;
@@ -58,11 +56,10 @@ type State = {
   isLoading: boolean;
   equipment: Equipment | null;
   data: TransformedData | null;
-  messages: Message;
+  messages: Messages;
 };
 
 export {
-  Message,
   State,
   Equipment,
   InputData,
