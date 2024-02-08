@@ -26,7 +26,7 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { RowInformation } from "@components/RowInformation";
 
 import { ITypeParams } from "./types";
-import { initialState, response } from "./constants";
+import { initialState, responses } from "./constants";
 
 export function TelemetryDevice() {
   const route = useRoute();
@@ -87,7 +87,7 @@ export function TelemetryDevice() {
               isConnecting: false,
             }));
 
-            Alert.alert(response[4].title, response[4].subtitle, [
+            Alert.alert(responses[4].title, responses[4].subtitle, [
               { text: "Tentar novamente" },
             ]);
           }
@@ -109,7 +109,7 @@ export function TelemetryDevice() {
           isConnecting: false,
         }));
 
-        Alert.alert(response[0].title, response[0].subtitle);
+        Alert.alert(responses[0].title, responses[0].subtitle);
       }
     } else {
       setState((previousState) => ({
@@ -118,7 +118,7 @@ export function TelemetryDevice() {
         isConnecting: false,
       }));
 
-      Alert.alert(response[1].title, response[1].subtitle);
+      Alert.alert(responses[1].title, responses[1].subtitle);
     }
   };
 
@@ -156,7 +156,7 @@ export function TelemetryDevice() {
         });
       }
     } else {
-      Alert.alert(response[2].title, response[2].subtitle);
+      Alert.alert(responses[2].title, responses[2].subtitle);
     }
   };
 
@@ -174,7 +174,7 @@ export function TelemetryDevice() {
         }
       }
     } else {
-      Alert.alert(response[2].title, response[2].subtitle);
+      Alert.alert(responses[2].title, responses[2].subtitle);
     }
   };
 

@@ -16,7 +16,7 @@ import { useBluetooth } from "@hooks/bluetooth";
 
 import { ListTitle } from "./styles";
 
-import { response } from "./constants";
+import { responses } from "./constants";
 import { TypeEquipment } from "./types";
 
 import { adicionarChaveParaCadaEquipamento } from "./utils";
@@ -87,8 +87,8 @@ export function EquipamentosDisponiveis() {
 
         if (data.erro === 0) {
           Alert.alert(
-            `${response[data.erro].title}`,
-            `${response[data.erro].subtitle}`,
+            responses[data.erro].title,
+            responses[data.erro].subtitle,
             [
               {
                 text: "Mostrar Agrupamentos",
@@ -98,8 +98,8 @@ export function EquipamentosDisponiveis() {
           );
         } else {
           Alert.alert(
-            `${response[data.erro].title}`,
-            `${response[data.erro].subtitle}`,
+            responses[data.erro].title,
+            responses[data.erro].subtitle,
           );
         }
       } catch (error) {

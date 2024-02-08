@@ -10,7 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api from "@services/api";
 
 import { TypeForm } from "./types";
-import { response, schema } from "./constants";
+import { responses, schema } from "./constants";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
@@ -41,7 +41,7 @@ export function SendEmailScreen() {
       if (data === 0) {
         navigation.navigate("ValidateCodeScreen", { email });
       } else {
-        Alert.alert(response[data].title, response[data].subtitle);
+        Alert.alert(responses[data].title, responses[data].subtitle);
       }
     } catch (error) {
       Alert.alert(

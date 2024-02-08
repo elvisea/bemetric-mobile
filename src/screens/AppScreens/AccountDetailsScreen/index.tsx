@@ -16,7 +16,7 @@ import { THEME } from "@theme/theme";
 import { useAuth } from "@hooks/authentication";
 
 import { Form } from "./interfaces";
-import { messages, schema } from "./constants";
+import { responses, schema } from "./constants";
 
 export function AccountDetailsScreen() {
   const { colors } = THEME;
@@ -59,18 +59,18 @@ export function AccountDetailsScreen() {
 
       if (response.status === 200) fetchDataUser();
 
-      const message = messages[response.data];
+      const message = responses[response.data];
 
       if (message) {
         Alert.alert(
-          messages[response.data].title,
-          messages[response.data].subtitle,
+          responses[response.data].title,
+          responses[response.data].subtitle,
         );
       } else {
-        Alert.alert(messages[4].title, messages[4].subtitle);
+        Alert.alert(responses[4].title, responses[4].subtitle);
       }
     } catch (error) {
-      Alert.alert(messages[3].title, messages[3].subtitle);
+      Alert.alert(responses[3].title, responses[3].subtitle);
     } finally {
       setIsLoading(false);
     }

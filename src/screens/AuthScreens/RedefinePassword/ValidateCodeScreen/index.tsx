@@ -12,8 +12,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
-import { TypeForm, TypeParams } from "./types";
-import { resposta, schema } from "./constants";
+import { Form, Params } from "./types";
+import { responses, schema } from "./constants";
 
 import { Button } from "@components/Button";
 import { InputToken } from "@components/InputToken";
@@ -22,7 +22,7 @@ import { LayoutDefault } from "@components/LayoutDefault";
 export function ValidateCodeScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { email } = route.params as TypeParams;
+  const { email } = route.params as Params;
 
   const [isSending, setIsSending] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -31,11 +31,11 @@ export function ValidateCodeScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<TypeForm>({
+  } = useForm<Form>({
     resolver: yupResolver(schema),
   });
 
-  const handleNextPage = async (props: TypeForm) => {
+  const handleNextPage = async (props: Form) => {
     const token = Object.values(props).join("");
 
     try {
@@ -55,8 +55,8 @@ export function ValidateCodeScreen() {
 
       if (response.data !== 0) {
         Alert.alert(
-          resposta.validation[response.data].title,
-          resposta.validation[response.data].subtitle,
+          responses.validation[response.data].title,
+          responses.validation[response.data].subtitle,
         );
       }
     } catch (error) {
@@ -80,8 +80,8 @@ export function ValidateCodeScreen() {
 
       if (response.data === 1) {
         Alert.alert(
-          resposta.resend[response.data].title,
-          resposta.resend[response.data].subtitle,
+          responses.resend[response.data].title,
+          responses.resend[response.data].subtitle,
         );
       }
     } catch (error) {
