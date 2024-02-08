@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 const schema = yup.object({
   email: yup.string().required("Informe seu e-mail.").email("E-mail inválido"),
@@ -10,7 +10,7 @@ const schema = yup.object({
     .min(6, "A senha deve ter pelo menos 6 dígitos."),
 });
 
-const messages: Messages = {
+const responses: Responses = {
   1: {
     title: "Erro ao tentar fazer login.",
     subtitle: "Email do login não cadastrado. Tente novamente.",
@@ -40,7 +40,7 @@ const messages: Messages = {
 
 const initialState = {
   isLoading: false,
-  messages,
+  responses,
 };
 
 export { schema, initialState };

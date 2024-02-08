@@ -70,7 +70,7 @@ export function Equipments() {
         }));
       }
     } catch (error) {
-      Alert.alert(state.messages[0].title, state.messages[0].subtitle);
+      Alert.alert(state.responses[0].title, state.responses[0].subtitle);
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }

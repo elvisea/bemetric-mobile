@@ -2,7 +2,7 @@ import * as yup from "yup";
 import uuid from "react-native-uuid";
 
 import { IInput } from "../types";
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 const inputs: IInput[] = [
   {
@@ -73,7 +73,7 @@ const schema = yup.object({
   initialOdometer: yup.number().required("Informe o seguinte campo"),
 });
 
-const resposta: Messages = {
+const responses: Responses = {
   0: {
     title: "Equipamento cadastrado com sucesso.",
     subtitle: "Mostrar equipamentos.",
@@ -112,4 +112,4 @@ const resposta: Messages = {
   },
 };
 
-export { resposta, inputs, schema };
+export { responses, inputs, schema };

@@ -1,7 +1,7 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 import { State } from "../types";
 
-const messages: Messages = {
+const responses: Responses = {
   0: {
     title: "Erro de Comunicação",
     subtitle:
@@ -12,7 +12,7 @@ const messages: Messages = {
 const initialState: State = {
   data: null,
   equipment: null,
-  messages,
+  responses,
   isLoading: false,
 };
 

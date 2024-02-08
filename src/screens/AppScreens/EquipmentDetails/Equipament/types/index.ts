@@ -1,4 +1,4 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 type InputData = {
   incluir: boolean;
@@ -56,7 +56,7 @@ type State = {
   isLoading: boolean;
   equipment: Equipment | null;
   data: TransformedData | null;
-  messages: Messages;
+  responses: Responses;
 };
 
 export { State, Equipment, InputData, DataReceived, TransformedData, Params };

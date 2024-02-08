@@ -1,4 +1,4 @@
-type Messages = {
+type Responses = {
   [key: number]: { title: string; subtitle: string; text?: string };
 };
 
@@ -42,4 +42,4 @@ type Customer = {
   criadoEm: string;
 };
 
-export { User, Messages, Customer };
+export { User, Responses, Customer };

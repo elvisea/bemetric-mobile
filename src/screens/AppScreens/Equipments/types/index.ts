@@ -1,4 +1,4 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 type Group = {
   key: string;
@@ -43,7 +43,7 @@ type State = {
   expanded: string;
   count: Count;
   groupings: Group[];
-  messages: Messages;
+  responses: Responses;
 };
 
 export {

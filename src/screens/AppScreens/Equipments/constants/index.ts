@@ -1,7 +1,7 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 import { State } from "../types";
 
-const messages: Messages = {
+const responses: Responses = {
   0: {
     title: "Erro de Comunicação",
     subtitle:
@@ -14,7 +14,7 @@ const initialState: State = {
   expanded: "",
   count: { events: 0, messages: 0 },
   groupings: [],
-  messages,
+  responses,
 };
 
 export { initialState };

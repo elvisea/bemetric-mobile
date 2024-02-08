@@ -63,19 +63,19 @@ export function Change() {
 
       if (response.data === 1) {
         Alert.alert(
-          state.messages[response.data].title,
-          state.messages[response.data].subtitle,
+          state.responses[response.data].title,
+          state.responses[response.data].subtitle,
         );
       }
 
       if (response.data === 2) {
         Alert.alert(
-          state.messages[response.data].title,
-          state.messages[response.data].subtitle,
+          state.responses[response.data].title,
+          state.responses[response.data].subtitle,
         );
       }
     } catch (error) {
-      Alert.alert(state.messages[3].title, state.messages[3].subtitle);
+      Alert.alert(state.responses[3].title, state.responses[3].subtitle);
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }
@@ -107,7 +107,7 @@ export function Change() {
               }));
           }
         } catch (error) {
-          Alert.alert(state.messages[3].title, state.messages[3].subtitle);
+          Alert.alert(state.responses[3].title, state.responses[3].subtitle);
         } finally {
           setState((prevState) => ({ ...prevState, isLoading: false }));
         }

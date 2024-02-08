@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 import { IInput } from "../types";
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 const inputs: IInput[] = [
   {
@@ -18,7 +18,7 @@ const inputs: IInput[] = [
   },
 ];
 
-const response: Messages = {
+const responses: Responses = {
   0: {
     title: "Credenciais inválidas.",
     subtitle: "Verifique se as credenciais de acesso estão corretas.",
@@ -36,4 +36,4 @@ const schema = yup.object({
   senha: yup.string().required("Informe a senha da rede"),
 });
 
-export { response, inputs, schema };
+export { responses, inputs, schema };

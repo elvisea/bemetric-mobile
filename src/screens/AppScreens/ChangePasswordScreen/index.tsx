@@ -56,8 +56,8 @@ function ChangePasswordScreen() {
       const response = await api.put("Usuario/AlterarSenha", data);
 
       Alert.alert(
-        state.messages[response.data].title,
-        state.messages[response.data].subtitle,
+        state.responses[response.data].title,
+        state.responses[response.data].subtitle,
         [
           {
             text: response.data === 0 ? "Voltar" : "Tentar novamente",
@@ -67,7 +67,7 @@ function ChangePasswordScreen() {
         ],
       );
     } catch (error) {
-      Alert.alert(state.messages[5].title, state.messages[5].subtitle);
+      Alert.alert(state.responses[5].title, state.responses[5].subtitle);
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }

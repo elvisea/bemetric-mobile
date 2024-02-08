@@ -1,7 +1,7 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 import { State } from "../types";
 
-const messages: Messages = {
+const responses: Responses = {
   0: {
     title: "Equipamento Desvinculado do Dispositivo",
     subtitle: "Equipamento Desvinculado do Dispositivo",
@@ -27,7 +27,7 @@ const initialState: State = {
   equipments: [],
   action: "desvincular",
   selected: null,
-  messages,
+  responses,
 };
 
 export { initialState };
