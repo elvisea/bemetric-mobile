@@ -52,6 +52,8 @@ export const THEME = extendTheme({
     dark: "#000",
     white: "#FFFFFF",
     shape: "#F3F3F3",
+    STROKE_COLOR: "rgba(0, 105, 192, 1)",
+    FILL_COLOR: "rgba(160, 198, 229, 0.3)"
   },
   fonts: {
     Roboto_400Regular: "Roboto_400Regular",

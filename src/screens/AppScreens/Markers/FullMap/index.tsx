@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useReducer, useRef } from "react";
 import { Alert, FlatList } from "react-native";
 
 import MapView, { Circle, Marker, Polygon } from "react-native-maps";
@@ -7,12 +7,12 @@ import { HStack, IconButton, VStack } from "native-base";
 
 import { useFocusEffect } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { Entypo, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
-import { useAuth } from "@hooks/authentication";
+
 import { useCustomer } from "@hooks/customer";
+import { useAuth } from "@hooks/authentication";
 
 import { Button } from "@components/Button";
 import { MarkerItem } from "@components/MarkerItem";
@@ -20,18 +20,20 @@ import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { ICoordinate } from "../UpdateGeofences/interfaces";
+import { calculateInitialRegion } from "../utils";
 
-import { calculateDelta, calculateInitialRegion } from "../utils";
+import { IEquipment, IGeofence } from "../interfaces";
+
+import { reducer } from "./reducer";
+import { Modal, PointReceived } from "./types";
+import { buttons, initialState, url } from "./constants";
 
 import {
-  IEquipment,
-  IGeofence,
-  IInicialRegion,
-  IMarker,
-  IPoint,
-  ISelected,
-} from "../interfaces";
+  normalizePoints,
+  normalizeGeofences,
+  normalizeEquipments,
+  generateListCoordinates,
+} from "./functions";
 
 export function FullMap() {
   const { colors } = THEME;
@@ -39,263 +41,153 @@ export function FullMap() {
   const { user } = useAuth();
   const { customer } = useCustomer();
 
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const mapRef = useRef<MapView>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const checkSize = (arrays: Array<any[]>): boolean => {
+    return arrays.every((arr) => arr.length === 0);
+  };
 
-  const [marker, setMarker] = useState<IMarker>({
-    points: [] as IPoint[],
-    geofences: [] as IGeofence[],
-    equipments: [] as IEquipment[],
-  });
+  const onPressFilter = () => {
+    dispatch({ type: "TOGGLE_MODAL" });
 
-  const [selectedMarkers, setSelectedMarkers] = useState<IMarker>({
-    points: [] as IPoint[],
-    geofences: [] as IGeofence[],
-    equipments: [] as IEquipment[],
-  });
+    dispatch({
+      type: "SET_INITIAL_REGION",
+      payload: {
+        points: state.filters.points,
+        geofences: state.filters.geofences,
+        equipment: state.filters.equipment,
+      },
+    });
 
-  const [itens, setItems] = useState({
-    points: [] as number[],
-    geofences: [] as number[],
-    equipments: [] as number[],
-  });
+    const arrays = [
+      state.filters.points,
+      state.filters.geofences,
+      state.filters.equipment,
+    ];
 
-  const [selected, setSelected] = useState<ISelected>({} as ISelected);
+    const isArraysEmpty = checkSize(arrays);
 
-  const [initialRegion, setInitialRegion] = useState<
-    IInicialRegion | undefined
-  >(undefined);
+    const coords = isArraysEmpty
+      ? generateListCoordinates(
+        state.markers.points,
+        state.markers.geofences,
+        state.markers.equipment,
+      )
+      : generateListCoordinates(
+        state.filters.points,
+        state.filters.geofences,
+        state.filters.equipment,
+      );
 
-  const handleSelecionarItens = (codigo: number) => {
-    const include = itens[selected.type].includes(codigo);
-
-    setItems((oldState) => {
-      const newState = { ...oldState };
-      newState[selected.type] = include
-        ? newState[selected.type].filter((item) => item !== codigo)
-        : [...newState[selected.type], codigo];
-      return newState;
+    mapRef.current?.animateCamera({
+      center: {
+        latitude: calculateInitialRegion(coords).latitude,
+        longitude: calculateInitialRegion(coords).longitude,
+      },
     });
   };
 
-  const updateSelectedPoints = () => {
-    const selectedPoints = marker.points.filter((point) =>
-      itens.points.includes(point.codigoPontoInteresse),
-    );
-
-    setSelectedMarkers((prevMarkers) => ({
-      ...prevMarkers,
-      points: selectedPoints,
-    }));
-
-    const coordsPoints = selectedPoints.map(({ latitude, longitude }) => ({
-      latitude,
-      longitude,
-    }));
-
-    return coordsPoints;
+  const setModal = (modal: Modal) => {
+    dispatch({ type: "SET_MODAL", payload: modal });
+    dispatch({ type: "TOGGLE_MODAL" });
   };
 
-  const updateSelectedGeofences = () => {
-    const selectedGeofences = marker.geofences.filter((geofence) =>
-      itens.geofences.includes(geofence.codigoGeocerca),
-    );
+  const onPressOption = useCallback(
+    (id: string) => {
+      const include = state.filters[state.modal.key].some(
+        (item) => item.id === id,
+      );
 
-    setSelectedMarkers((prevMarkers) => ({
-      ...prevMarkers,
-      geofences: selectedGeofences,
-    }));
+      if (include) {
+        dispatch({ type: "REMOVE_FILTER", payload: id });
+      } else {
+        const found = state.markers[state.modal.key].find(
+          (item) => item.id === id,
+        );
 
-    const coordsGeofences = selectedGeofences.flatMap(
-      ({ listaPontosGeocerca }) =>
-        listaPontosGeocerca.map(({ latitude, longitude }) => ({
-          latitude,
-          longitude,
-        })),
-    );
-
-    return coordsGeofences;
-  };
-
-  const updateSelectedEquipments = () => {
-    const selectedEquipments = marker.equipments.filter((equipment) =>
-      itens.equipments.includes(equipment.codigoEquipamento),
-    );
-
-    setSelectedMarkers((prevMarkers) => ({
-      ...prevMarkers,
-      equipments: selectedEquipments,
-    }));
-
-    const coordsEquipments = selectedEquipments.map(
-      ({ latitude, longitude }) => ({ latitude, longitude }),
-    );
-
-    return coordsEquipments;
-  };
-
-  const gerarListaDeCoordenadas = ({
-    points,
-    geofences,
-    equipments,
-  }: IMarker): ICoordinate[] => {
-    const coordsPoints = points.map(({ latitude, longitude }) => ({
-      latitude,
-      longitude,
-    }));
-
-    const coordsEquipments = equipments.map(({ latitude, longitude }) => ({
-      latitude,
-      longitude,
-    }));
-
-    const coordsGeofences = geofences.flatMap(({ listaPontosGeocerca }) =>
-      listaPontosGeocerca.map(({ latitude, longitude }) => ({
-        latitude,
-        longitude,
-      })),
-    );
-
-    return [...coordsPoints, ...coordsEquipments, ...coordsGeofences];
-  };
-
-  const handleFilter = () => {
-    const coordsPoints = updateSelectedPoints();
-    const coordsGeofences = updateSelectedGeofences();
-    const coordsEquipments = updateSelectedEquipments();
-
-    const coords = [...coordsPoints, ...coordsEquipments, ...coordsGeofences];
-
-    if (coords.length > 0) {
-      setInitialRegion({
-        latitude: calculateInitialRegion(coords).latitude,
-        longitude: calculateInitialRegion(coords).longitude,
-        latitudeDelta: calculateDelta(coords).latitudeDelta,
-        longitudeDelta: calculateDelta(coords).longitudeDelta,
-      });
-
-      mapRef.current?.animateCamera({
-        center: {
-          latitude: calculateInitialRegion(coords).latitude,
-          longitude: calculateInitialRegion(coords).longitude,
-        },
-      });
-
-      setIsOpenModal(false);
-    } else {
-      const coords = gerarListaDeCoordenadas(marker);
-
-      if (coords.length > 0) {
-        const startInitialRegion = {
-          latitude: calculateInitialRegion(coords).latitude,
-          longitude: calculateInitialRegion(coords).longitude,
-          latitudeDelta: calculateDelta(coords).latitudeDelta,
-          longitudeDelta: calculateDelta(coords).longitudeDelta,
-        };
-
-        setInitialRegion(startInitialRegion);
-
-        mapRef.current?.animateCamera({
-          center: {
-            latitude: calculateInitialRegion(coords).latitude,
-            longitude: calculateInitialRegion(coords).longitude,
-          },
-        });
-
-        setIsOpenModal(false);
+        if (found) {
+          dispatch({ type: "ADD_FILTER", payload: found });
+        }
       }
-    }
-  };
+    },
+    [state.filters, state.markers, state.modal],
+  );
 
-  const handleSelectedItem = ({ title, type }: ISelected) => {
-    setSelected({ title, type });
-    setIsOpenModal(true);
-  };
+  const showOptions = useCallback(() => {
+    return state.markers[state.modal.key].map((marker) => ({
+      id: marker.id,
+      code: marker.code,
+      name: marker.name,
+    }));
+  }, [state.markers, state.modal.key]);
+
+  const isOptionSelected = useCallback(
+    (id: string) => {
+      return state.filters[state.modal.key].some((item) => item.id === id);
+    },
+    [state.filters, state.modal],
+  );
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
       async function fetchData() {
-        setIsLoading(true);
-        try {
-          if (customer) {
-            const [points, geofences, equipments] = await Promise.all([
-              api.post<IPoint[]>(
-                "/PontoInteresse/ObterListaPontoInteresseApp",
-                {
-                  codigoCliente: customer.codigoCliente,
-                },
-              ),
+        if (user && customer) {
+          try {
+            dispatch({ type: "TOGGLE_LOADING" });
 
-              api.post<IGeofence[]>("/Geocerca/ObterListaGeocercaApp", {
-                codigoCliente: customer.codigoCliente,
-              }),
-
-              api.post<IEquipment[]>("/Dashboard/ObterListaDadosEquipamento", {
-                codigoCliente: customer?.codigoCliente,
-                localDashboard: 3,
-                codigoUsuario: user?.codigoUsuario,
-              }),
-            ]);
-
-            const startMarker = {
-              points: typeof points.data === "string" ? [] : points.data,
-              geofences:
-                typeof geofences.data === "string" ? [] : geofences.data,
-              equipments:
-                typeof equipments.data === "string" ? [] : equipments.data,
+            const data = {
+              localDashboard: 3,
+              codigoUsuario: user.codigoUsuario,
+              codigoCliente: customer.codigoCliente,
             };
 
-            if (isActive) {
-              setMarker(startMarker);
-              setSelectedMarkers(startMarker);
+            const response = await Promise.all([
+              api.post<PointReceived[]>(url.points, {
+                codigoCliente: data.codigoCliente,
+              }),
 
-              const startItems = {
-                points: startMarker.points.map(
-                  ({ codigoPontoInteresse }) => codigoPontoInteresse,
-                ),
-                geofences: startMarker.geofences.map(
-                  ({ codigoGeocerca }) => codigoGeocerca,
-                ),
-                equipments: startMarker.equipments.map(
-                  ({ codigoEquipamento }) => codigoEquipamento,
-                ),
-              };
+              api.post<IGeofence[]>(url.geofences, {
+                codigoCliente: data.codigoCliente,
+              }),
 
-              setItems(startItems);
+              api.post<IEquipment[]>(url.equipments, data),
+            ]);
 
-              const coords = gerarListaDeCoordenadas(startMarker);
+            const points = normalizePoints(response[0].data);
+            const geofences = normalizeGeofences(response[1].data);
+            const equipment = normalizeEquipments(response[2].data);
 
-              if (coords.length > 0) {
-                const startInitialRegion = {
-                  latitude: calculateInitialRegion(coords).latitude,
-                  longitude: calculateInitialRegion(coords).longitude,
-                  latitudeDelta: calculateDelta(coords).latitudeDelta,
-                  longitudeDelta: calculateDelta(coords).longitudeDelta,
-                };
+            dispatch({
+              type: "SET_MARKERS",
+              payload: { points, equipment, geofences },
+            });
 
-                setInitialRegion(startInitialRegion);
-                setIsOpenModal(false);
-              }
-            } else {
-              setIsOpenModal(false);
-              setInitialRegion(undefined);
-            }
+            dispatch({
+              type: "SET_FILTERS",
+              payload: { points, geofences, equipment },
+            });
+
+            dispatch({
+              type: "SET_INITIAL_REGION",
+              payload: { points, geofences, equipment },
+            });
+
+          } catch (error) {
+            Alert.alert(
+              "Erro de Comunicação",
+              "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+            );
+          } finally {
+            dispatch({ type: "TOGGLE_LOADING" });
           }
-        } catch (error) {
-          Alert.alert(
-            "Erro de Comunicação",
-            "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
-          );
-        } finally {
-          setIsLoading(false);
         }
       }
 
-      fetchData();
+      isActive && fetchData();
 
       return () => {
         isActive = false;
@@ -306,164 +198,84 @@ export function FullMap() {
   return (
     <>
       <GenericModal
-        title={selected.title}
-        isOpen={isOpenModal}
-        closeModal={() => setIsOpenModal(false)}
+        title={state.modal.title}
+        isOpen={state.isOpenModal}
+        closeModal={() => dispatch({ type: "TOGGLE_MODAL" })}
       >
-        {selected.type === "points" && (
-          <FlatList
-            data={marker.points}
-            style={{ width: "100%" }}
-            keyExtractor={(_item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <MarkerItem
-                title={item.nomePonto}
-                onPress={() => handleSelecionarItens(item.codigoPontoInteresse)}
-                isChecked={itens.points.includes(item.codigoPontoInteresse)}
-              />
-            )}
-          />
-        )}
-
-        {selected.type === "geofences" && (
-          <FlatList
-            data={marker.geofences}
-            style={{ width: "100%" }}
-            keyExtractor={(_item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <MarkerItem
-                title={item.nomeGeocerca}
-                onPress={() => handleSelecionarItens(item.codigoGeocerca)}
-                isChecked={itens.geofences.includes(item.codigoGeocerca)}
-              />
-            )}
-          />
-        )}
-
-        {selected.type === "equipments" && (
-          <FlatList
-            data={marker.equipments}
-            style={{ width: "100%" }}
-            keyExtractor={(_item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <MarkerItem
-                title={item.nomeEquipamento}
-                onPress={() => handleSelecionarItens(item.codigoEquipamento)}
-                isChecked={itens.equipments.includes(item.codigoEquipamento)}
-              />
-            )}
-          />
-        )}
+        <FlatList
+          data={showOptions()}
+          style={{ width: "100%" }}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <MarkerItem
+              title={item.name}
+              isChecked={isOptionSelected(item.id)}
+              onPress={() => onPressOption(item.id)}
+            />
+          )}
+        />
 
         <Button
           h={`${RFValue(48)}px`}
           mt={`${RFValue(20)}px`}
           title="Filtrar"
           width="100%"
-          onPress={handleFilter}
+          onPress={onPressFilter}
         />
       </GenericModal>
 
       <VStack flex={1} width="full" bg={colors.shape}>
         <HeaderDefault title="Mapa Completo">
           <HStack>
-            <IconButton
-              icon={
-                <MaterialIcons
-                  color={colors.blue[700]}
-                  size={20}
-                  name="settings"
-                />
-              }
-              onPress={() =>
-                handleSelectedItem({
-                  type: "equipments",
-                  title: "Selecione os Equipamentos",
-                })
-              }
-            />
-            <IconButton
-              icon={
-                <Entypo color={colors.blue[700]} size={20} name="location" />
-              }
-              onPress={() =>
-                handleSelectedItem({
-                  type: "geofences",
-                  title: "Selecione as Geocercas",
-                })
-              }
-            />
-            <IconButton
-              icon={
-                <FontAwesome5
-                  color={colors.blue[700]}
-                  size={20}
-                  name="dot-circle"
-                />
-              }
-              onPress={() =>
-                handleSelectedItem({
-                  type: "points",
-                  title: "Selecione os Pontos de Interesse",
-                })
-              }
-            />
+            {buttons.map((button) => (
+              <IconButton
+                key={button.key}
+                icon={button.icon}
+                onPress={() =>
+                  setModal({ key: button.key, title: button.title })
+                }
+              />
+            ))}
           </HStack>
         </HeaderDefault>
 
-        {isLoading && <LoadingSpinner color={colors.blue[700]} />}
+        {state.isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-        {!isLoading && (
+        {!state.isLoading && (
           <MapView
             ref={mapRef}
             style={{ flex: 1 }}
-            initialRegion={initialRegion}
+            initialRegion={state.initialRegion}
             zoomControlEnabled
           >
-            {selectedMarkers.points.map((point, index) => (
-              <>
-                <Circle
-                  key={`${point.codigoPontoInteresse}${point.nomePonto}${index}`}
-                  center={{
-                    latitude: point.latitude,
-                    longitude: point.longitude,
-                  }}
-                  radius={point.raio}
-                  fillColor="rgba(160, 198, 229, 0.3)"
-                  strokeColor="rgba(0, 105, 192, 1)"
-                  strokeWidth={2}
-                />
-
-                <Marker
-                  coordinate={{
-                    latitude: point.latitude,
-                    longitude: point.longitude,
-                  }}
-                />
-              </>
-            ))}
-
-            {selectedMarkers.geofences.map((geofence) => (
-              <Polygon
-                key={geofence.codigoGeocerca}
-                coordinates={geofence.listaPontosGeocerca}
-                fillColor="rgba(160, 198, 229, 0.3)"
-                strokeColor="rgba(0, 105, 192, 1)"
+            {state.filters.points.map((point) => (
+              <Circle
+                key={point.id}
+                center={point.coord}
+                radius={point.radius}
+                fillColor={colors.FILL_COLOR}
+                strokeColor={colors.STROKE_COLOR}
                 strokeWidth={2}
               />
             ))}
 
-            {selectedMarkers.equipments.map((equipment) => (
-              <Marker
-                key={equipment.codigoEquipamento}
-                coordinate={{
-                  latitude: equipment.latitude,
-                  longitude: equipment.longitude,
-                }}
+            {state.filters.points.map((point) => (
+              <Marker key={point.id} coordinate={point.coord} />
+            ))}
+
+            {state.filters.geofences.map((geofence) => (
+              <Polygon
+                key={geofence.id}
+                fillColor={colors.FILL_COLOR}
+                coordinates={geofence.coords}
+                strokeColor={colors.STROKE_COLOR}
+                strokeWidth={2}
               />
+            ))}
+
+            {state.filters.equipment.map((equipment) => (
+              <Marker key={equipment.id} coordinate={equipment.coord} />
             ))}
           </MapView>
         )}
