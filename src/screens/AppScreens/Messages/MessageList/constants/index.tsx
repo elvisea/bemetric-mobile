@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { THEME } from "@theme/theme";
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 import SystemRead from "@assets/system-read.svg";
 import SystemUnread from "@assets/system-unread.svg";
@@ -56,7 +56,7 @@ const types: Types = {
   },
 };
 
-const responses: Messages = {
+const responses: Responses = {
   0: {
     title: "Exclusão Concluída",
     subtitle: "A mensagem foi excluída com sucesso.",

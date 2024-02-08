@@ -1,4 +1,4 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 import { KeyboardTypeOptions } from "react-native";
 
 type TypeForm = {
@@ -28,7 +28,7 @@ type TypeInput = {
   keyboardType: KeyboardTypeOptions;
 };
 
-type TypeAction = { action?: () => void; response: Messages[number] };
+type TypeAction = { action?: () => void; response: Responses[number] };
 
 type TypeResponse = object | null | undefined;
 

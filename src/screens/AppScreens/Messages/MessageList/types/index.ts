@@ -1,4 +1,4 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
 type MessageReceived = {
   codigoMensagem: number;
@@ -38,7 +38,7 @@ type State = {
   types: Types;
   isLoading: boolean;
   messages: NormalizedMessages[];
-  responses: Messages;
+  responses: Responses;
 };
 
 export { MessageReceived, NormalizedMessages, Types, State };

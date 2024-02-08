@@ -53,7 +53,7 @@ export function Equipament() {
         equipment: extractEquipmentData(response[0].data[0]),
       }));
     } catch (error) {
-      Alert.alert(state.messages[3].title, state.messages[0].subtitle);
+      Alert.alert(state.responses[3].title, state.responses[0].subtitle);
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }
@@ -73,7 +73,7 @@ export function Equipament() {
         data: transformData(response.data),
       }));
     } catch (error) {
-      Alert.alert(state.messages[3].title, state.messages[0].subtitle);
+      Alert.alert(state.responses[3].title, state.responses[0].subtitle);
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }

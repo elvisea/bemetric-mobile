@@ -12,7 +12,7 @@ const schema = yup.object({
     .required("O campo 'Telefone' é obrigatório. Insira seu telefone."),
 });
 
-const messages: { [index: number]: { title: string; subtitle: string } } = {
+const responses: { [index: number]: { title: string; subtitle: string } } = {
   0: {
     title: "Alteração Concluída",
     subtitle: "O usuário foi atualizado com sucesso no sistema.",
@@ -38,4 +38,4 @@ const messages: { [index: number]: { title: string; subtitle: string } } = {
   },
 };
 
-export { messages, schema };
+export { responses, schema };

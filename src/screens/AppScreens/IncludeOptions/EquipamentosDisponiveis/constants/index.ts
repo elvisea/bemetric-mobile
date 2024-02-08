@@ -1,6 +1,6 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
-const response: Messages = {
+const responses: Responses = {
   0: {
     title: "Equipamento cadastrado com sucesso.",
     subtitle: "Mostrar equipamentos.",
@@ -39,4 +39,4 @@ const response: Messages = {
   },
 };
 
-export { response };
+export { responses };

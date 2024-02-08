@@ -33,7 +33,7 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 import { styles } from "./styles";
-import { inputs, resposta, schema } from "./constants";
+import { inputs, responses, schema } from "./constants";
 
 import {
   Agrupamento,
@@ -193,8 +193,8 @@ export function AddEquipment() {
 
       if (data.erro === 0) {
         Alert.alert(
-          `${resposta[data.erro].title}`,
-          `${resposta[data.erro].subtitle}`,
+          responses[data.erro].title,
+          responses[data.erro].subtitle,
           [
             {
               text: "Mostrar Equipamentos",
@@ -204,8 +204,8 @@ export function AddEquipment() {
         );
       } else {
         Alert.alert(
-          `${resposta[data.erro].title}`,
-          `${resposta[data.erro].subtitle}`,
+          responses[data.erro].title,
+          responses[data.erro].subtitle,
         );
       }
     } catch (error) {

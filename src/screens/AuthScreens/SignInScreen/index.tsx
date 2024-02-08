@@ -51,15 +51,15 @@ export function SignInScreen() {
       } else if (response.data.erro === 5) {
         navigation.navigate("TemporaryPasswordScreen", { email, password });
       } else {
-        const message = state.messages[response.data.erro];
+        const message = state.responses[response.data.erro];
         if (message) {
           Alert.alert(message.title, message.subtitle);
         } else {
-          Alert.alert(state.messages[5].title, state.messages[5].subtitle);
+          Alert.alert(state.responses[5].title, state.responses[5].subtitle);
         }
       }
     } catch (error) {
-      Alert.alert(state.messages[6].title, state.messages[6].subtitle);
+      Alert.alert(state.responses[6].title, state.responses[6].subtitle);
     } finally {
       setState((prevState) => ({ ...prevState, isLoading: false }));
     }
@@ -72,7 +72,7 @@ export function SignInScreen() {
       const response = await api.get("setup/DateTime");
       console.log(response.data);
     } catch (error) {
-      Alert.alert(state.messages[6].title, state.messages[6].subtitle);
+      Alert.alert(state.responses[6].title, state.responses[6].subtitle);
     }
   }
 

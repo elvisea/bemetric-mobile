@@ -1,7 +1,7 @@
 import * as yup from "yup";
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 
-const response: Messages = {
+const responses: Responses = {
   1: {
     title: "Erro ao tentar redefinir senha.",
     subtitle: "Email não foi encontrado. Tente novamente.",
@@ -20,4 +20,4 @@ const schema = yup.object({
   email: yup.string().required("Informe seu e-mail").email("E-mail inválido"),
 });
 
-export { response, schema };
+export { responses, schema };

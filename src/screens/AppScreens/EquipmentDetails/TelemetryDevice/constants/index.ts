@@ -1,7 +1,7 @@
-import { Messages } from "@typings/index";
+import { Responses } from "@typings/index";
 import { TypeInitialState } from "../types";
 
-const response: Messages = {
+const responses: Responses = {
   0: {
     title: "Dispositivo não encontrado.",
     subtitle: "Verifique se o dispositivo está ligado.",
@@ -32,4 +32,4 @@ const initialState: TypeInitialState = {
   isConnecting: false,
 };
 
-export { response, initialState };
+export { responses, initialState };
