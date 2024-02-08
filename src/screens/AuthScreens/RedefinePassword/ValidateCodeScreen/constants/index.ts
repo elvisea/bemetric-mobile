@@ -1,22 +1,22 @@
+import { Responses } from "@typings/index";
 import * as yup from "yup";
-import { TypeResponse } from "../types";
 
-const resposta: TypeResponse = {
+const responses: Record<"resend" | "validation", Responses> = {
   resend: {
     1: {
-      title: "Código reenviado com sucesso.",
-      subtitle: "Código reenviado com sucesso. Verifique seu e-mail.",
+      title: "Código Reenviado",
+      subtitle: "Um novo código de verificação foi enviado ao seu e-mail. Por favor, verifique sua caixa de entrada e siga as instruções contidas no e-mail.",
     },
   },
 
   validation: {
     1: {
-      title: "Erro ao tentar validar código.",
-      subtitle: "Código de verificação inválido. Tente novamente.",
+      title: "Falha na Verificação do Código",
+      subtitle: "O código de verificação inserido é inválido. Por favor, verifique o código fornecido e tente novamente.",
     },
     2: {
-      title: "Erro ao tentar validar código.",
-      subtitle: "Código de verificação expirado. Tente novamente.",
+      title: "Código Expirado",
+      subtitle: "O código de verificação expirou. Solicite um novo código para continuar.",
     },
   },
 };
@@ -30,4 +30,4 @@ const schema = yup.object({
   "6": yup.string().required("Inválido"),
 });
 
-export { resposta, schema };
+export { responses, schema };

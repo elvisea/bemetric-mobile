@@ -1,10 +1,5 @@
-type TypeResponse = {
-  resend: { [key: number]: { title: string; subtitle: string } };
-  validation: { [key: number]: { title: string; subtitle: string } };
-};
+type Form = { [index: string]: string };
 
-type TypeForm = { [index: string]: string };
+type Params = { email: string };
 
-type TypeParams = { email: string };
-
-export { TypeResponse, TypeForm, TypeParams };
+export { Form, Params };

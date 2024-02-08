@@ -24,7 +24,7 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { TypeAction } from "./types";
-import { inputs, response, schema } from "./constants";
+import { inputs, responses, schema } from "./constants";
 
 export function ConexaoManual() {
   const route = useRoute();
@@ -94,14 +94,14 @@ export function ConexaoManual() {
     switch (context.response.WIFI_STATUS_CONNECTION) {
       case "0":
         handleAction({
-          response: response[0],
+          response: responses[0],
           action: () => context.clearReceivedValues(),
         });
         break;
 
       case "1":
         handleAction({
-          response: response[1],
+          response: responses[1],
           action: () => handleGoToNextScreen(),
         });
         break;
