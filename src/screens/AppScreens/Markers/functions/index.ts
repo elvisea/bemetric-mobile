@@ -9,9 +9,8 @@ import {
   Geofence,
   Point,
   PointReceived,
+  Delta,
 } from "../types";
-
-import { calculateDelta, calculateInitialRegion } from "../../utils";
 
 const normalizePoints = (points: PointReceived[]): Point[] => {
   if (typeof points === "string") return [];
@@ -104,11 +103,68 @@ const checkSize = (arrays: Array<any[]>): boolean => {
   return arrays.every((arr) => arr.length === 0);
 };
 
+const calculateDelta = (coords: Coord[]): Delta => {
+  const margemAjuste = 1;
+  const minLatitude = Math.min(...coords.map((coord) => coord.latitude));
+  const maxLatitude = Math.max(...coords.map((coord) => coord.latitude));
+  const minLongitude = Math.min(...coords.map((coord) => coord.longitude));
+  const maxLongitude = Math.max(...coords.map((coord) => coord.longitude));
+
+  const amplitudeLatitude = maxLatitude - minLatitude;
+  const amplitudeLongitude = maxLongitude - minLongitude;
+
+  const margemLatitude = margemAjuste * amplitudeLatitude;
+  const margemLongitude = margemAjuste * amplitudeLongitude;
+
+  const latitudeDelta = amplitudeLatitude + margemLatitude;
+  const longitudeDelta = amplitudeLongitude + margemLongitude;
+
+  return { latitudeDelta, longitudeDelta };
+};
+
+const calculateInitialRegion = (coords: Coord[]) => {
+  const numCoordenadas = coords.length;
+
+  let somaLatitudes = 0;
+  let somaLongitudes = 0;
+
+  coords.forEach((coord) => {
+    somaLatitudes += coord.latitude;
+    somaLongitudes += coord.longitude;
+  });
+
+  const mediaLatitude = somaLatitudes / numCoordenadas;
+  const mediaLongitude = somaLongitudes / numCoordenadas;
+
+  const pontoCentral = {
+    latitude: mediaLatitude,
+    longitude: mediaLongitude,
+  };
+
+  return pontoCentral;
+};
+
+const getDeltaFromRadius = (center: Coord, radius: number): Coord => {
+  const earthCircumference = 40075016.686;
+
+  const latDelta = (radius / earthCircumference) * 360;
+
+  const lonDelta =
+    (radius /
+      (Math.cos((center.latitude * Math.PI) / 180) * earthCircumference)) *
+    360;
+
+  return { latitude: latDelta * 5, longitude: lonDelta * 5 };
+};
+
 export {
   checkSize,
+  calculateDelta,
   normalizePoints,
   setInitialRegion,
   normalizeGeofences,
+  getDeltaFromRadius,
   normalizeEquipments,
   generateListCoordinates,
+  calculateInitialRegion,
 };

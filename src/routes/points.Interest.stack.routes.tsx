@@ -6,9 +6,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { THEME } from "@theme/theme";
 
-import { PointsInterest } from "@screens/AppScreens/Markers/PointsInterest";
-import { CreatePointsInterest } from "@screens/AppScreens/Markers/CreatePointsInterest";
-import { UpdatePointsInterest } from "@screens/AppScreens/Markers/UpdatePointsInterest";
+import { Points } from "@screens/AppScreens/Markers/screens/Points";
+import { CreatePoint } from "@screens/AppScreens/Markers/screens/CreatePoint";
+import { Point } from "@screens/AppScreens/Markers/screens/Point";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,20 +18,20 @@ export default function PointsInterestStackRoutes() {
       <StatusBar backgroundColor={THEME.colors.blue[700]} />
       <Stack.Navigator>
         <Stack.Screen
-          name="PointsInterest"
-          component={PointsInterest}
+          name="Points"
+          component={Points}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name="CreatePointsInterest"
-          component={CreatePointsInterest}
+          name="CreatePoint"
+          component={CreatePoint}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name="UpdatePointsInterest"
-          component={UpdatePointsInterest}
+          name="Point"
+          component={Point}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

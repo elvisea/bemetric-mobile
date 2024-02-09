@@ -16,8 +16,8 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { styles } from "./styles";
 import { IParams } from "../interfaces/IEquipamentDetails";
 
-import { calculateDelta } from "@screens/AppScreens/Markers/utils";
-import { IDelta } from "@screens/AppScreens/Markers/UpdateGeofences/interfaces";
+import { Delta } from "@screens/AppScreens/Markers/types";
+import { calculateDelta } from "@screens/AppScreens/Markers/functions";
 
 interface ILocation {
   lat: number;
@@ -33,7 +33,7 @@ export function Route() {
   const { colors } = THEME;
   const { params } = route.params as IParams;
 
-  const [delta, setDelta] = useState<IDelta>({} as IDelta);
+  const [delta, setDelta] = useState<Delta>({} as Delta);
   const [location, setLocation] = useState<ILocation | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);

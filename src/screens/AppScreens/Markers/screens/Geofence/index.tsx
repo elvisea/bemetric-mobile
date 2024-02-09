@@ -26,12 +26,12 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { ContainerCheckbox } from "../CreateGeofence/styles";
 
 import { Container } from "./styles";
-import { calculateDelta, calculateInitialRegion } from "../utils/";
+import { calculateDelta, calculateInitialRegion } from "../../functions";
 
 import { responses } from "./constants/responses";
 import { ICoordinate, IDelta, IGeofence, IParams } from "./interfaces";
 
-export function UpdateGeofences() {
+export function Geofence() {
   const { colors } = THEME;
 
   const route = useRoute();

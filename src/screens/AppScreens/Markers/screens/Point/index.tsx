@@ -24,7 +24,7 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { ContainerCheckbox } from "./styles";
-import { getDeltaFromRadius } from "../utils";
+import { getDeltaFromRadius } from "../../functions";
 
 import { IPointsInterest } from "./types";
 import { deleteResponse, updateResponse } from "./responses";
@@ -33,7 +33,7 @@ interface IParams {
   codigoPontoInteresse: number;
 }
 
-export function UpdatePointsInterest() {
+export function Point() {
   const { colors } = THEME;
 
   const route = useRoute();
@@ -67,7 +67,7 @@ export function UpdatePointsInterest() {
             [
               {
                 text: "Visualizar Pontos de Interesse",
-                onPress: () => navigation.navigate("PointsInterest"),
+                onPress: () => navigation.navigate("Points"),
               },
             ],
           );
@@ -128,7 +128,7 @@ export function UpdatePointsInterest() {
           [
             {
               text: "Visualizar Pontos de Interesse",
-              onPress: () => navigation.navigate("PointsInterest"),
+              onPress: () => navigation.navigate("Points"),
             },
           ],
         );

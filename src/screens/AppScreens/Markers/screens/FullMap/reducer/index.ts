@@ -1,5 +1,5 @@
 import { Action, State } from "../types";
-import { setInitialRegion } from "../functions";
+import { setInitialRegion } from "../../../functions";
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
