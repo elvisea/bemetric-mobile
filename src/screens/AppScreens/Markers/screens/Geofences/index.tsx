@@ -15,12 +15,9 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { Container } from "./styles";
+import { initialState } from "./constants";
 
-interface IGeofence {
-  descricao: string;
-  nomeGeocerca: string;
-  codigoGeocerca: number;
-}
+import { normalizeGeofences } from "../../functions";
 
 export function Geofences() {
   const { colors } = THEME;
@@ -28,27 +25,24 @@ export function Geofences() {
   const { customer } = useCustomer();
   const navigation = useNavigation();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [geofences, setGeofences] = useState<IGeofence[]>([]);
+  const [state, setState] = useState(initialState);
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
       async function fetchData() {
-        setIsLoading(true);
-
         try {
+          setState((prevState) => ({ ...prevState, isLoading: true }));
+
           if (customer) {
             const response = await api.post("/Geocerca/ObterListaGeocercaApp", {
               codigoCliente: customer.codigoCliente,
             });
 
-            if (response.data === 204) {
-              setGeofences([]);
-            } else {
-              setGeofences(response.data);
-            }
+            const geofences = normalizeGeofences(response.data);
+
+            setState((prevState) => ({ ...prevState, geofences: geofences }));
           }
         } catch (error) {
           Alert.alert(
@@ -56,11 +50,11 @@ export function Geofences() {
             "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
           );
         } finally {
-          setIsLoading(false);
+          setState((prevState) => ({ ...prevState, isLoading: false }));
         }
       }
 
-      fetchData();
+      isActive && fetchData();
 
       return () => {
         isActive = false;
@@ -79,24 +73,24 @@ export function Geofences() {
         />
       </HeaderDefault>
 
-      {isLoading && <LoadingSpinner color={colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-      {geofences.length > 0 && !isLoading && (
+      {!state.isLoading && (
         <FlatList
-          data={geofences}
-          keyExtractor={(item) => item.codigoGeocerca.toString()}
+          data={state.geofences}
+          keyExtractor={(item) => item.id}
           style={{ width: "100%", padding: 16 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item: geofence }) => (
             <MarkerCard
-              title={geofence.nomeGeocerca}
+              title={geofence.name}
               icon={
                 <Entypo name="location" size={28} color={colors.blue[700]} />
               }
-              description={geofence.descricao}
+              description={geofence.description}
               onPress={() =>
-                navigation.navigate("UpdateGeofences", {
-                  codigoGeocerca: geofence.codigoGeocerca,
+                navigation.navigate("Geofence", {
+                  codigoGeocerca: geofence.code,
                 })
               }
             />

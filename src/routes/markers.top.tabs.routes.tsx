@@ -3,7 +3,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { FontAwesome5, Entypo } from "@expo/vector-icons";
 
 import { THEME } from "@theme/theme";
-import { FullMap } from "@screens/AppScreens/Markers/FullMap";
+import { FullMap } from "@screens/AppScreens/Markers/screens/FullMap";
 
 import GeofencesStackRoutes from "./geofences.stack.routes";
 import PointsInterestStackRoutes from "./points.Interest.stack.routes";

@@ -156,21 +156,14 @@ export declare global {
 
       ChangePasswordScreen: undefined;
 
-      UpdateGeofences: {
-        codigoGeocerca: number;
-      };
-
       Geofences: undefined;
-
       CreateGeofence: undefined;
+      Geofence: { codigoGeocerca: number; };
 
-      PointsInterest: undefined;
+      Points: undefined;
+      CreatePoint: undefined;
+      Point: { codigoPontoInteresse: number; };
 
-      CreatePointsInterest: undefined;
-
-      UpdatePointsInterest: {
-        codigoPontoInteresse: number;
-      };
 
       NotificationDetailing: {
         screen: "DetailingScreen";

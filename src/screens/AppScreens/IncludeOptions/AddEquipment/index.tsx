@@ -192,21 +192,14 @@ export function AddEquipment() {
       });
 
       if (data.erro === 0) {
-        Alert.alert(
-          responses[data.erro].title,
-          responses[data.erro].subtitle,
-          [
-            {
-              text: "Mostrar Equipamentos",
-              onPress: () => navigation.navigate("Equipments"),
-            },
-          ],
-        );
+        Alert.alert(responses[data.erro].title, responses[data.erro].subtitle, [
+          {
+            text: "Mostrar Equipamentos",
+            onPress: () => navigation.navigate("Equipments"),
+          },
+        ]);
       } else {
-        Alert.alert(
-          responses[data.erro].title,
-          responses[data.erro].subtitle,
-        );
+        Alert.alert(responses[data.erro].title, responses[data.erro].subtitle);
       }
     } catch (error) {
       Alert.alert(

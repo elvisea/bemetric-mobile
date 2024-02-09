@@ -31,7 +31,7 @@ import { ContainerCheckbox } from "./styles";
 import { responses } from "./constants/responses";
 import { ILocation, IPointsInterest } from "./interfaces";
 
-export function CreatePointsInterest() {
+export function CreatePoint() {
   const { colors } = THEME;
 
   const { customer } = useCustomer();
@@ -101,7 +101,7 @@ export function CreatePointsInterest() {
         Alert.alert(responses[response.data], responses[response.data], [
           {
             text: "Visualizar Pontos de Interesse",
-            onPress: () => navigation.navigate("PointsInterest"),
+            onPress: () => navigation.navigate("Points"),
           },
         ]);
         setStateDefault();

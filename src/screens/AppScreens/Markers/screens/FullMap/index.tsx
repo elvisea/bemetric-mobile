@@ -20,17 +20,17 @@ import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { calculateInitialRegion } from "../utils";
+import { calculateInitialRegion } from "../../functions";
 
+import { Modal } from "./types";
 import { reducer } from "./reducer";
 import { buttons, initialState, url } from "./constants";
 
 import {
-  Modal,
   PointReceived,
   GeofenceReceived,
   EquipmentReceived,
-} from "./types";
+} from "../../types";
 
 import {
   checkSize,
@@ -38,7 +38,7 @@ import {
   normalizeGeofences,
   normalizeEquipments,
   generateListCoordinates,
-} from "./functions";
+} from "../../functions";
 
 export function FullMap() {
   const { colors } = THEME;
@@ -72,15 +72,15 @@ export function FullMap() {
 
     const coords = isArraysEmpty
       ? generateListCoordinates(
-        state.markers.points,
-        state.markers.geofences,
-        state.markers.equipment,
-      )
+          state.markers.points,
+          state.markers.geofences,
+          state.markers.equipment,
+        )
       : generateListCoordinates(
-        state.filters.points,
-        state.filters.geofences,
-        state.filters.equipment,
-      );
+          state.filters.points,
+          state.filters.geofences,
+          state.filters.equipment,
+        );
 
     mapRef.current?.animateCamera({
       center: {

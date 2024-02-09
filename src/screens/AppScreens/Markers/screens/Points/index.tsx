@@ -9,33 +9,29 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 
+import { initialState } from "./constants";
+import { normalizePoints } from "../../functions";
+
 import { MarkerCard } from "@components/MarkerCard";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-interface IPointsInterest {
-  descricao: string;
-  nomePonto: string;
-  codigoPontoInteresse: number;
-}
-
-export function PointsInterest() {
+export function Points() {
   const { colors } = THEME;
 
   const { customer } = useCustomer();
   const navigation = useNavigation();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [pointsInterest, setPointsInterest] = useState<IPointsInterest[]>([]);
+  const [state, setState] = useState(initialState);
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
       async function fetchData() {
-        setIsLoading(true);
-
         try {
+          setState((prevState) => ({ ...prevState, isLoading: true }));
+
           if (customer) {
             const response = await api.post(
               "/PontoInteresse/ObterListaPontoInteresseApp",
@@ -44,7 +40,9 @@ export function PointsInterest() {
               },
             );
 
-            isActive && setPointsInterest(response.data);
+            const points = normalizePoints(response.data);
+
+            setState((prevState) => ({ ...prevState, points: points }));
           }
         } catch (error) {
           Alert.alert(
@@ -52,11 +50,11 @@ export function PointsInterest() {
             "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
           );
         } finally {
-          setIsLoading(false);
+          setState((prevState) => ({ ...prevState, isLoading: false }));
         }
       }
 
-      fetchData();
+      isActive && fetchData();
 
       return () => {
         isActive = false;
@@ -75,21 +73,21 @@ export function PointsInterest() {
               color={colors.blue[700]}
             />
           }
-          onPress={() => navigation.navigate("CreatePointsInterest")}
+          onPress={() => navigation.navigate("CreatePoint")}
         />
       </HeaderDefault>
 
-      {isLoading && <LoadingSpinner color={colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-      {pointsInterest.length > 0 && !isLoading && (
+      {!state.isLoading && (
         <FlatList
-          data={pointsInterest}
-          keyExtractor={(item) => item.codigoPontoInteresse.toString()}
+          data={state.points}
+          keyExtractor={(item) => item.id}
           style={{ width: "100%", padding: 16 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item: point }) => (
             <MarkerCard
-              title={point.nomePonto}
+              title={point.name}
               icon={
                 <FontAwesome5
                   name="dot-circle"
@@ -97,10 +95,10 @@ export function PointsInterest() {
                   color={colors.blue[700]}
                 />
               }
-              description={point.descricao}
+              description={point.description}
               onPress={() =>
-                navigation.navigate("UpdatePointsInterest", {
-                  codigoPontoInteresse: point.codigoPontoInteresse,
+                navigation.navigate("Point", {
+                  codigoPontoInteresse: point.code,
                 })
               }
             />
