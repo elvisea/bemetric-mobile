@@ -43,8 +43,6 @@ export function Point() {
 
   const [state, setState] = useState(initialState);
 
-  console.log("STATE:", state);
-
   const onValueChange = useCallback(
     (
       value: number | string | boolean | Coord,
