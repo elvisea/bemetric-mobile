@@ -2,16 +2,17 @@ import React, { useCallback, useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 
 import {
-  useFocusEffect,
-  useNavigation,
   useRoute,
+  useNavigation,
+  useFocusEffect,
 } from "@react-navigation/native";
 
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
+
+import MapView, { Circle, Marker } from "react-native-maps";
 import { HStack, IconButton, Text, VStack } from "native-base";
-import MapView, { Circle, MapPressEvent, Marker } from "react-native-maps";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
@@ -23,15 +24,14 @@ import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { ContainerCheckbox } from "./styles";
+import { Coord } from "../../types";
 import { getDeltaFromRadius } from "../../functions";
 
-import { IPointsInterest } from "./types";
-import { deleteResponse, updateResponse } from "./responses";
+import { Params } from "./types";
+import { ContainerCheckbox } from "./styles";
 
-interface IParams {
-  codigoPontoInteresse: number;
-}
+import { initialState, url } from "./constants";
+import { normalizeReceivedPoint, transformDataSend } from "./functions";
 
 export function Point() {
   const { colors } = THEME;
@@ -39,159 +39,139 @@ export function Point() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const { codigoPontoInteresse } = route.params as IParams;
+  const { codigoPontoInteresse } = route.params as Params;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [state, setState] = useState(initialState);
 
-  const [pointInterest, setPointInterest] = useState<IPointsInterest | null>(
-    null,
+  console.log("STATE:", state);
+
+  const onValueChange = useCallback(
+    (
+      value: number | string | boolean | Coord,
+      key: keyof typeof state.updatedPoint,
+    ) => {
+      if (state.isEditMode) {
+        setState((prevState) => ({
+          ...prevState,
+          updatedPoint: { ...prevState.updatedPoint, [key]: value },
+        }));
+      }
+    },
+    [state.isEditMode],
   );
 
-  const [newPointInterest, setNewPointInterest] = useState<IPointsInterest>(
-    {} as IPointsInterest,
-  );
-
-  const handleDeletePointsInterest = async () => {
+  const deletePoint = async () => {
     try {
-      if (pointInterest) {
-        const response = await api.delete("/PontoInteresse/Excluir", {
-          data: { codigoPontoInteresse: codigoPontoInteresse },
-        });
+      const response = await api.delete(url.delete, {
+        data: { codigoPontoInteresse: codigoPontoInteresse },
+      });
 
+      const message = state.responses.delete[response.data];
+
+      if (message) {
         if (response.data === 0) {
-          Alert.alert(
-            deleteResponse[response.data],
-            deleteResponse[response.data],
-            [
-              {
-                text: "Visualizar Pontos de Interesse",
-                onPress: () => navigation.navigate("Points"),
-              },
-            ],
-          );
+          Alert.alert(message.title, message.subtitle, [
+            {
+              text: message.text,
+              onPress: () => navigation.navigate("Points"),
+            },
+          ]);
+        } else {
+          Alert.alert(message.title, message.subtitle);
         }
-
-        if (response.data !== 0) {
-          Alert.alert(
-            deleteResponse[response.data],
-            deleteResponse[response.data],
-          );
-        }
+      } else {
+        Alert.alert(
+          state.responses.delete[3].title,
+          state.responses.delete[3].subtitle,
+        );
       }
     } catch (error) {
       Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        state.responses.delete[4].title,
+        state.responses.delete[4].subtitle,
       );
     }
   };
 
-  const handleValueChange = (value: number) => {
-    setNewPointInterest((oldState) => ({ ...oldState, raio: value }));
-  };
-
-  const setStateDefault = () => {
-    setNewPointInterest({} as IPointsInterest);
-    setIsOpenModal(false);
-
-    setIsEditMode(false);
-  };
-
-  const hancleCloseModal = () => setStateDefault();
-
-  const handleMapPress = (event: MapPressEvent) => {
-    const { coordinate } = event.nativeEvent;
-
-    setNewPointInterest((oldState) => ({
-      ...oldState,
-      latitude: coordinate.latitude,
-      longitude: coordinate.longitude,
+  const hancleCloseModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isEditMode: false,
+      isOpenModal: false,
     }));
   };
 
-  const handleUpdatePointInterest = async () => {
-    const data = newPointInterest;
-
-    if (!data.alertaPermanencia) delete data.alertaPermanenciaTempo;
-
+  const updatePoint = async () => {
     try {
-      const response = await api.post("/PontoInteresse/Gravar", data);
+      const data = transformDataSend(state.updatedPoint);
 
-      if (response.data === 0) {
-        setStateDefault();
+      const response = await api.post(url.update, data);
 
-        Alert.alert(
-          updateResponse[response.data],
-          updateResponse[response.data],
-          [
+      const message = state.responses.update[response.data];
+
+      if (message) {
+        if (response.data === 0) {
+          Alert.alert(message.title, message.subtitle, [
             {
-              text: "Visualizar Pontos de Interesse",
+              text: message.text,
               onPress: () => navigation.navigate("Points"),
             },
-          ],
-        );
-      }
-
-      if (response.data === 1) {
+          ]);
+        } else {
+          Alert.alert(message.title, message.subtitle);
+        }
+      } else {
         Alert.alert(
-          updateResponse[response.data],
-          updateResponse[response.data],
+          state.responses.update[4].title,
+          state.responses.update[4].subtitle,
         );
-        setStateDefault();
-        setIsOpenModal(false);
-      }
-
-      if (response.data === 2) {
-        Alert.alert(
-          updateResponse[response.data],
-          updateResponse[response.data],
-        );
-      }
-
-      if (response.data === 3) {
-        Alert.alert(
-          updateResponse[response.data],
-          updateResponse[response.data],
-        );
-        setStateDefault();
-        setIsOpenModal(false);
       }
     } catch (error) {
       Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        state.responses.update[5].title,
+        state.responses.update[5].subtitle,
       );
+    } finally {
+      setState((prevState) => ({ ...prevState, isOpenModal: false }));
     }
   };
 
   const handlePressEditMode = () => {
-    setIsEditMode(true);
-    setNewPointInterest(
-      pointInterest ? pointInterest : ({} as IPointsInterest),
-    );
+    setState((prevState) => ({ ...prevState, isEditMode: true }));
   };
 
-  const fetchPointsInterest = async () => {
-    setIsLoading(true);
-
+  const fetchPoint = async () => {
     try {
-      const { data } = await api.post<IPointsInterest[]>(
-        "/PontoInteresse/ObterLista",
-        {
-          codigoPontoInteresse,
-        },
+      setState((prevState) => ({ ...prevState, isLoading: true }));
+
+      const response = await api.post(url.list, { codigoPontoInteresse });
+
+      const normalizedPoint = normalizeReceivedPoint(response.data[0]);
+
+      const delta = getDeltaFromRadius(
+        normalizedPoint.coord,
+        normalizedPoint.radius,
       );
 
-      setPointInterest(data[0]);
+      setState((prevState) => ({
+        ...prevState,
+        point: normalizedPoint,
+        updatedPoint: normalizedPoint,
+        initialRegion: {
+          latitude: normalizedPoint.coord.latitude,
+          longitude: normalizedPoint.coord.longitude,
+          latitudeDelta: delta.latitude,
+          longitudeDelta: delta.longitude,
+        },
+      }));
+
     } catch (error) {
       Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        state.responses.update[5].title,
+        state.responses.update[5].subtitle,
       );
     } finally {
-      setIsLoading(false);
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
   };
 
@@ -199,7 +179,7 @@ export function Point() {
     useCallback(() => {
       let isActive = true;
 
-      isActive && fetchPointsInterest();
+      isActive && fetchPoint();
 
       return () => {
         isActive = false;
@@ -209,149 +189,111 @@ export function Point() {
 
   return (
     <>
-      {newPointInterest.nomePonto && (
-        <GenericModal
-          title="Editar Ponto de Interesse"
-          isOpen={isOpenModal}
-          closeModal={hancleCloseModal}
-        >
-          <Input
-            mb={4}
-            value={newPointInterest.nomePonto}
-            onChangeText={(text) =>
-              setNewPointInterest((oldState) => ({
-                ...oldState,
-                nomePonto: text,
-              }))
+      <GenericModal
+        title="Editar Ponto de Interesse"
+        isOpen={state.isOpenModal}
+        closeModal={hancleCloseModal}
+      >
+        <Input
+          mb={4}
+          value={state.updatedPoint.name}
+          onChangeText={(text) => onValueChange(text, "name")}
+          color={"#363636"}
+          _focus={{ borderColor: "blue.700", bg: "white" }}
+          variant="outline"
+          placeholder="Nome"
+          fontSize="14px"
+          borderBottomColor="blue.700"
+          placeholderTextColor={"blue.700"}
+        />
+
+        <Input
+          value={state.updatedPoint.description}
+          onChangeText={(text) => onValueChange(text, "description")}
+          color={"#363636"}
+          _focus={{ borderColor: "blue.700", bg: "white" }}
+          variant="outline"
+          placeholder="Descrição"
+          fontSize="14px"
+          borderBottomColor="blue.700"
+          placeholderTextColor={"blue.700"}
+        />
+
+        <Text fontSize={14} mt="16px" mb="12px" color={THEME.colors.blue[700]}>
+          {`Raio ${state.updatedPoint.radius} m`}
+        </Text>
+
+        <Slider
+          step={1}
+          style={{ width: "100%" }}
+          minimumValue={0}
+          maximumValue={1000}
+          value={state.updatedPoint.radius}
+          onValueChange={(value) => onValueChange(value, "radius")}
+          minimumTrackTintColor={THEME.colors.blue[700]}
+          maximumTrackTintColor="#C6C6C6"
+          thumbTintColor={THEME.colors.blue[700]}
+        />
+
+        <Text fontSize={14} mt="16px">
+          Alertas de marcador
+        </Text>
+
+        <Text fontSize={12} mb="16px">
+          Gerar alerta de evento
+        </Text>
+
+        <ContainerCheckbox mb={8}>
+          <Checkbox
+            style={styles.checkbox}
+            value={state.updatedPoint.alert}
+            onValueChange={(value) => onValueChange(value, "alert")}
+            color={
+              state.updatedPoint.alert ? THEME.colors.blue[700] : undefined
             }
-            color={"#363636"}
-            _focus={{ borderColor: "blue.700", bg: "white" }}
-            variant="outline"
-            placeholder="Nome"
-            fontSize="14px"
-            borderBottomColor="blue.700"
-            placeholderTextColor={"blue.700"}
           />
+          <Text style={styles.paragraph}>Entrada e Saída</Text>
+        </ContainerCheckbox>
 
-          <Input
-            value={newPointInterest.descricao}
-            onChangeText={(text) =>
-              setNewPointInterest((oldState) => ({
-                ...oldState,
-                descricao: text,
-              }))
-            }
-            color={"#363636"}
-            _focus={{ borderColor: "blue.700", bg: "white" }}
-            variant="outline"
-            placeholder="Descrição"
-            fontSize="14px"
-            borderBottomColor="blue.700"
-            placeholderTextColor={"blue.700"}
-          />
-
-          <Text
-            fontSize={14}
-            mt="16px"
-            mb="12px"
-            color={THEME.colors.blue[700]}
-          >
-            {`Raio ${newPointInterest.raio} m`}
-          </Text>
-
-          <Slider
-            step={1}
-            style={{ width: "100%" }}
-            minimumValue={0}
-            maximumValue={1000}
-            value={newPointInterest.raio}
-            onValueChange={handleValueChange}
-            minimumTrackTintColor={THEME.colors.blue[700]}
-            maximumTrackTintColor="#C6C6C6"
-            thumbTintColor={THEME.colors.blue[700]}
-          />
-
-          <Text fontSize={14} mt="16px">
-            Alertas de marcador
-          </Text>
-
-          <Text fontSize={12} mb="16px">
-            Gerar alerta de evento
-          </Text>
-
-          <ContainerCheckbox mb={8}>
+        <ContainerCheckbox mb={8} style={{ justifyContent: "space-between" }}>
+          <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Checkbox
               style={styles.checkbox}
-              value={newPointInterest.alertaEntradaSaida}
-              onValueChange={(value) =>
-                setNewPointInterest((oldState) => ({
-                  ...oldState,
-                  alertaEntradaSaida: value,
-                }))
-              }
+              value={state.updatedPoint.permanence}
+              onValueChange={(value) => onValueChange(value, "permanence")}
               color={
-                newPointInterest.alertaEntradaSaida
+                state.updatedPoint.permanence
                   ? THEME.colors.blue[700]
                   : undefined
               }
             />
-            <Text style={styles.paragraph}>Entrada e Saída</Text>
-          </ContainerCheckbox>
+            <Text style={styles.paragraph}>Permanência</Text>
+          </View>
 
-          <ContainerCheckbox mb={8} style={{ justifyContent: "space-between" }}>
-            <View style={{ flexDirection: "row", justifyContent: "center" }}>
-              <Checkbox
-                style={styles.checkbox}
-                value={newPointInterest.alertaPermanencia}
-                onValueChange={(value) =>
-                  setNewPointInterest((oldState) => ({
-                    ...oldState,
-                    alertaPermanencia: value,
-                  }))
-                }
-                color={
-                  newPointInterest.alertaPermanencia
-                    ? THEME.colors.blue[700]
-                    : undefined
-                }
-              />
-              <Text style={styles.paragraph}>Permanência</Text>
-            </View>
-
-            <TextInput
-              keyboardType="numeric"
-              value={
-                newPointInterest.alertaPermanenciaTempo
-                  ? newPointInterest.alertaPermanenciaTempo.toString()
-                  : ""
-              }
-              onChangeText={(text) =>
-                setNewPointInterest((oldState) => ({
-                  ...oldState,
-                  alertaPermanenciaTempo: Number(text),
-                }))
-              }
-              textAlign="center"
-              placeholder="min"
-              style={{
-                width: 40,
-                padding: 0,
-                borderBottomWidth: 1,
-                borderBottomColor: THEME.colors.blue[700],
-              }}
-              editable={newPointInterest.alertaPermanencia}
-            />
-          </ContainerCheckbox>
-
-          <Button
-            title="Salvar"
-            w="full"
-            h="58px"
-            mt="24px"
-            onPress={handleUpdatePointInterest}
+          <TextInput
+            keyboardType="numeric"
+            value={state.updatedPoint.duration?.toString()}
+            onChangeText={(text) => onValueChange(text, "duration")}
+            textAlign="center"
+            placeholder="min"
+            style={{
+              width: 40,
+              padding: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: THEME.colors.blue[700],
+            }}
+            editable={state.updatedPoint.permanence}
           />
-        </GenericModal>
-      )}
+        </ContainerCheckbox>
+
+        <Button
+          title="Salvar"
+          w="full"
+          h="58px"
+          mt="24px"
+          onPress={updatePoint}
+        />
+      </GenericModal>
 
       <VStack flex={1} width="full" bg={colors.shape}>
         <HeaderDefault title="Ponto de Interesse">
@@ -363,71 +305,51 @@ export function Point() {
             <IconButton
               style={{ marginLeft: 8 }}
               icon={<Feather name="trash" size={22} color={colors.red[600]} />}
-              onPress={handleDeletePointsInterest}
+              onPress={deletePoint}
             />
           </HStack>
         </HeaderDefault>
 
-        {isLoading && <LoadingSpinner color={colors.blue[700]} />}
+        {state.isLoading && <LoadingSpinner color={colors.blue[700]} />}
 
-        {!isLoading && pointInterest && (
+        {!state.isLoading && state.point && (
           <MapView
             style={{ flex: 1 }}
-            onPress={
-              isEditMode
-                ? handleMapPress
-                : () => console.log(`Edit Mode: ${isEditMode}`)
-            }
             zoomControlEnabled
-            initialRegion={{
-              latitude: pointInterest.latitude,
-              longitude: pointInterest.longitude,
-              latitudeDelta: getDeltaFromRadius(
-                {
-                  latitude: pointInterest.latitude,
-                  longitude: pointInterest.longitude,
-                },
-                pointInterest.raio,
-              ).latitude,
-              longitudeDelta: getDeltaFromRadius(
-                {
-                  latitude: pointInterest.latitude,
-                  longitude: pointInterest.longitude,
-                },
-                pointInterest.raio,
-              ).longitude,
-            }}
+            initialRegion={state.initialRegion}
+            onPress={({ nativeEvent: { coordinate } }) =>
+              onValueChange(coordinate, "coord")
+            }
           >
             <Circle
-              center={{
-                latitude: !isEditMode
-                  ? pointInterest.latitude
-                  : newPointInterest.latitude,
-                longitude: !isEditMode
-                  ? pointInterest.longitude
-                  : newPointInterest.longitude,
-              }}
-              radius={!isEditMode ? pointInterest.raio : newPointInterest.raio}
-              fillColor="rgba(160, 198, 229, 0.3)"
-              strokeColor="rgba(0, 105, 192, 1)"
+              center={
+                state.isEditMode ? state.updatedPoint.coord : state.point.coord
+              }
+              radius={
+                state.isEditMode
+                  ? state.updatedPoint.radius
+                  : state.point.radius
+              }
+              fillColor={colors.FILL_COLOR}
+              strokeColor={colors.STROKE_COLOR}
               strokeWidth={2}
             />
 
             <Marker
-              coordinate={{
-                latitude: !isEditMode
-                  ? pointInterest.latitude
-                  : newPointInterest.latitude,
-                longitude: !isEditMode
-                  ? pointInterest.longitude
-                  : newPointInterest.longitude,
-              }}
+              coordinate={
+                state.isEditMode ? state.updatedPoint.coord : state.point.coord
+              }
             />
           </MapView>
         )}
 
-        {isEditMode && (
-          <ButtonFull title="Editar" onPress={() => setIsOpenModal(true)} />
+        {state.isEditMode && (
+          <ButtonFull
+            title="Editar"
+            onPress={() =>
+              setState((prevState) => ({ ...prevState, isOpenModal: true }))
+            }
+          />
         )}
       </VStack>
     </>
@@ -441,11 +363,11 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     fontSize: 15,
-    color: "#717171",
+    color: THEME.colors.gray[250],
   },
   checkbox: {
     marginRight: 16,
-    color: "#0069C0",
+    color: THEME.colors.blue[700],
   },
 
   input: {

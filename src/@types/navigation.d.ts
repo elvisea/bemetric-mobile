@@ -158,12 +158,11 @@ export declare global {
 
       Geofences: undefined;
       CreateGeofence: undefined;
-      Geofence: { codigoGeocerca: number; };
+      Geofence: { codigoGeocerca: number };
 
       Points: undefined;
       CreatePoint: undefined;
-      Point: { codigoPontoInteresse: number; };
-
+      Point: { codigoPontoInteresse: number };
 
       NotificationDetailing: {
         screen: "DetailingScreen";
