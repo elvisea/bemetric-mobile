@@ -21,7 +21,7 @@ const transformDataSend = (point: NormalizedPoint): PointReceived => {
     alertaPermanencia: point.permanence,
     alertaPermanenciaTempo: point.duration,
     codigoCliente: point.client,
-    codigoParceiro: 5,
+    codigoParceiro: point.partner,
     codigoPontoInteresse: point.code,
     descricao: point.description,
     latitude: point.coord.latitude,

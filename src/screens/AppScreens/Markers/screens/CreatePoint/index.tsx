@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { IconButton, Text, VStack } from "native-base";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
-import MapView, { MapPressEvent, Marker, Circle } from "react-native-maps";
+import MapView, { Marker, Circle } from "react-native-maps";
 
 import {
-  LocationAccuracy,
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
-  watchPositionAsync,
 } from "expo-location";
 
 import { Input } from "@components/Input";
@@ -21,15 +19,16 @@ import { Button } from "@components/Button";
 import { ButtonFull } from "@components/ButtonFull";
 import { GenericModal } from "@components/GenericModal";
 import { HeaderDefault } from "@components/HeaderDefault";
-import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 import { useCustomer } from "@hooks/customer";
 
+import { Coord } from "../../types";
+
+import { initialState } from "./constants";
 import { ContainerCheckbox } from "./styles";
-import { responses } from "./constants/responses";
-import { ILocation, IPointsInterest } from "./interfaces";
+import { transformPointForSubmission } from "./functions";
 
 export function CreatePoint() {
   const { colors } = THEME;
@@ -37,153 +36,135 @@ export function CreatePoint() {
   const { customer } = useCustomer();
   const navigation = useNavigation();
 
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const mapRef = useRef<MapView>(null);
 
-  const [location, setLocation] = useState<ILocation | null>(null);
+  const [state, setState] = useState(initialState);
 
-  const [pointInterest, setPointInterest] = useState<IPointsInterest>({
-    incluir: true,
-    codigoCliente: customer?.codigoCliente,
-    nomePonto: "",
-    descricao: "",
-    raio: 100,
-    latitude: null,
-    longitude: null,
-    alertaEntradaSaida: false,
-    alertaPermanencia: false,
-    alertaPermanenciaTempo: 0,
-  } as IPointsInterest);
-
-  const handleMapPress = (event: MapPressEvent) => {
-    const { coordinate } = event.nativeEvent;
-
-    setPointInterest((oldState) => ({
-      ...oldState,
-      latitude: coordinate.latitude,
-      longitude: coordinate.longitude,
-    }));
+  const animateCamera = (coord: Coord) => {
+    mapRef.current?.animateCamera({
+      center: { latitude: coord.latitude, longitude: coord.longitude },
+    });
   };
 
-  const setStateDefault = () => {
+  const closeModal = async () => {
+    const { coords } = await getCurrentPositionAsync();
+    setState({
+      ...initialState,
+      point: {
+        ...initialState.point,
+        coord: { latitude: coords.latitude, longitude: coords.longitude },
+      },
+    });
+
+    animateCamera({ latitude: coords.latitude, longitude: coords.longitude });
+  };
+
+  const cleanPoint = async () => {
+    const { coords } = await getCurrentPositionAsync();
+
+    setState((prevState) => ({
+      ...prevState,
+      point: {
+        ...prevState.point,
+        coord: { latitude: coords.latitude, longitude: coords.longitude },
+      },
+    }));
+
+    animateCamera({ latitude: coords.latitude, longitude: coords.longitude });
+  };
+
+  const savePoint = async () => {
     if (customer) {
-      setPointInterest({
-        incluir: true,
-        codigoCliente: customer.codigoCliente,
-        nomePonto: "",
-        descricao: "",
-        raio: 100,
-        latitude: null,
-        longitude: null,
-        alertaEntradaSaida: false,
-        alertaPermanencia: false,
-        alertaPermanenciaTempo: 0,
-      });
+      const data = transformPointForSubmission(
+        state.point,
+        customer.codigoCliente,
+      );
+
+      try {
+        const response = await api.post("/PontoInteresse/Gravar", data);
+
+        const message = state.responses[response.data];
+
+        if (message) {
+          if (response.data === 0) {
+            Alert.alert(message.title, message.subtitle, [
+              {
+                text: message.text,
+                onPress: () => {
+                  navigation.navigate("Points");
+                  setState(initialState);
+                },
+              },
+            ]);
+          } else {
+            Alert.alert(message.title, message.subtitle);
+          }
+        } else {
+          Alert.alert(state.responses[4].title, state.responses[4].subtitle);
+        }
+      } catch (error) {
+        Alert.alert(state.responses[5].title, state.responses[5].subtitle);
+      } finally {
+      }
     }
   };
 
-  const hancleCloseModal = () => {
-    setStateDefault();
-    setIsOpenModal(!isOpenModal);
-  };
+  const onValueChange = (
+    value: number | string | boolean | Coord,
+    key: keyof typeof state.point,
+  ) => {
+    setState((prevState) => ({
+      ...prevState,
+      point: { ...prevState.point, [key]: value },
+    }));
 
-  const handleValueChange = (value: number) => {
-    setPointInterest((oldState) => ({ ...oldState, raio: value }));
-  };
-
-  const handleSavePointInterest = async () => {
-    const data = pointInterest;
-
-    if (!data.alertaPermanencia) delete data.alertaPermanenciaTempo;
-
-    try {
-      const response = await api.post("/PontoInteresse/Gravar", data);
-      if (response.data === 0) {
-        Alert.alert(responses[response.data], responses[response.data], [
-          {
-            text: "Visualizar Pontos de Interesse",
-            onPress: () => navigation.navigate("Points"),
-          },
-        ]);
-        setStateDefault();
-        setIsOpenModal(false);
-      }
-      if (response.data === 1) {
-        Alert.alert(responses[response.data], responses[response.data]);
-        setStateDefault();
-        setIsOpenModal(false);
-      }
-      if (response.data === 2) {
-        Alert.alert(responses[response.data], responses[response.data]);
-      }
-      if (response.data === 3) {
-        Alert.alert(responses[response.data], responses[response.data]);
-        setStateDefault();
-        setIsOpenModal(false);
-      }
-    } catch (error) {
-      Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
-      );
+    if (typeof value === "object") {
+      setState((prevState) => ({ ...prevState, touchedMap: true }));
+      animateCamera({ latitude: value.latitude, longitude: value.longitude });
     }
   };
 
   const requestLocationPermission = async () => {
     const { status } = await requestForegroundPermissionsAsync();
 
-    if (status !== "granted") {
-      setLocation({
-        latitude: -23.5505,
-        longitude: -46.6333,
-      });
-    }
-
     if (status === "granted") {
       const { coords } = await getCurrentPositionAsync();
 
-      setLocation({
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-      });
+      setState((prevState) => ({
+        ...prevState,
+        point: {
+          ...prevState.point,
+          coord: { latitude: coords.latitude, longitude: coords.longitude },
+        },
+      }));
+
+      animateCamera({ latitude: coords.latitude, longitude: coords.longitude });
     }
   };
 
-  useEffect(() => {
-    requestLocationPermission();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-  useEffect(() => {
-    watchPositionAsync(
-      {
-        accuracy: LocationAccuracy.Highest,
-        timeInterval: 10000,
-        distanceInterval: 1,
-      },
-      (response) => {
-        setLocation({
-          latitude: response.coords.latitude,
-          longitude: response.coords.longitude,
-        });
-      },
-    );
-  }, []);
+      if (isActive) requestLocationPermission();
+
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
 
   return (
     <>
       <GenericModal
         title="Criar Ponto de Interesse"
-        isOpen={isOpenModal}
-        closeModal={hancleCloseModal}
+        isOpen={state.isOpenModal}
+        closeModal={closeModal}
       >
         <Input
           mb={4}
-          value={pointInterest.nomePonto}
-          onChangeText={(text) =>
-            setPointInterest((oldState) => ({
-              ...oldState,
-              nomePonto: text,
-            }))
-          }
+          value={state.point.name}
+          onChangeText={(text) => onValueChange(text, "name")}
           color={"#363636"}
           _focus={{ borderColor: "blue.700", bg: "white" }}
           variant="outline"
@@ -194,10 +175,8 @@ export function CreatePoint() {
         />
 
         <Input
-          value={pointInterest.descricao}
-          onChangeText={(text) =>
-            setPointInterest((oldState) => ({ ...oldState, descricao: text }))
-          }
+          value={state.point.description}
+          onChangeText={(text) => onValueChange(text, "description")}
           color={"#363636"}
           _focus={{ borderColor: "blue.700", bg: "white" }}
           variant="outline"
@@ -208,7 +187,7 @@ export function CreatePoint() {
         />
 
         <Text fontSize={14} mt="16px" mb="12px" color={THEME.colors.blue[700]}>
-          {`Raio ${pointInterest.raio} m`}
+          {`Raio ${state.point.radius} m`}
         </Text>
 
         <Slider
@@ -216,8 +195,8 @@ export function CreatePoint() {
           style={{ width: "100%" }}
           minimumValue={0}
           maximumValue={1000}
-          value={pointInterest.raio}
-          onValueChange={handleValueChange}
+          value={state.point.radius}
+          onValueChange={(value) => onValueChange(value, "radius")}
           minimumTrackTintColor={THEME.colors.blue[700]}
           maximumTrackTintColor="#C6C6C6"
           thumbTintColor={THEME.colors.blue[700]}
@@ -234,18 +213,9 @@ export function CreatePoint() {
         <ContainerCheckbox mb={8}>
           <Checkbox
             style={styles.checkbox}
-            value={pointInterest.alertaEntradaSaida}
-            onValueChange={(value) =>
-              setPointInterest((oldState) => ({
-                ...oldState,
-                alertaEntradaSaida: value,
-              }))
-            }
-            color={
-              pointInterest.alertaEntradaSaida
-                ? THEME.colors.blue[700]
-                : undefined
-            }
+            value={state.point.alert}
+            onValueChange={(value) => onValueChange(value, "alert")}
+            color={state.point.alert ? THEME.colors.blue[700] : undefined}
           />
           <Text style={styles.paragraph}>Entrada e Saída</Text>
         </ContainerCheckbox>
@@ -254,17 +224,10 @@ export function CreatePoint() {
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Checkbox
               style={styles.checkbox}
-              value={pointInterest.alertaPermanencia}
-              onValueChange={(value) =>
-                setPointInterest((oldState) => ({
-                  ...oldState,
-                  alertaPermanencia: value,
-                }))
-              }
+              value={state.point.permanence}
+              onValueChange={(value) => onValueChange(value, "permanence")}
               color={
-                pointInterest.alertaPermanencia
-                  ? THEME.colors.blue[700]
-                  : undefined
+                state.point.permanence ? THEME.colors.blue[700] : undefined
               }
             />
             <Text style={styles.paragraph}>Permanência</Text>
@@ -272,17 +235,8 @@ export function CreatePoint() {
 
           <TextInput
             keyboardType="numeric"
-            value={
-              pointInterest.alertaPermanenciaTempo
-                ? pointInterest.alertaPermanenciaTempo.toString()
-                : ""
-            }
-            onChangeText={(text) =>
-              setPointInterest((oldState) => ({
-                ...oldState,
-                alertaPermanenciaTempo: Number(text),
-              }))
-            }
+            value={state.point.duration ? state.point.duration.toString() : ""}
+            onChangeText={(text) => onValueChange(text, "duration")}
             textAlign="center"
             placeholder="min"
             style={{
@@ -291,7 +245,7 @@ export function CreatePoint() {
               borderBottomWidth: 1,
               borderBottomColor: THEME.colors.blue[700],
             }}
-            editable={pointInterest.alertaPermanencia}
+            editable={state.point.permanence}
           />
         </ContainerCheckbox>
 
@@ -300,7 +254,7 @@ export function CreatePoint() {
           w="full"
           h="58px"
           mt="24px"
-          onPress={handleSavePointInterest}
+          onPress={savePoint}
         />
       </GenericModal>
 
@@ -308,55 +262,45 @@ export function CreatePoint() {
         <HeaderDefault title="Ponto de Interesse">
           <IconButton
             icon={<Feather name="delete" size={22} color={colors.blue[700]} />}
-            onPress={() =>
-              setPointInterest((oldState) => ({
-                ...oldState,
-                listaPontosGeocerca: [],
-              }))
-            }
+            onPress={cleanPoint}
           />
         </HeaderDefault>
 
-        {!location && <LoadingSpinner color={colors.blue[700]} />}
+        <MapView
+          ref={mapRef}
+          style={{ flex: 1 }}
+          loadingEnabled
+          onPress={({ nativeEvent: { coordinate } }) =>
+            onValueChange(coordinate, "coord")
+          }
+          zoomControlEnabled
+          initialRegion={{
+            latitude: state.point.coord.latitude,
+            longitude: state.point.coord.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }}
+        >
+          {state.touchedMap && (
+            <Circle
+              center={state.point.coord}
+              radius={state.point.radius}
+              fillColor={colors.FILL_COLOR}
+              strokeColor={colors.STROKE_COLOR}
+              strokeWidth={2}
+            />
+          )}
 
-        {location && (
-          <MapView
-            style={{ flex: 1 }}
-            onPress={handleMapPress}
-            zoomControlEnabled
-            initialRegion={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005,
-            }}
-          >
-            {pointInterest.latitude && pointInterest.longitude && (
-              <>
-                <Circle
-                  center={{
-                    latitude: pointInterest.latitude,
-                    longitude: pointInterest.longitude,
-                  }}
-                  radius={pointInterest.raio}
-                  fillColor="rgba(160, 198, 229, 0.3)"
-                  strokeColor="rgba(0, 105, 192, 1)"
-                  strokeWidth={2}
-                />
+          {state.touchedMap && <Marker coordinate={state.point.coord} />}
+        </MapView>
 
-                <Marker
-                  coordinate={{
-                    latitude: pointInterest.latitude,
-                    longitude: pointInterest.longitude,
-                  }}
-                />
-              </>
-            )}
-          </MapView>
-        )}
-
-        {pointInterest.latitude && pointInterest.longitude && (
-          <ButtonFull title="Criar" onPress={() => setIsOpenModal(true)} />
+        {state.touchedMap && (
+          <ButtonFull
+            title="Criar"
+            onPress={() =>
+              setState((prevState) => ({ ...prevState, isOpenModal: true }))
+            }
+          />
         )}
       </VStack>
     </>
@@ -370,11 +314,11 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     fontSize: 15,
-    color: "#717171",
+    color: THEME.colors.gray[250],
   },
   checkbox: {
     marginRight: 16,
-    color: "#0069C0",
+    color: THEME.colors.blue[700],
   },
 
   input: {
