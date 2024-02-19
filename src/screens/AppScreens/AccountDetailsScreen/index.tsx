@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Alert, ScrollView } from "react-native";
+
 import { Text, VStack, Button as ButtonNativeBase } from "native-base";
+
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import { useForm, Controller } from "react-hook-form";
@@ -21,8 +23,8 @@ import { responses, schema } from "./constants";
 export function AccountDetailsScreen() {
   const { colors } = THEME;
 
+  const { user, updateUser } = useAuth();
   const navigation = useNavigation();
-  const { user, fetchDataUser } = useAuth();
 
   const defaultValues = {
     name: user?.nomeUsuario ? user?.nomeUsuario : "",
@@ -45,34 +47,44 @@ export function AccountDetailsScreen() {
   });
 
   const handleUpdateUser = async ({ name, mobile, phone }: Form) => {
-    try {
-      setIsLoading(true);
+    if (user) {
+      try {
+        setIsLoading(true);
 
-      const data = {
-        codigoUsuario: user?.codigoUsuario,
-        nomeUsuario: name,
-        telefone: phone,
-        celular: mobile,
-      };
+        const data = {
+          codigoUsuario: user.codigoUsuario,
+          nomeUsuario: name,
+          telefone: phone,
+          celular: mobile,
+        };
 
-      const response = await api.post("Usuario/AlterarUsuarioApp", data);
+        const response = await api.post("Usuario/AlterarUsuarioApp", data);
 
-      if (response.status === 200) fetchDataUser();
+        if (response.status === 200) {
+          user.nomeUsuario = name;
+          user.celular = mobile || user.celular;
+          user.telefone = phone || user.telefone;
 
-      const message = responses[response.data];
+          await updateUser(user);
 
-      if (message) {
-        Alert.alert(
-          responses[response.data].title,
-          responses[response.data].subtitle,
-        );
-      } else {
-        Alert.alert(responses[4].title, responses[4].subtitle);
+          Alert.alert(responses[0].title, responses[0].subtitle);
+        } else {
+          const message = responses[response.data];
+
+          if (message) {
+            Alert.alert(
+              responses[response.data].title,
+              responses[response.data].subtitle,
+            );
+          } else {
+            Alert.alert(responses[4].title, responses[4].subtitle);
+          }
+        }
+      } catch (error) {
+        Alert.alert(responses[3].title, responses[3].subtitle);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      Alert.alert(responses[3].title, responses[3].subtitle);
-    } finally {
-      setIsLoading(false);
     }
   };
 
