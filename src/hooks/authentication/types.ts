@@ -12,8 +12,7 @@ type AuthContextData = {
 
   signIn: (data: User) => Promise<void>;
   signOut: () => Promise<void>;
-
-  fetchDataUser: () => void;
+  updateUser: (user: User) => Promise<void>;
 };
 
 type AuthState = {
@@ -23,7 +22,8 @@ type AuthState = {
 };
 
 type AuthAction =
-  | { type: "SIGN_IN"; payload: User }
+  | { type: "SET_USER_AND_AUTHENTICATE"; payload: User }
+  | { type: "UPDATE_USER"; payload: User }
   | { type: "SIGN_OUT" }
   | { type: "LOADING" };
 

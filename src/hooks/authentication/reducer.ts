@@ -2,10 +2,16 @@ import { AuthAction, AuthState } from "./types";
 
 const reducer = (state: AuthState, action: AuthAction): AuthState => {
   switch (action.type) {
-    case "SIGN_IN":
+    case "SET_USER_AND_AUTHENTICATE":
       return {
         ...state,
+        user: action.payload,
         isAuthenticated: true,
+      };
+
+    case "UPDATE_USER":
+      return {
+        ...state,
         user: action.payload,
       };
     case "SIGN_OUT":

@@ -26,8 +26,7 @@ export const AuthContext = createContext<AuthContextData>({
 
   signIn: async () => {},
   signOut: async () => {},
-
-  fetchDataUser: async () => {},
+  updateUser: async () => {},
 });
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -35,8 +34,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const loadUserFromStorage = async () => {
     const userFromStorage = await storageUserGet();
+
     if (userFromStorage) {
-      dispatch({ type: "SIGN_IN", payload: userFromStorage });
+      dispatch({
+        type: "SET_USER_AND_AUTHENTICATE",
+        payload: userFromStorage,
+      });
     }
   };
 
@@ -47,34 +50,40 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const fetchDataUser = async () => {
+  const updateUser = async (user: User) => {
+    dispatch({
+      type: "UPDATE_USER",
+      payload: user,
+    });
+
+    await storageUserSave(user);
+  };
+
+  const signIn = async (data: User) => {
     try {
+      dispatch({ type: "LOADING" });
+
+      api.defaults.headers.common.Authorization = `Bearer ${data.jwtToken}`;
+      await storageTokenSave(data.jwtToken);
+
       const response = await api.post("/Usuario/ListaUsuarios", {
-        codigoUsuario: state.user?.codigoUsuario,
+        codigoUsuario: data.codigoUsuario,
+      });
+
+      dispatch({
+        type: "SET_USER_AND_AUTHENTICATE",
+        payload: response.data[0],
       });
 
       await storageUserSave(response.data[0]);
-
-      dispatch({ type: "SIGN_IN", payload: response.data[0] });
     } catch (error) {
       Alert.alert(
         "Erro de Comunicação",
         "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
       );
+    } finally {
+      dispatch({ type: "LOADING" });
     }
-  };
-
-  const signIn = async (data: User) => {
-    dispatch({ type: "LOADING" });
-
-    dispatch({ type: "SIGN_IN", payload: data });
-
-    api.defaults.headers.common.Authorization = `Bearer ${data.jwtToken}`;
-
-    await storageUserSave(data);
-    await storageTokenSave(data.jwtToken);
-
-    dispatch({ type: "LOADING" });
   };
 
   const signOut = async () => {
@@ -108,8 +117,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
         signIn,
         signOut,
-
-        fetchDataUser,
+        updateUser,
       }}
     >
       {children}
