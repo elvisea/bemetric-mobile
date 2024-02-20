@@ -162,7 +162,6 @@ export function Point() {
           longitudeDelta: delta.longitude,
         },
       }));
-
     } catch (error) {
       Alert.alert(
         state.responses.update[5].title,

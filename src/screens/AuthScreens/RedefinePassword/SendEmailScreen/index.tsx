@@ -10,7 +10,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api from "@services/api";
 
 import { TypeForm } from "./types";
-import { responses, schema } from "./constants";
+
+import {
+  schema,
+  responses,
+  SUCCESS,
+  GENERIC_ERROR,
+  NETWORK_ERROR,
+} from "./constants";
 
 import { Input } from "@components/Input";
 import { ButtonFull } from "@components/ButtonFull";
@@ -29,6 +36,11 @@ export function SendEmailScreen() {
     resolver: yupResolver(schema),
   });
 
+  const showAlertForCode = (code: number) => {
+    const message = responses[code] || responses[GENERIC_ERROR];
+    Alert.alert(message.title, message.subtitle);
+  };
+
   const handleNextPage = async ({ email }: TypeForm) => {
     try {
       setIsLoading(true);
@@ -38,16 +50,13 @@ export function SendEmailScreen() {
         tipoAplicacao: 0,
       });
 
-      if (data === 0) {
+      if (data === SUCCESS) {
         navigation.navigate("ValidateCodeScreen", { email });
       } else {
-        Alert.alert(responses[data].title, responses[data].subtitle);
+        showAlertForCode(data);
       }
     } catch (error) {
-      Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
-      );
+      showAlertForCode(NETWORK_ERROR);
     } finally {
       setIsLoading(false);
     }
