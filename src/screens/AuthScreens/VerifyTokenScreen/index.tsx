@@ -92,7 +92,7 @@ export function VerifyTokenScreen() {
       setIsResending(true);
 
       const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${params.email}`,
+        `/Usuario/GerarCodigoAtivacao?nome=${params.name}&email=${params.email}`,
       );
 
       if (response.data === 1) {

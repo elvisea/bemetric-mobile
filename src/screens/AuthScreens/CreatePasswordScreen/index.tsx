@@ -44,7 +44,7 @@ export function CreatePasswordScreen() {
       setIsLoading(true);
 
       const response = await api.post(
-        `/Usuario/GerarCodigoAtivacao?email=${email}`,
+        `/Usuario/GerarCodigoAtivacao?nome=${name}&email=${email}`,
       );
 
       if (response.data === 1) {
