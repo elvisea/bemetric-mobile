@@ -1,113 +1,121 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { Alert, StyleSheet, ScrollView } from "react-native";
 
-import { Box, Text, HStack, VStack } from "native-base";
+import { Text, HStack, VStack } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { RFValue } from "react-native-responsive-fontsize";
-
-import { useForm, Controller } from "react-hook-form";
-
-import { yupResolver } from "@hookform/resolvers/yup";
 
 import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
-import { InputToken } from "@components/InputToken";
+import { OTPInputs } from "@components/OTPInputs";
 import { LayoutDefault } from "@components/LayoutDefault";
 
-import { responses, schema } from "./constants";
-import { TypeForm, TypeParams } from "./types";
+import { Params } from "./types";
+import { initialState } from "./constants";
 
 export function VerifyTokenScreen() {
   const navigation = useNavigation();
 
-  const [isSending, setIsSending] = useState(false);
-  const [isResending, setIsResending] = useState(false);
+  const [state, setState] = useState(initialState);
 
   const route = useRoute();
-  const params = route.params as TypeParams;
+  const params = route.params as Params;
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<TypeForm>({
-    resolver: yupResolver(schema),
-  });
+  const showAlert = () => {
+    Alert.alert(
+      "Campos Incompletos",
+      "Por favor, preencha todos os campos para continuar.",
+    );
+  };
 
-  const handleNextPage = async (props: TypeForm) => {
-    const token = Object.values(props).join("");
+  const setValues = (values: string[]) => {
+    setState((prevState) => ({ ...prevState, values: values }));
+  };
 
-    const data = {
-      nomeUsuario: params.name,
-      emailUsuario: params.email,
-      senhaUsuario: params.password,
-      tipoContaCliente: params.type,
-      cpfCnpjCliente: Number(params.identification),
-      nomeCliente: params.client,
-      tokenCliente: params.tokenCliente,
-      codigoAtivacao: Number(token),
-      tipoCNPJCPF: params.tipoCNPJCPF,
-    };
-
+  const verifyToken = async () => {
     try {
-      setIsSending(true);
+      setState((prevState) => ({ ...prevState, isSending: true }));
+
+      const token = Object.values(state.values).join("");
+
+      const data = {
+        nomeUsuario: params.name,
+        emailUsuario: params.email,
+        senhaUsuario: params.password,
+        tipoContaCliente: params.type,
+        cpfCnpjCliente: Number(params.identification),
+        nomeCliente: params.client,
+        tokenCliente: params.tokenCliente,
+        codigoAtivacao: Number(token),
+        tipoCNPJCPF: params.tipoCNPJCPF,
+      };
 
       const response = await api.post("/Usuario/CriarContaApp", data);
 
-      if (response.data === 0) {
-        Alert.alert(
-          responses[response.data].title,
-          responses[response.data].subtitle,
-          [
+      const message = state.responses.validation[response.data];
+
+      if (message) {
+        if (response.data === 0) {
+          Alert.alert(message.title, message.subtitle, [
             {
               text: "Login",
               onPress: () => navigation.navigate("SignInScreen"),
             },
-          ],
-        );
-      }
-
-      if (response.data !== 0) {
+          ]);
+        } else {
+          Alert.alert(message.title, message.subtitle);
+        }
+      } else {
         Alert.alert(
-          responses[response.data].title,
-          responses[response.data].subtitle,
+          state.responses.unknown[0].title,
+          state.responses.unknown[0].subtitle,
         );
       }
     } catch (error) {
       Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        state.responses.network[0].title,
+        state.responses.network[0].subtitle,
       );
     } finally {
-      setIsSending(false);
+      setState((prevState) => ({ ...prevState, isSending: false }));
     }
   };
 
-  const handleResendToken = async () => {
+  const submitForm = useCallback(() => {
+    const isFormValid = state.values.every((value) => value.trim() !== "");
+
+    isFormValid ? verifyToken() : showAlert();
+  }, [state.values]);
+
+  const resendToken = async () => {
     try {
-      setIsResending(true);
+      setState((prevState) => ({ ...prevState, isResending: true }));
 
       const response = await api.post(
         `/Usuario/GerarCodigoAtivacao?nome=${params.name}&email=${params.email}`,
       );
 
-      if (response.data === 1) {
+      const message = state.responses.resend[response.data];
+
+      if (message) {
+        Alert.alert(message.title, message.subtitle);
+      } else {
         Alert.alert(
-          "Código reenviado com sucesso!",
-          "Código reenviado com sucesso. Verifique sua caixa de e-mail.",
+          state.responses.unknown[0].title,
+          state.responses.unknown[0].subtitle,
         );
       }
     } catch (error) {
       Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+        state.responses.network[0].title,
+        state.responses.network[0].subtitle,
       );
     } finally {
-      setIsResending(false);
+      setState((prevState) => ({ ...prevState, isResending: false }));
     }
   };
 
@@ -139,26 +147,7 @@ export function VerifyTokenScreen() {
             </Text>
 
             <HStack mt={12} justifyContent="space-between" w="100%">
-              {Array.of("1", "2", "3", "4", "5", "6").map((item) => (
-                <Box key={item} width={`${RFValue(52)}px`}>
-                  <Controller
-                    control={control}
-                    name={item}
-                    render={({ field: { onChange, value } }) => (
-                      <InputToken
-                        value={value}
-                        placeholder="0"
-                        borderWidth={1}
-                        borderRadius={6}
-                        keyboardType="numeric"
-                        h={`${RFValue(52)}px`}
-                        onChangeText={onChange}
-                        errorMessage={errors[item]?.message}
-                      />
-                    )}
-                  />
-                </Box>
-              ))}
+              <OTPInputs inputs={6} onComplete={setValues} />
             </HStack>
           </VStack>
 
@@ -168,16 +157,16 @@ export function VerifyTokenScreen() {
               h={`${RFValue(52)}px`}
               w="full"
               mb={4}
-              isLoading={isResending}
-              onPress={handleResendToken}
+              isLoading={state.isResending}
+              onPress={resendToken}
             />
 
             <Button
               title="Enviar"
               h={`${RFValue(52)}px`}
               w="full"
-              isLoading={isSending}
-              onPress={handleSubmit(handleNextPage)}
+              isLoading={state.isSending}
+              onPress={submitForm}
             />
           </VStack>
         </VStack>
