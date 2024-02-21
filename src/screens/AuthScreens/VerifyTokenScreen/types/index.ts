@@ -1,8 +1,4 @@
-type TypeForm = { [index: string]: string };
-
-type TypeResponses = { [index: number]: { title: string; subtitle: string } };
-
-type TypeParams = {
+type Params = {
   name: string;
   email: string;
   password: string;
@@ -13,4 +9,4 @@ type TypeParams = {
   tipoCNPJCPF: number;
 };
 
-export { TypeForm, TypeParams, TypeResponses };
+export { Params };

@@ -1,40 +1,74 @@
-import * as yup from "yup";
-import { TypeResponses } from "../types";
+import { Responses } from "@typings/index";
 
-const schema = yup.object({
-  "1": yup.string().required("Inválido"),
-  "2": yup.string().required("Inválido"),
-  "3": yup.string().required("Inválido"),
-  "4": yup.string().required("Inválido"),
-  "5": yup.string().required("Inválido"),
-  "6": yup.string().required("Inválido"),
-});
-
-const responses: TypeResponses = {
-  0: {
-    title: "Conta criada com sucesso!",
-    subtitle: "Conta criada com sucesso. Você já fazer login na sua conta!",
+const responses: Record<
+  "resend" | "validation" | "unknown" | "network",
+  Responses
+> = {
+  resend: {
+    1: {
+      title: "Código Reenviado",
+      subtitle:
+        "Um novo código de verificação foi enviado ao seu e-mail. Por favor, verifique sua caixa de entrada e siga as instruções contidas no e-mail.",
+    },
   },
-  1: {
-    title: "Erro ao tentar criar conta.",
-    subtitle: "Erro no código de ativação. Tente novamente.",
+  validation: {
+    0: {
+      title: "Ativação Concluída",
+      subtitle:
+        "Seu usuário foi criado com sucesso. Você já pode fazer login na sua conta!",
+    },
+    1: {
+      title: "Falha na Verificação do Código",
+      subtitle:
+        "O código de verificação inserido é inválido. Por favor, verifique o código fornecido e tente novamente.",
+    },
+    2: {
+      title: "Código Expirado",
+      subtitle:
+        "O código de verificação expirou. Solicite um novo código para continuar.",
+    },
+    3: {
+      title: "E-mail Já Cadastrado",
+      subtitle:
+        "O e-mail fornecido já está em uso. Por favor, utilize outro e-mail ou recupere sua senha.",
+    },
+    4: {
+      title: "CNPJ/CPF Já Registrado",
+      subtitle:
+        "O CNPJ/CPF fornecido já está cadastrado. Por favor, verifique os dados ou entre em contato com o suporte.",
+    },
+    5: {
+      title: "Token Não Encontrado",
+      subtitle:
+        "Não foi possível validar seu token. Por favor, solicite um novo ou entre em contato com o suporte.",
+    },
+    6: {
+      title: "Erro de Processamento",
+      subtitle:
+        "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde ou entre em contato com o suporte.",
+    },
   },
-  2: {
-    title: "Erro ao tentar criar conta.",
-    subtitle: "Erro código de ativação expirado. Tente novamente.",
+  unknown: {
+    0: {
+      title: "Erro desconhecido",
+      subtitle: "Ocorreu um erro desconhecido. Tente novamente mais tarde.",
+    },
   },
-  3: {
-    title: "Erro ao tentar criar conta.",
-    subtitle: "Email já cadastrado. Tente novamente.",
-  },
-  4: {
-    title: "Erro ao tentar criar conta.",
-    subtitle: "CNPJ ou CPF já existente. Tente novamente.",
-  },
-  5: {
-    title: "Erro ao tentar criar conta.",
-    subtitle: "Token do cliente não existe. Tente novamente.",
+  network: {
+    0: {
+      title: "Erro de Comunicação",
+      subtitle:
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+    },
   },
 };
 
-export { schema, responses };
+const initialState = {
+  responses,
+  isSending: false,
+  isResending: false,
+  isFormValid: false,
+  values: Array(6).fill(""),
+};
+
+export { responses, initialState };
