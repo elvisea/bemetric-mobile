@@ -1,25 +1,46 @@
-import * as yup from "yup";
+import { Responses } from "@typings/index";
 
-const schema = yup.object({
-  "1": yup.string().required("Inválido"),
-  "2": yup.string().required("Inválido"),
-  "3": yup.string().required("Inválido"),
-  "4": yup.string().required("Inválido"),
-  "5": yup.string().required("Inválido"),
-  "6": yup.string().required("Inválido"),
-});
-
-const resposta = {
-  0: {
-    title: "Token Inválido",
-    subtitle: "Verifique o token inserido e tente novamente",
-    text: "Tentar Novamente",
+const responses: Record<
+  "validation" | "unknown" | "network" | "form",
+  Responses
+> = {
+  validation: {
+    0: {
+      title: "Token Inválido",
+      subtitle:
+        "O token fornecido não é válido. Por favor, verifique se inseriu corretamente ou solicite um novo token.",
+    },
+    1: {
+      title: "Token Válido",
+      subtitle:
+        "O token foi validado com sucesso. Você pode continuar com o próximo passo.",
+    },
   },
-  1: {
-    title: "Falha na Conexão",
-    subtitle: "Não foi possível conectar com o servidor",
-    text: "Tentar Novamente",
+  unknown: {
+    0: {
+      title: "Erro desconhecido",
+      subtitle: "Ocorreu um erro desconhecido. Tente novamente mais tarde.",
+    },
+  },
+  network: {
+    0: {
+      title: "Erro de Comunicação",
+      subtitle:
+        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
+    },
+  },
+  form: {
+    0: {
+      title: "Campos Incompletos",
+      subtitle: "Por favor, preencha todos os campos para continuar.",
+    },
   },
 };
 
-export { schema, resposta };
+const initialState = {
+  responses,
+  isLoading: false,
+  values: Array(6).fill(""),
+};
+
+export { initialState };

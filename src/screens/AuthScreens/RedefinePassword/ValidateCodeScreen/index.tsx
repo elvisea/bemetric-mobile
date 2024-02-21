@@ -13,7 +13,7 @@ import { Params } from "./types";
 import { initialState } from "./constants";
 
 import { Button } from "@components/Button";
-import { OTPInputs } from "@components/OTPInputs";
+import { Inputs } from "@components/Inputs";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 export function ValidateCodeScreen() {
@@ -96,7 +96,7 @@ export function ValidateCodeScreen() {
     }
   };
 
-  const setValues = (values: string[]) => {
+  const onValueChanges = (values: string[]) => {
     setState((prevState) => ({ ...prevState, values: values }));
   };
 
@@ -141,7 +141,7 @@ export function ValidateCodeScreen() {
             </Text>
 
             <HStack mt={12} justifyContent="space-between" w="100%">
-              <OTPInputs inputs={6} onComplete={setValues} />
+              <Inputs inputs={6} onValueChanges={onValueChanges} />
             </HStack>
           </VStack>
 

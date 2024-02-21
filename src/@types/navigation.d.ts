@@ -34,7 +34,7 @@ export declare global {
         identification?: string;
         type: number;
         tokenCliente?: string;
-        tipoCNPJCPF: number;
+        tipoCNPJCPF?: number;
       };
 
       VerifyTokenScreen: {
