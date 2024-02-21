@@ -1,5 +1,10 @@
-type Form = { [index: string]: string };
+import { Responses } from "@typings/index";
 
 type Params = { name: string; email: string; type: number };
 
-export { Form, Params };
+type Action = {
+  action?: () => void;
+  response: Responses[0];
+};
+
+export { Params, Action };

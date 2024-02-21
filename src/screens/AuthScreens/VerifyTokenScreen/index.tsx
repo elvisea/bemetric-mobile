@@ -11,7 +11,7 @@ import api from "@services/api";
 import { THEME } from "@theme/theme";
 
 import { Button } from "@components/Button";
-import { OTPInputs } from "@components/OTPInputs";
+import { Inputs } from "@components/Inputs";
 import { LayoutDefault } from "@components/LayoutDefault";
 
 import { Params } from "./types";
@@ -32,7 +32,7 @@ export function VerifyTokenScreen() {
     );
   };
 
-  const setValues = (values: string[]) => {
+  const onValueChanges = (values: string[]) => {
     setState((prevState) => ({ ...prevState, values: values }));
   };
 
@@ -147,7 +147,7 @@ export function VerifyTokenScreen() {
             </Text>
 
             <HStack mt={12} justifyContent="space-between" w="100%">
-              <OTPInputs inputs={6} onComplete={setValues} />
+              <Inputs inputs={6} onValueChanges={onValueChanges} />
             </HStack>
           </VStack>
 

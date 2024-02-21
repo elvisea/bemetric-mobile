@@ -2,15 +2,15 @@ import React, { createRef, useState, RefObject } from "react";
 
 import { Container } from "./styles";
 
-import { OTPInput } from "@components/OTPInput";
+import { InputToken } from "@components/InputToken";
 import { TextInput } from "react-native";
 
-interface OTPInputsProps {
+type InputsProps = {
   inputs?: number;
-  onComplete?: (values: string[]) => void;
-}
+  onValueChanges?: (values: string[]) => void;
+};
 
-const OTPInputs: React.FC<OTPInputsProps> = ({ inputs = 4, onComplete }) => {
+const Inputs: React.FC<InputsProps> = ({ inputs = 4, onValueChanges }) => {
   let inputRefs: RefObject<TextInput>[] = Array.from({ length: inputs }, () =>
     createRef<TextInput>(),
   );
@@ -35,7 +35,7 @@ const OTPInputs: React.FC<OTPInputsProps> = ({ inputs = 4, onComplete }) => {
     setValues(newValues);
 
     text ? focusNextInput(index) : focusPreviousInput(index);
-    onComplete && onComplete(newValues);
+    onValueChanges && onValueChanges(newValues);
   };
 
   const onKeyPress = (key: string, index: number) => {
@@ -45,7 +45,7 @@ const OTPInputs: React.FC<OTPInputsProps> = ({ inputs = 4, onComplete }) => {
         const newValues = [...values];
         newValues[index - 1] = "";
         setValues(newValues);
-        onComplete && onComplete(newValues);
+        onValueChanges && onValueChanges(newValues);
       }
     }
   };
@@ -53,7 +53,7 @@ const OTPInputs: React.FC<OTPInputsProps> = ({ inputs = 4, onComplete }) => {
   return (
     <Container>
       {inputRefs.map((ref, index) => (
-        <OTPInput
+        <InputToken
           key={index}
           ref={ref}
           value={values[index]}
@@ -65,4 +65,4 @@ const OTPInputs: React.FC<OTPInputsProps> = ({ inputs = 4, onComplete }) => {
   );
 };
 
-export { OTPInputs };
+export { Inputs };

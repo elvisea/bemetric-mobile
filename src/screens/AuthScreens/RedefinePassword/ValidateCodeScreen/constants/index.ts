@@ -60,7 +60,6 @@ const initialState = {
   responses,
   isSending: false,
   isResending: false,
-  isFormValid: false,
   values: Array(6).fill(""),
 };
 
