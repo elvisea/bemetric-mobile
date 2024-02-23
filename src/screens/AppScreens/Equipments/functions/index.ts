@@ -9,7 +9,7 @@ import {
   GroupingReceived,
 } from "../types";
 
-function transformEquipmentData(equipments: EquipmentReceived[]): Equipment[] {
+function normalizeEquipment(equipments: EquipmentReceived[]): Equipment[] {
   return equipments.map((equipment) => ({
     key: uuid.v4().toString(),
     code: equipment.codigoEquipamento,
@@ -19,20 +19,22 @@ function transformEquipmentData(equipments: EquipmentReceived[]): Equipment[] {
   }));
 }
 
-function transformGroupingData(groupings: GroupingReceived[]): Group[] {
+function normalizeGroupings(groupings: GroupingReceived[]): Group[] {
+  if (typeof groupings === "string") return [];
+
   return groupings.map((group) => ({
     key: uuid.v4().toString(),
     name: group.nomeAgrupamento,
     description: group.descricao,
-    equipments: transformEquipmentData(group.listaEquipamentos),
+    equipments: normalizeEquipment(group.listaEquipamentos),
   }));
 }
 
-function transformCountData(data: CountReceived): Count {
+function normalizeCount(data: CountReceived): Count {
   return {
     events: data.contadorEvento,
     messages: data.contadorMensagem,
   };
 }
 
-export { transformEquipmentData, transformGroupingData, transformCountData };
+export { normalizeEquipment, normalizeGroupings, normalizeCount };

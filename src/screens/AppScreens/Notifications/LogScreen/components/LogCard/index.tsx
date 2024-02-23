@@ -55,11 +55,16 @@ function LogCard({ icon, html, date, search }: ILogCardProps) {
 
       <ContentWebView>
         <WebView
-          style={{ flex: 1, width: "100%", height: "100%" }}
+          style={{ flex: 1 }}
           originWhitelist={["*"]}
           scalesPageToFit={false}
           showsVerticalScrollIndicator={false}
           source={{ html: html }}
+          onError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent;
+            console.error('WebView error: ', nativeEvent);
+          }}
+          onLoad={() => console.log('WebView loaded successfully')}
         />
       </ContentWebView>
     </Container>

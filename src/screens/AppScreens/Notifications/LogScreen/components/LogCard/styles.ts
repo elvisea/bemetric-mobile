@@ -8,19 +8,15 @@ export const Container = styled.View`
   padding: ${RFValue(12)}px;
   border-radius: ${RFValue(6)}px;
   width: 100%;
-  min-height: ${RFValue(100)}px;
   border: ${RFValue(1)}px solid #e6e6e6;
   background-color: ${THEME.colors.white};
 `;
 
 export const Header = styled.View`
   padding: ${RFValue(8)}px;
-
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
-
-  border-bottom: ${RFValue(1)}px;
   border-bottom-width: ${RFValue(1)}px;
   border-bottom-color: ${THEME.colors.gray[200]};
 `;
@@ -45,7 +41,6 @@ export const ButtonSearch = styled.TouchableOpacity`
 `;
 
 export const ContentWebView = styled.View`
-  flex: 1;
+  min-height: ${RFValue(48)}px;
   width: 100%;
-  height: 100%;
 `;
