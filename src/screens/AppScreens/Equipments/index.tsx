@@ -24,7 +24,7 @@ import { useAuth } from "@hooks/authentication";
 import { useCustomer } from "@hooks/customer";
 
 import { initialState } from "./constants";
-import { transformCountData, transformGroupingData } from "./functions";
+import { normalizeCount, normalizeGroupings } from "./functions";
 
 export function Equipments() {
   const navigation = useNavigation();
@@ -42,6 +42,13 @@ export function Equipments() {
     } else {
       setState((prevState) => ({ ...prevState, expanded: expand }));
     }
+  };
+
+  const onPressEquipment = (code: number) => {
+    navigation.navigate("EquipmentDetails", {
+      screen: "Equipament",
+      params: { codigoEquipamento: code },
+    });
   };
 
   const fetchData = async () => {
@@ -62,11 +69,8 @@ export function Equipments() {
 
         setState((prevState) => ({
           ...prevState,
-          count: transformCountData(response[1].data),
-          groupings:
-            typeof response[0].data !== "string"
-              ? transformGroupingData(response[0].data)
-              : [],
+          count: normalizeCount(response[1].data),
+          groupings: normalizeGroupings(response[0].data),
         }));
       }
     } catch (error) {
@@ -84,6 +88,7 @@ export function Equipments() {
 
       return () => {
         isActive = false;
+        setState(initialState);
       };
     }, [customer]),
   );
@@ -128,14 +133,7 @@ export function Equipments() {
                       velocity={equipament.speed}
                       title={equipament.name}
                       status={equipament.online ? "Ligado" : "Desligado"}
-                      onPress={() =>
-                        navigation.navigate("EquipmentDetails", {
-                          screen: "Equipament",
-                          params: {
-                            codigoEquipamento: equipament.code,
-                          },
-                        })
-                      }
+                      onPress={() => onPressEquipment(equipament.code)}
                     />
                   ))}
               </AccordionSession>
