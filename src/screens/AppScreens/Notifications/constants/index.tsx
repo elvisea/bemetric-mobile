@@ -110,4 +110,4 @@ const initialState: State = {
   },
 };
 
-export { initialState };
+export { initialState, count };

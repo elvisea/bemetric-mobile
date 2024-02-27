@@ -13,6 +13,14 @@ const reducer = (state: State, action: Action): State => {
         isLoading: !state.isLoading,
       };
 
+    case "SET_DATA":
+      return {
+        ...state,
+        count: action.payload.count,
+        events: action.payload.events,
+        options: { ...state.options, ...action.payload.options },
+      };
+
     case "SET_EVENTS":
       return {
         ...state,

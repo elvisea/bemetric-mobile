@@ -6,10 +6,14 @@ import { addDays, differenceInDays } from "date-fns";
 
 import api from "@services/api";
 
+import { count } from "../constants";
+
 import {
   Action,
+  Count,
   EquipmentReceived,
   Event,
+  EventListResponse,
   EventReceived,
   FetchEventParams,
   Item,
@@ -61,6 +65,54 @@ export const mountSearchObject = (
     listaEventos: search.events.map((item) => item.code),
     listaMarcadores: mountMarkers(search.markers),
     listaEquipamentos: search.equipments.map((item) => item.code),
+  };
+};
+
+export const normalizeCounters = (
+  data: EventListResponse,
+  count: Count,
+): Count => {
+  return {
+    ...count,
+    geogence: {
+      ...count.geogence,
+      ignition: {
+        on: data.totalGeocercaParadoIgnicaoLigada,
+        off: data.totalGeocercaParadoIgnicaoDesligada,
+      },
+      permanence: {
+        exceeded: data.totalGeocercaPermanenciaExcedida,
+        obeyed: data.totalGeocercaPermanenciaObedecida,
+      },
+    },
+    point: {
+      ...count.point,
+      ignition: {
+        on: data.totalPontoInteresseParadoIgnicaoLiagada,
+        off: data.totalPontoInteresseParadoIgnicaoDesligada,
+      },
+      permanence: {
+        exceeded: data.totalPontoInteressePermanenciaExcedida,
+        obeyed: data.totalPontoInteressePermanenciaObedecida,
+      },
+    },
+    equipment: {
+      ...count.equipment,
+      amount: data.totalEquipamentos,
+      movement: data.totalEquipamentosMovimento,
+      speed: data.totalEquipamentosVelocidadeExcedida,
+      ignition: {
+        on: data.totalEquipamentosParadoIgnicaoLigada,
+        off: data.totalEquipamentoMovimentoEquipamentosParadoIgnicaoDesligada,
+      },
+    },
+    other: {
+      ...count.other,
+      permanence: {
+        exceeded: data.intOutraLocalizacaoParadoIgnicaoDesligada,
+        obeyed: data.intOutraLocalizacaoParadoIgnicaoDesligada,
+      },
+    },
   };
 };
 
@@ -151,8 +203,14 @@ export const useFetchData = (
     const result = await fetchEvent({ customer, user, search, date });
     dispatch({ type: "TOGGLE_LOADING" });
     if (result) {
-      dispatch({ type: "SET_EVENTS", payload: result.events });
-      dispatch({ type: "SET_OPTIONS", payload: result.options });
+      dispatch({
+        type: "SET_DATA",
+        payload: {
+          count: result.count,
+          events: result.events,
+          options: result.options,
+        },
+      });
     }
   }, [customer, user, search, date, dispatch]);
 
@@ -195,8 +253,6 @@ export const fetchEvent = async (params: FetchEventParams) => {
         params.date,
       );
 
-      console.log("Objeto Montado:", data);
-
       const response = await Promise.all([
         api.post("/Evento/ObterListaEventos", {}),
         api.post("/Evento/ObterListaMarcadores", {
@@ -209,9 +265,11 @@ export const fetchEvent = async (params: FetchEventParams) => {
       ]);
 
       const normalizedEvents = normalizeEvents(response[3].data.listaEventos);
+      const normalizedCounters = normalizeCounters(response[3].data, count);
 
       return {
         events: normalizedEvents,
+        count: normalizedCounters,
         options: {
           events: normalizeEventsReceived(response[0].data),
           markers: normalizeMarkers(response[1].data),

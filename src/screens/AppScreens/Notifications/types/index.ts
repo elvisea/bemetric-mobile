@@ -1,5 +1,32 @@
 import { Customer, User } from "@typings/index";
 
+type ListEvents = {
+  codigoEvento: number;
+  tipoEvento: number;
+  mensagemHtml: string;
+  criadoEmFormatado: string;
+  eventoLido: boolean;
+};
+
+type EventListResponse = {
+  intOutraLocalizacaoParadoIgnicaoDesligada: number;
+  listaEventos: ListEvents[];
+  totalEquipamentoMovimentoEquipamentosParadoIgnicaoDesligada: number;
+  totalEquipamentos: number;
+  totalEquipamentosMovimento: number;
+  totalEquipamentosParadoIgnicaoLigada: number;
+  totalEquipamentosVelocidadeExcedida: number;
+  totalGeocercaParadoIgnicaoDesligada: number;
+  totalGeocercaParadoIgnicaoLigada: number;
+  totalGeocercaPermanenciaExcedida: number;
+  totalGeocercaPermanenciaObedecida: number;
+  totalOutraLocalizacaoParadoIgnicaoLiagada: number;
+  totalPontoInteresseParadoIgnicaoDesligada: number;
+  totalPontoInteresseParadoIgnicaoLiagada: number;
+  totalPontoInteressePermanenciaExcedida: number;
+  totalPontoInteressePermanenciaObedecida: number;
+};
+
 type ReceivedEvents = {
   angulo: number;
   codigoCliente: number;
@@ -153,6 +180,14 @@ type Action =
   | { type: "SET_EVENTS"; payload: Event[] }
   | { type: "UPDATE_ITEM"; payload: { key: Key; item: Item } }
   | { type: "SELECT_MODAL"; payload: Key }
+  | {
+      type: "SET_DATA";
+      payload: {
+        count: Count;
+        events: Event[];
+        options: { events: Item[]; markers: Item[]; equipments: Item[] };
+      };
+    }
   | { type: "TOGGLE_LOADING" }
   | { type: "RESET_STATE" }
   | {
@@ -183,4 +218,5 @@ export {
   Count,
   CountKey,
   PropsCountKey,
+  EventListResponse,
 };
