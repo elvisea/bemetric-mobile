@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { THEME } from "@theme/theme";
 
-import DetailingScreen from "@screens/AppScreens/Notifications/DetailingScreen";
+import { DetailingScreen } from "@screens/AppScreens/Notifications/screens/DetailingScreen";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
