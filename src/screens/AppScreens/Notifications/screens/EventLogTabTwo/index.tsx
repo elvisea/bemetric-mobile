@@ -74,7 +74,7 @@ export function EventLogTabTwo() {
         html={item.html}
         date={item.date}
         search={() => handleNextPage(item)}
-        icon={item.type === 0 ? "bell" : "flag"}
+        icon={item.type === 0 ? "flag" : "bell"}
       />
     );
   };
