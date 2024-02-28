@@ -52,7 +52,7 @@ const search = {
 const count: Count = {
   point: {
     icon: <FontAwesome name="gears" size={18} color={colors.white} />,
-    title: "Equipamento",
+    title: "Em Pontos de Interesse",
     amount: 0,
     ignition: { on: 0, off: 0 },
     movement: 0,
@@ -61,7 +61,7 @@ const count: Count = {
   },
   equipment: {
     icon: <Foundation name="map" size={20} color={colors.white} />,
-    title: "Outras Localizações",
+    title: "Equipamento",
     amount: 0,
     ignition: { on: 0, off: 0 },
     movement: 0,
@@ -81,7 +81,7 @@ const count: Count = {
   },
   other: {
     icon: <FontAwesome5 color={colors.white} size={20} name="dot-circle" />,
-    title: "Em Pontos de Interesse",
+    title: "Outras Localizações",
     amount: 0,
     ignition: { on: 0, off: 0 },
     movement: 0,

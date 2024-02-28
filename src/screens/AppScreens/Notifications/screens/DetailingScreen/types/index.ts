@@ -1,4 +1,8 @@
-type Data = {
+import { LatLng, Region } from "react-native-maps";
+
+import { Responses } from "@typings/index";
+
+type ReceivedData = {
   atividade: number;
   criadoEmFormatado: string;
   hodometro: number;
@@ -22,10 +26,53 @@ type Data = {
   horimetroFormatado: string;
 };
 
-type IParams = {
+type Params = {
   codigoEvento: number;
   codigoEquipamento: number;
   codigoDispositivo: number;
 };
 
-export { Data, IParams };
+type Status = {
+  speed: number;
+  odometer: number;
+  hourmeter: string;
+};
+
+type Equipment = {
+  name: string;
+  status: Status;
+};
+
+type Fetch = {
+  user: number;
+  event: number;
+  equipment: number;
+  device: number;
+};
+
+type Data = {
+  equipment: Equipment;
+  coordinate: LatLng;
+  initialRegion: Region | undefined;
+  coord: { type: number };
+  point: {
+    radius: number;
+    coordinate: LatLng;
+  };
+
+  geofence: LatLng[];
+
+  date: string;
+  marker: string;
+  register: string;
+};
+
+type State = {
+  isLoading: boolean;
+
+  data: Data;
+
+  responses: Record<"error", Responses>;
+};
+
+export { ReceivedData, Params, State, Data, Fetch };

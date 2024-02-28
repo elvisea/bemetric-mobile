@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Alert, ScrollView, StyleSheet, View, Dimensions } from "react-native";
 
 import { useFocusEffect, useRoute } from "@react-navigation/native";
@@ -6,27 +6,18 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MapView, { Marker, Polygon, Circle } from "react-native-maps";
 
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  AntDesign,
-} from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
-import api from "@services/api";
 import { THEME } from "@theme/theme";
+import { useAuth } from "@hooks/authentication";
 
 import Truck from "@assets/truck.svg";
-import IconHourMeter from "@assets/hourmeter.svg";
-import IconSpeedometer from "@assets/speedometer.svg";
 
 import { Item } from "@components/Item";
 import { Cabecalho } from "@components/Cabecalho";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { Data, IParams } from "./types";
-import { createCoordsGeofence } from "./utils";
-
-import { formatHour } from "@utils/formatHours";
+import { Params } from "./types";
 
 import {
   ContentHeader,
@@ -37,52 +28,46 @@ import {
   HeaderSecondary,
 } from "./styles";
 
-import { useAuth } from "@hooks/authentication";
-
-const icons: { [index: number]: ReactNode } = {
-  0: <Ionicons name="flag" size={20} color={THEME.colors.blue[700]} />,
-  1: (
-    <MaterialCommunityIcons
-      name="bell-ring"
-      color={THEME.colors.yellow[100]}
-      size={20}
-    />
-  ),
-};
-
-const typeCoord: { [index: number]: string } = {
-  0: "Geocerca",
-  1: "Ponto de interesse",
-};
+import { getData } from "./services";
+import { icons, initialState, items, type } from "./constants";
 
 const { height } = Dimensions.get("screen");
 
 export function DetailingScreen() {
   const route = useRoute();
-  const params = route.params as IParams;
+  const params = route.params as Params;
 
   const { user } = useAuth();
 
-  const [data, setData] = useState<Data | null>(null);
+  const [state, setState] = useState(initialState);
 
   async function fetchData() {
-    const data = {
-      localDashboard: 3,
-      codigoUsuario: user?.codigoUsuario,
+    if (user) {
+      try {
+        setState((prevState) => ({ ...prevState, isLoading: true }));
 
-      codigoEvento: params.codigoEvento,
-      codigoEquipamento: params.codigoEquipamento,
-      codigoDispositivo: params.codigoDispositivo,
-    };
+        const response = await getData({
+          user: user.codigoUsuario,
+          event: params.codigoEvento,
+          device: params.codigoDispositivo,
+          equipment: params.codigoEquipamento,
+        });
 
-    try {
-      const response = await api.post("/Evento/DetalharEvento", data);
-      setData(response.data);
-    } catch (error) {
-      Alert.alert(
-        "Erro de Comunicação",
-        "Não foi possível completar a solicitação. Por favor, tente novamente mais tarde.",
-      );
+        if (response) {
+          setState((prevState) => ({
+            ...prevState,
+            data: response,
+            isLoading: false,
+          }));
+        }
+      } catch (error) {
+        Alert.alert(
+          state.responses.error[0].title,
+          state.responses.error[0].subtitle,
+        );
+      } finally {
+        setState((prevState) => ({ ...prevState, isLoading: false }));
+      }
     }
   }
 
@@ -102,9 +87,9 @@ export function DetailingScreen() {
     <>
       <Cabecalho hasIcon={false} />
 
-      {!data && <LoadingSpinner color={THEME.colors.blue[700]} />}
+      {state.isLoading && <LoadingSpinner color={THEME.colors.blue[700]} />}
 
-      {data && (
+      {!state.isLoading && (
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.container}
@@ -119,100 +104,68 @@ export function DetailingScreen() {
                 color={THEME.colors.gray[50]}
                 style={{ marginRight: 8 }}
               />
-              <Text>{data.criadoEmFormatado}</Text>
+              <Text>{state.data.date}</Text>
             </ContentHeader>
           </Header>
 
           <HeaderSecondary>
             <Row>
               <Text>Equipamento</Text>
-              <Value>{data.nomeEquipamento}</Value>
+              <Value>{state.data.equipment.name}</Value>
             </Row>
 
             <Row>
               <Text>Registro</Text>
-              <Value>{data.registroApp}</Value>
+              <Value>{state.data.register}</Value>
             </Row>
 
-            {data.tipoCoordenadas === 2 ? null : (
+            {state.data.coord.type === 2 ? null : (
               <Row>
-                <Text>{typeCoord[data.tipoCoordenadas]}</Text>
-                <Value>{data.marcadorApp}</Value>
+                <Text>{type[state.data.coord.type]}</Text>
+                <Value>{state.data.marker}</Value>
               </Row>
             )}
           </HeaderSecondary>
 
-          <Item
-            h={`${RFValue(58)}px`}
-            mb={`${RFValue(8)}px`}
-            icon={<IconSpeedometer />}
-            title="Velocimetro"
-          >
-            <Value>{data.velocidade} Km/h</Value>
-          </Item>
-
-          <Item
-            h={`${RFValue(58)}px`}
-            mb={`${RFValue(8)}px`}
-            icon={<IconHourMeter />}
-            title="Horímetro"
-          >
-            <Value>{data ? formatHour(data.horimetro) : ""}</Value>
-          </Item>
-
-          <Item
-            h={`${RFValue(58)}px`}
-            icon={
-              <Ionicons
-                name="speedometer-outline"
-                color={THEME.colors.gray[50]}
-                size={22}
-              />
-            }
-            title="Hodômetro"
-          >
-            <Value>{data.hodometro} Km</Value>
-          </Item>
+          {Object.values(state.data.equipment.status).map((item, index) => (
+            <Item
+              key={index}
+              h={`${RFValue(58)}px`}
+              mb={`${RFValue(8)}px`}
+              icon={items[index].icon}
+              title={items[index].title}
+            >
+              <Value>{`${item} ${items[index].label}`}</Value>
+            </Item>
+          ))}
 
           <View style={styles.mapContainer}>
-            {data && (
+            {!state.isLoading && (
               <MapView
-                initialRegion={{
-                  latitude: data.latitude,
-                  longitude: data.longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
-                }}
+                initialRegion={state.data.initialRegion}
                 style={styles.map}
                 zoomControlEnabled
               >
-                <Marker
-                  coordinate={{
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                  }}
-                >
+                <Marker coordinate={state.data.coordinate}>
                   <Truck />
                 </Marker>
 
-                {data.tipoCoordenadas === 0 && (
-                  <Polygon
-                    coordinates={createCoordsGeofence(data.geoFence)}
-                    fillColor="rgba(160, 198, 229, 0.3)"
-                    strokeColor="rgba(0, 105, 192, 1)"
-                    strokeWidth={2}
-                  />
-                )}
+                {state.data.coord.type === 0 &&
+                  state.data.geofence.length > 0 && (
+                    <Polygon
+                      coordinates={state.data.geofence}
+                      fillColor={THEME.colors.FILL_COLOR}
+                      strokeColor={THEME.colors.STROKE_COLOR}
+                      strokeWidth={2}
+                    />
+                  )}
 
-                {data.tipoCoordenadas === 1 && (
+                {state.data.coord.type === 1 && (
                   <Circle
-                    center={{
-                      latitude: data.pointFence.latitude,
-                      longitude: data.pointFence.longitude,
-                    }}
-                    radius={data.pointFence.raio}
-                    fillColor="rgba(160, 198, 229, 0.3)"
-                    strokeColor="rgba(0, 105, 192, 1)"
+                    radius={state.data.point.radius}
+                    center={state.data.point.coordinate}
+                    fillColor={THEME.colors.FILL_COLOR}
+                    strokeColor={THEME.colors.STROKE_COLOR}
                     strokeWidth={2}
                   />
                 )}
