@@ -1,5 +1,5 @@
 import React, { useCallback, useReducer } from "react";
-import { FlatList, ListRenderItemInfo, ScrollView } from "react-native";
+import { FlatList, ListRenderItemInfo } from "react-native";
 
 import { HStack, Text } from "native-base";
 import { useFocusEffect } from "@react-navigation/native";
@@ -26,7 +26,7 @@ import { HeaderDefault } from "@components/HeaderDefault";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { reducer } from "../../reducer";
-import { Input, Item, Key } from "../../types";
+import { Input, Item, Key, PropsCountKey } from "../../types";
 
 import { initialState } from "../../constants";
 
@@ -66,6 +66,20 @@ export function EventLogTabOne() {
         title={item.name}
         onPress={() => chooseOption(item)}
         isActive={isSelected(item.code)}
+      />
+    );
+  };
+
+  const renderCards = ({ item }: ListRenderItemInfo<PropsCountKey>) => {
+    return (
+      <CardEventLog
+        icon={item.icon}
+        title={item.title}
+        speed={item.speed}
+        amount={item.amount}
+        ignition={item.ignition}
+        movement={item.movement}
+        permanence={item.permanence}
       />
     );
   };
@@ -195,23 +209,14 @@ export function EventLogTabOne() {
       )}
 
       {!state.isLoading && (
-        <ScrollView
-          style={{ flex: 1, paddingHorizontal: 20 }}
+        <FlatList
+          data={Object.values(state.count)}
+          keyExtractor={(item) => item.title}
           showsVerticalScrollIndicator={false}
-        >
-          {Object.values(state.count).map((item, index) => (
-            <CardEventLog
-              key={index}
-              icon={item.icon}
-              title={item.title}
-              speed={item.speed}
-              amount={item.amount}
-              ignition={item.ignition}
-              movement={item.movement}
-              permanence={item.permanence}
-            />
-          ))}
-        </ScrollView>
+          contentContainerStyle={{ paddingBottom: 32 }}
+          style={{ width: "100%", paddingHorizontal: 16 }}
+          renderItem={renderCards}
+        />
       )}
     </>
   );
