@@ -49,9 +49,16 @@ const search = {
   markers: [],
 };
 
+const POINT = <FontAwesome name="gears" size={18} color={colors.white} />;
+const EQUIPMENT = <Foundation name="map" size={20} color={colors.white} />;
+const GEOFENCE = (
+  <MaterialCommunityIcons name="map-marker-path" size={22} color="white" />
+);
+const OTHER = <FontAwesome5 color={colors.white} size={20} name="dot-circle" />;
+
 const count: Count = {
   point: {
-    icon: <FontAwesome name="gears" size={18} color={colors.white} />,
+    icon: POINT,
     title: "Em Pontos de Interesse",
     amount: 0,
     ignition: { on: 0, off: 0 },
@@ -60,7 +67,7 @@ const count: Count = {
     speed: 0,
   },
   equipment: {
-    icon: <Foundation name="map" size={20} color={colors.white} />,
+    icon: EQUIPMENT,
     title: "Equipamento",
     amount: 0,
     ignition: { on: 0, off: 0 },
@@ -69,9 +76,7 @@ const count: Count = {
     speed: 0,
   },
   geogence: {
-    icon: (
-      <MaterialCommunityIcons name="map-marker-path" size={22} color="white" />
-    ),
+    icon: GEOFENCE,
     title: "Em Geocercas",
     amount: 0,
     ignition: { on: 0, off: 0 },
@@ -80,7 +85,7 @@ const count: Count = {
     speed: 0,
   },
   other: {
-    icon: <FontAwesome5 color={colors.white} size={20} name="dot-circle" />,
+    icon: OTHER,
     title: "Outras Localizações",
     amount: 0,
     ignition: { on: 0, off: 0 },
